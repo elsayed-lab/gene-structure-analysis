@@ -50,6 +50,8 @@ CONFIG <- list(
     # Non-coding RNA filters
     'id_filter_string'   = 'rRNA|5SRRNA|snRNA|snoRNA|SLRNA|TRNA|SRP',
     'type_filter_string' = 'rRNAencoding|snRNAencoding|snoRNAencoding|tRNAencoding'
+
+    # Total number of reads mapped (used to determine % SL-/Poly(A)-containing
 )
 
 rm(utr_analysis_basedir)
