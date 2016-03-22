@@ -1,0 +1,56 @@
+```{r settings}
+# Input and output data used from previous analyses
+utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2015',
+                                  '110-utr-lengths')
+
+CONFIG <- list(
+    # species information
+    'parasite' = 'T. cruzi strain Y strain',
+    'host'     = 'H. sapiens',
+    'stages'  = c('trypomastigote', 'amastigote', 'epimastigote'),
+
+    # Output verbosity
+    'verbose' = FALSE,
+
+    # output file prefix
+    'outfile_prefix' = 'tcruzi_ystrain',
+
+    # fasta/gff
+    'input_gff'   = file.path(Sys.getenv('REF'), 'tcruzi_clbrener_esmeraldo-like',
+                            '/annotation/TriTrypDB-8.1_TcruziCLBrenerEsmeraldo-like.gff'),
+    'input_fasta' = file.path(Sys.getenv("REF"), 
+                            'tcruzi_clbrener_esmeraldo-like/genome/TriTrypDB-8.1_TcruziCLBrenerEsmeraldo-like_Genome.fasta'),
+
+    'utr5_stats' = list(
+        amastigote=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_amastigote_5utr.csv'),
+        combined=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_combined_5utr.csv'),
+        trypomastigote=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_trypomastigote_5utr.csv'),
+        epimastigote=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_epimastigote_5utr.csv')
+    ),
+
+    'utr3_stats' = list(
+        amastigote=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_amastigote_3utr.csv'),
+        combined=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_combined_3utr.csv'),
+        trypomastigote=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_trypomastigote_3utr.csv'),
+        epimastigote=file.path(utr_analysis_basedir, 'output/tcruzi_ystrain/tcruzi_ystrain_epimastigote_3utr.csv')
+    ),
+
+    'sl_sites' = list(
+        amastigote=file.path(utr_analysis_basedir, 'input/tcruzi_infecting_hsapiens_amastigote_sl_sorted.gff.gz'),
+        trypomastigote=file.path(utr_analysis_basedir, 'input/tcruzi_infecting_hsapiens_trypomastigote_sl_sorted.gff.gz'),
+        epimastigote=file.path(utr_analysis_basedir, 'input/tcruzi_infecting_hsapiens_epimastigote_sl_sorted.gff.gz')
+    ),
+
+    'polya_sites' = list(
+        amastigote=file.path(utr_analysis_basedir, 'input/tcruzi_infecting_hsapiens_amastigote_polya_sorted.gff.gz'),
+        trypomastigote=file.path(utr_analysis_basedir, 'input/tcruzi_infecting_hsapiens_trypomastigote_polya_sorted.gff.gz'),
+        epimastigote=file.path(utr_analysis_basedir, 'input/tcruzi_infecting_hsapiens_epimastigote_polya_sorted.gff.gz')
+    ),
+
+    # Non-coding RNA filters
+    'id_filter_string'   = 'rRNA|5SRRNA|snRNA|snoRNA|SLRNA|TRNA|SRP',
+    'type_filter_string' = 'rRNAencoding|snRNAencoding|snoRNAencoding|tRNAencoding'
+)
+
+rm(utr_analysis_basedir)
+```

@@ -1,0 +1,104 @@
+---
+title: Trypanosome Gene Structure Analysis (T. cruzi v0.1)
+author: Keith Hughitt
+---
+
+Introduction
+============
+
+In previous work, *L. major* and *T. cruzi* RNA-Seq data was used to determine
+UTR boundaries and splice leader and polyadenylation acceptor 
+sites ([1](https://github.com/elsayed-lab/utr_analysis)), and to look for
+evidence of alternative trans-splicing and poly-adenylation, and compute basic
+statistics relating to SL and Poly(A) site usage 
+([2](http://www.umiacs.umd.edu/~keith/research/2015/110-utr-lengths/)) across
+on a genome-wide scale.
+
+Here, we expand on these analyses and attempt to map out the gene structure
+for each of the parasites, and explore some of the basic properties and features 
+of the trypanosome gene structure.
+
+```{r include=FALSE, echo=CONFIG$verbose}
+library(knitr)
+knit('settings/tcruzi_ystrain.Rmd', quiet=TRUE, output=tempfile())
+```
+
+```{r knitr_settings, include=FALSE}
+opts_knit$set(progress=FALSE, verbose=TRUE)
+opts_chunk$set(fig.width=1080/96,
+               fig.height=1080/96,
+               dpi=96)
+options(digits=4)
+options(stringsAsFactors=FALSE)
+options(knitr.duplicate.label='allow')
+```
+
+```{r load_libraries, message=FALSE, warning=FALSE, echo=CONFIG$verbose}
+library(GenomicRanges)
+library(Biostrings)
+library(rtracklayer)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(readr)
+source('child/helper.R')
+```
+
+```{r include=FALSE, echo=CONFIG$verbose}
+knit('child/load_data.Rmd', quiet=TRUE, output=tempfile())
+```
+
+Results
+=======
+
+Overview
+--------
+
+### All developmental stages
+
+```{r fig.height=250/96, echo=CONFIG$verbose}
+# Summary of gene structure
+utr5_summary <- utr5_stats %>% 
+	group_by(stage) %>% 
+	summarise(median=median(length, na.rm=TRUE))
+
+utr3_summary <- utr3_stats %>% 
+	group_by(stage) %>% 
+	summarise(median=median(length, na.rm=TRUE))
+
+median_5utr <- (utr5_summary %>% filter(stage == 'combined'))$median
+median_cds  <- median(as.numeric(genes$size))
+median_3utr <- (utr3_summary %>% filter(stage == 'combined'))$median
+
+plot_gene_structure(median_5utr, median_cds, median_3utr)
+```
+
+```{r gene_structure_summary_table, results='asis', echo=CONFIG$verbose}
+# Table 1: Gene Structure Summary
+summary_dat <- gene_structure_summary((utr5_stats %>% filter(stage == 'combined'))$length,
+                                      as.numeric(genes$size),
+                                      (utr3_stats %>% filter(stage == 'combined'))$length)
+kable(summary_dat, caption='**Table 1** Gene structure summary table.')
+```
+
+### Comparison of UTR lengths across stages
+
+Median UTR length for each development stage.
+
+```{r lengths_by_developmental_stage, results='asis', echo=CONFIG$verbose}
+df <- cbind(
+	stage=stages,
+	utr5=utr5_summary %>% filter(stage != 'combined') %>% select(median),
+	utr3=utr3_summary %>% filter(stage != 'combined') %>% select(median)
+)
+colnames(df) <- c('stage', "5'UTR", "3'UTR")
+
+kable(df, caption='Table 2**: Stage-specific UTR lengths.')
+```
+
+### RNA-Seq coverage support for UTR boundaries
+
+```{r coverage_summary_table, results='asis', echo=CONFIG$verbose}
+
+```
+

@@ -1,0 +1,55 @@
+```{r settings}
+# species information
+parasite = 'L. major'
+host     = 'H. sapiens - M. Musculus'
+stages  = c('hs-procyclic', 'hs-metacyclic', 'hs-amastigote', 'mm-procyclic',
+            'mm-metacyclic', 'mm-amastigote')
+
+# Output verbosity
+verbose = TRUE,
+
+# Number of individual UTR plots to display for each developmental stage and
+# UTR side. The purpose of these plots are to provide a sense of the data
+# distribution and to visualize the effect of primary # site selection with and
+# without smoothing.
+
+max_plots = 10
+
+# output file prefix
+outfile_prefix = 'lmajor_all_separate'
+
+# fasta/gff
+input_gff   = file.path(Sys.getenv('REF'), 'lmajor_friedlin',
+                        'annotation/TriTrypDB-8.1_LmajorFriedlin_plus_unannotated_orfs.gff')
+input_fasta = file.path(Sys.getenv("REF"), 
+                        'lmajor_friedlin/genome/TriTrypDB-8.1_LmajorFriedlin_Genome.fasta')
+
+# spliced leader / polyadeynlation sites
+# Taken from L. major / H. sapiens  UTR analysis output from 2015/05/20
+sl_input = list(
+    hs_procyclic='input/lmajor_hsapiens_procyclic_ncrnas_removed_sl.gff.gz',
+    hs_metacyclic='input/lmajor_hsapiens_metacyclic_ncrnas_removed_sl.gff.gz',
+    hs_amastigote='input/lmajor_hsapiens_amastigote_ncrnas_removed_sl.gff.gz',
+    mm_procyclic='input/lmajor_mmusculus_procyclic_ncrnas_removed_sl.gff.gz',
+    mm_metacyclic='input/lmajor_mmusculus_metacyclic_ncrnas_removed_sl.gff.gz',
+    mm_amastigote='input/lmajor_mmusculus_amastigote_ncrnas_removed_sl.gff.gz'
+)
+
+polya_input = list(
+    hs_procyclic='input/lmajor_hsapiens_procyclic_ncrnas_removed_polya.gff.gz',
+    hs_metacyclic='input/lmajor_hsapiens_metacyclic_ncrnas_removed_polya.gff.gz',
+    hs_amastigote='input/lmajor_hsapiens_metacyclic_ncrnas_removed_polya.gff.gz',
+    mm_procyclic='input/lmajor_mmusculus_procyclic_ncrnas_removed_polya.gff.gz',
+    mm_metacyclic='input/lmajor_mmusculus_metacyclic_ncrnas_removed_polya.gff.gz',
+    mm_amastigote='input/lmajor_mmusculus_metacyclic_ncrnas_removed_polya.gff.gz'
+)
+
+# Number of bases flanking CDS to scan for motifs when actual UTR length is not
+# known; numbers are based on median 5' and 3' UTR lengths for L. major
+default_5utr_width = 250
+default_3utr_width = 545
+
+# Non-coding RNA filters
+id_filter_string   = 'rRNA|5SRRNA|snRNA|snoRNA|SLRNA|TRNA|SRP'
+type_filter_string = 'rRNAencoding|snRNAencoding|snoRNAencoding|tRNAencoding'
+```

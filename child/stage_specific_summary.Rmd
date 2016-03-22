@@ -1,0 +1,25 @@
+```{r fig.height=250/96, echo=FALSE, results='asis'}
+for (stage in c('combined', stages)) {
+	cat(sprintf('\n### %s\n\n', stage))
+	# Summary of gene structure
+	median_5utr <- median(utr5_stats[[stage]]$length, na.rm=TRUE)
+	median_cds  <- median(as.numeric(genes$size))
+	median_3utr <- median(utr3_stats[[stage]]$length, na.rm=TRUE)
+
+	# Figure 1: Summary of gene structure
+	if (stage == 'combined') {
+		# All stages
+		plot_gene_structure(median_5utr, median_cds, median_3utr)
+	} else {
+		# Stage-specific
+		plot_gene_structure(median_5utr, median_cds, median_3utr,
+                            utr_color='#9c836a', cds_color='#9c734b')
+	}
+
+	# Table 1: Gene Structure Summary
+	summary_dat <- gene_structure_summary(utr5_stats[[stage]]$length,
+										as.numeric(genes$size),
+										utr3_stats[[stage]]$length)
+	print(kable(summary_dat, caption='**Table 1** Gene structure summary table.'))
+	cat('\n\n')
+}

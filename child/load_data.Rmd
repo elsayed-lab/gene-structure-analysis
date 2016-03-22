@@ -1,0 +1,144 @@
+## Data types
+
+This analysis makes use of a number of different data sources, some of which
+were produced during previous analysis steps.
+
+The sources of data and annotations are:
+
+1. [TriTrypDB genome sequence (FASTA)](http://tritrypdb.org/tritrypdb/)
+2. [TriTrypDB genome annotations (GFF)](http://tritrypdb.org/tritrypdb/)
+3. Stage-specific spliced leader and poly(A) site GFFs (Generated from the [UTR analysis pipeline](https://github.com/elsayed-lab/utr_analysis))
+   - Separate files for each stage, and for each site type (SL/Poly(A).
+   - One entry for each detected site, including read coverage information.
+4. Summary 5'UTR and 3'UTR statistics (Generated in [previous UTR
+   analysis](http://www.umiacs.umd.edu/~keith/research/2015/110-utr-lengths/))
+   - 5' and 3'UTRs as defined by the primary acceptor and poly-adenylation
+     sites detected when aggregating data across all parasite developmental
+     stages.
+
+## Load sequence and annotations
+
+```{r load_annotations, warning=FALSE}
+# Load genome sequence and annotations
+gff <- import.gff3(CONFIG$input_gff)
+fasta <- readDNAStringSet(CONFIG$input_fasta)
+
+chromosomes <- gff[gff$type %in% c('contig', 'chromosome')]
+genes       <- gff[gff$type == 'gene']
+
+# Fix TriTrypDB FASTA names
+# e.g. "LmjF.24 | organism=Leishmania_major_strain_Friedlin |..." -> "LmjF.24"
+names(fasta) <- sapply(strsplit(names(fasta), ' | '), function(x) {x[1]})
+
+# L. major: load unannotated ORFs detected from ribosome profiling data
+if (CONFIG$parasite == 'L. major') {
+    orfs      <- gff[gff$type == 'ORF']
+    orfs$Name <- orfs$ID
+    orfs$description <- 'Unannotated ORF'
+
+    # 2015/06/30 A few of the unannotated ORFs appear to have multiple conflicting
+    # entries -- removing these for now...
+    orfs <- orfs[!duplicated(orfs$Name)]
+
+    # Drop GFF columns not shared between TriTrypDB GFF and uORF GFF
+    keep_cols <- intersect(colnames(mcols(genes)), colnames(mcols(orfs)))
+    genes <- genes[,keep_cols]
+    orfs <- orfs[,keep_cols]
+
+    genes <- append(genes, orfs)
+
+    # Fix names (L. major chromosome identifiers)
+    names(fasta) <- substring(names(fasta), 0, 7)
+}
+```
+
+## Remove noncoding RNAs
+
+```{r filter_ncrnas}
+# filter noncoding RNAs
+noncoding_ids <- genes$ID[grepl(CONFIG$id_filter_string, genes$ID)]
+
+ncrna_mask <- rep(FALSE, length(genes))
+
+if (!is.null(CONFIG$id_filter_string)) {
+    ncrna_mask <- ncrna_mask | grepl(CONFIG$id_filter_string, genes$ID)
+}
+
+if (!is.null(CONFIG$type_filter_string)) {
+    ncrna_mask <- ncrna_mask | grepl(CONFIG$type_filter_string, as.character(genes$type))
+}
+
+# remove noncoding RNAs
+genes <- genes[!ncrna_mask,]
+
+# remaining gene ids
+gene_ids <- genes$Name
+```
+
+## Load spliced leader and poly(A) site coordinates
+
+```{r load_acceptor_sites, warning=FALSE}
+sl_gffs <- list()
+polya_gffs <- list()
+
+# names of developmental stages being analyzed
+stages <- names(CONFIG$sl_sites)
+
+for (stage in stages) {
+    # SL acceptor sites
+    sl_gffs[stage] <- import.gff3(gzfile(CONFIG$sl_sites[[stage]]))
+    sl_gffs[stage] <- sl_gffs[[stage]][sl_gffs[[stage]]$Name %in% gene_ids]
+
+    # Poly(A) sites
+    polya_gffs[stage] <- import.gff3(gzfile(CONFIG$polya_sites[[stage]]))
+    polya_gffs[stage] <- polya_gffs[[stage]][polya_gffs[[stage]]$Name %in% gene_ids]
+}
+
+# Normalize seqinfo (e.g. when reads cover differing sets of contigs)
+sl_seqinfo <- seqinfo(sl_gffs[[stages[1]]])
+polya_seqinfo <- seqinfo(polya_gffs[[stages[1]]])
+
+if (length(stages) > 1) {
+    for (stage in stages[2:length(stages)]) {
+        sl_seqinfo <- suppressWarnings(merge(sl_seqinfo, seqinfo(sl_gffs[[stage]])))
+        polya_seqinfo <- suppressWarnings(merge(polya_seqinfo, seqinfo(polya_gffs[[stage]])))
+    }
+}
+
+# Normalize seqlevels
+for (stage in stages) {
+    # Add levels that aren't already represented
+    sl_levels <- seqlevels(sl_seqinfo)[!seqlevels(sl_seqinfo) 
+                                        %in% seqlevels(sl_gffs[[stage]])]
+    seqlevels(sl_gffs[[stage]]) <- c(seqlevels(sl_gffs[[stage]]), sl_levels)
+
+    # Reorder levels
+    seqlevels(sl_gffs[[stage]]) <- sort(seqlevels(sl_gffs[[stage]]))
+
+    # Add levels that aren't already represented
+    polya_levels <- seqlevels(polya_seqinfo)[!seqlevels(polya_seqinfo) 
+                                         %in% seqlevels(polya_gffs[[stage]])]
+    seqlevels(polya_gffs[[stage]]) <- c(seqlevels(polya_gffs[[stage]]), 
+                                       polya_levels)
+
+    # Reorder levels
+    seqlevels(polya_gffs[[stage]]) <- sort(seqlevels(polya_gffs[[stage]]))
+}
+```
+
+### Load 5' and 3'UTR summary statistics
+
+```{r}
+# Create data.frames containing the 5' and 3' length stats
+utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[[stage]]), stage='combined')
+for (stage in stages) {
+    utr5_stats <- rbind(utr5_stats, 
+                        cbind(read_csv(CONFIG$utr5_stats[[stage]]), stage=stage))
+}
+
+utr3_stats <- cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage='combined')
+for (stage in stages) {
+    utr3_stats <- rbind(utr3_stats,
+                        cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage=stage))
+}
+```
