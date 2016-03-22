@@ -1,0 +1,43 @@
+### UTR / CDS length correlations
+
+```{r length_correlations, fig.hold=TRUE, out.width='280px', warning=FALSE, fig.cap="**Figure 2**: UTR and CDS length correlations"}
+df <- as.data.frame(cbind(utr5_length=utr5_stats_combined$length,
+                          cds_length=as.numeric(genes$size),
+						  utr3_length=utr3_stats_combined$length))
+
+# 5'UTR vs. CDS
+ggplot(df, aes(x=utr5_length, y=cds_length)) + 
+	geom_point() + 
+    geom_smooth(method="rlm") +
+    scale_x_log10() +
+    scale_y_log10() +
+    ggtitle("5'UTR vs. CDS length")
+
+# 3'UTR vs. CDS
+ggplot(df, aes(x=utr3_length, y=cds_length)) + 
+	geom_point() + 
+    geom_smooth(method="rlm") +
+    scale_x_log10() +
+    scale_y_log10() +
+    ggtitle("3'UTR vs. CDS length")
+
+# 5'UTR vs. 3'UTR
+ggplot(df, aes(x=utr5_length, y=utr3_length)) + 
+	geom_point() + 
+    geom_smooth(method="rlm") +
+    scale_x_log10() +
+    scale_y_log10() +
+    ggtitle("5'UTR vs. 5'UTR length")
+```
+
+```{r length_correlations_table, results='asis'}
+table4 <- as.data.frame(c(
+    cor(df$utr5_length, df$cds_length, method='spearman', use='pairwise.complete.obs'),
+    cor(df$utr3_length, df$cds_length, method='spearman', use='pairwise.complete.obs'),
+    cor(df$utr5_length, df$utr3_length, method='spearman', use='pairwise.complete.obs')
+))
+rownames(table4) <- c("5'UTR vs. CDS", "3'UTR vs. CDS", "5'UTR vs. 3'UTR")
+colnames(table4) <- c("Spearman's rho")
+
+kable(table4, caption='**Table 4**: Percent genes containing N or more reads mapping to the specified feature.')
+```

@@ -86,11 +86,15 @@ stages <- names(CONFIG$sl_sites)
 
 for (stage in stages) {
     # SL acceptor sites
-    sl_gffs[stage] <- import.gff3(gzfile(CONFIG$sl_sites[[stage]]))
+    fp <- gzfile(CONFIG$sl_sites[[stage]])
+    sl_gffs[stage] <- import.gff3(fp)
+    close(fp)
     sl_gffs[stage] <- sl_gffs[[stage]][sl_gffs[[stage]]$Name %in% gene_ids]
 
     # Poly(A) sites
-    polya_gffs[stage] <- import.gff3(gzfile(CONFIG$polya_sites[[stage]]))
+    fp <- gzfile(CONFIG$polya_sites[[stage]])
+    polya_gffs[stage] <- import.gff3(fp)
+    close(fp)
     polya_gffs[stage] <- polya_gffs[[stage]][polya_gffs[[stage]]$Name %in% gene_ids]
 }
 
@@ -141,4 +145,9 @@ for (stage in stages) {
     utr3_stats <- rbind(utr3_stats,
                         cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage=stage))
 }
+
+# For convenience, we will also create version of the above containing just the
+# combined stats
+utr5_stats_combined <- utr5_stats %>% filter(stage == 'combined')
+utr3_stats_combined <- utr3_stats %>% filter(stage == 'combined')
 ```
