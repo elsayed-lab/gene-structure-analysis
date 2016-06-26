@@ -1,0 +1,15 @@
+### Intergenic length distribution
+
+```{r intergenic_lengths_table, results='asis'}
+intergenic_regions <- get_intergenic_lengths(gff)
+
+# Table 5: Intergenic region lengths
+df <- data.frame(length=c(min(intergenic_lengths), mean(intergenic_lengths),
+                         median(intergenic_lengths), max(intergenic_lengths)))
+rownames(df) <- c('min', 'mean', 'median', 'max')
+kable(t(df), caption='**Table 5** Intergenic length statistics.')
+```
+
+```{r intergenic_lengths_dist, fig.cap='**Figure 4**: Distribution of intergenic lengths'}
+plot(density(intergenic_lengths), main='Distribution of intergenic lengths')
+```

@@ -1,6 +1,12 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi v0.1)
+title: Trypanosome Gene Structure Analysis (T. cruzi v0.3)
 author: Keith Hughitt
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
 ---
 
 Introduction
@@ -56,84 +62,31 @@ Results
 Overview
 --------
 
-```{r fig.height=250/96, fig.cap="**Figure 1**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
-# Summary of gene structure
-utr5_summary <- utr5_stats %>% 
-	group_by(stage) %>% 
-	summarise(median=median(length, na.rm=TRUE))
-
-utr3_summary <- utr3_stats %>% 
-	group_by(stage) %>% 
-	summarise(median=median(length, na.rm=TRUE))
-
-median_5utr <- (utr5_summary %>% filter(stage == 'combined'))$median
-median_cds  <- median(as.numeric(genes$size))
-median_3utr <- (utr3_summary %>% filter(stage == 'combined'))$median
-
-plot_gene_structure(median_5utr, median_cds, median_3utr)
+```{r child='child/gene_structure_overview.Rmd'}
 ```
 
 CDS/UTRs
 --------
 
-### Summary of UTR and CDS lengths
-
-```{r gene_structure_summary_table, results='asis'}
-# Table 1: Gene Structure Summary
-summary_dat <- gene_structure_summary(utr5_stats_combined$length,
-                                      as.numeric(genes$size),
-                                      utr3_stats_combined$length)
-kable(summary_dat, caption='**Table 1** Gene structure summary table.')
-```
-
-### Comparison of UTR lengths across stages
-
-Median UTR length for each development stage.
-
-```{r lengths_by_developmental_stage, results='asis'}
-df <- cbind(
-	stage=stages,
-	utr5=(utr5_summary %>% filter(stage != 'combined'))$median,
-	utr3=(utr3_summary %>% filter(stage != 'combined'))$median
-)
-colnames(df) <- c('stage', "5'UTR", "3'UTR")
-
-kable(df, caption='Table 2**: Stage-specific UTR lengths.')
+```{r child='child/length_summary.Rmd'}
 ```
 
 ```{r child='child/length_correlations.Rmd'}
 ```
 
-### RNA-Seq coverage support for UTR boundaries
-
-```{r coverage_mapped_read_densities, fig.show='hold', out.width='450px', fig.cap="**Figure 3**: Distribution of number of SL- and Poly(A)-containing reads."}
-# number of reads containing SL- or Poly(A) sequence
-hist(log(utr5_stats_combined$num_reads + 1), main='# SL-containing reads')
-hist(log(utr3_stats_combined$num_reads + 1), main='# Poly(A)-containing reads')
+```{r child='child/rnaseq_coverage.Rmd'}
 ```
 
-```{r coverage_summary_table, results='asis'}
-total_genes <- nrow(utr5_stats_combined)
-nvals <- c(1, 2, 3, 4, 5, 10, 100, 1000) 
+Intergenic Regions
+------------------
 
-# % genes with N or more reads mapped to feature
-sl_pcts <- c()
-polya_pcts <- c()
+```{r child='child/intergenic_regions.Rmd'}
+```
 
-for (nval in nvals) {
-	sl_pcts <- append(sl_pcts, sum(utr5_stats_combined$num_reads >= nval) / total_genes)
-}
+System Info
+===========
 
-for (nval in nvals) {
-	polya_pcts <- append(polya_pcts, sum(utr3_stats_combined$num_reads >= nval) / total_genes)
-}
-
-sl_pcts    <- round(sl_pcts, 4) * 100
-polya_pcts <- round(polya_pcts, 4) * 100
-
-# summary data frame
-df <- cbind(N=nvals, SL=sl_pcts, PolyA=polya_pcts)
-
-kable(df, caption='**Table 4**: Percent genes containing N or more reads mapping to the specified feature.')
+```{r}
+sessionInfo()
 ```
 

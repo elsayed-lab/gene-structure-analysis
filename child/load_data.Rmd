@@ -23,6 +23,10 @@ The sources of data and annotations are:
 gff <- import.gff3(CONFIG$input_gff)
 fasta <- readDNAStringSet(CONFIG$input_fasta)
 
+# Sort GFF GenomicRanges
+gff <- sortSeqlevels(gff)
+gff <- sort(gff, ignore.strand=TRUE)
+
 chromosomes <- gff[gff$type %in% c('contig', 'chromosome')]
 genes       <- gff[gff$type == 'gene']
 
@@ -134,18 +138,67 @@ for (stage in stages) {
 
 ```{r}
 # Create data.frames containing the 5' and 3' length stats
-utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[[stage]]), stage='combined')
+utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[['combined']]), stage='combined')
 for (stage in stages) {
     utr5_stats <- rbind(utr5_stats, 
                         cbind(read_csv(CONFIG$utr5_stats[[stage]]), stage=stage))
 }
 
-utr3_stats <- cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage='combined')
+utr3_stats <- cbind(read_csv(CONFIG$utr3_stats[['combined']]), stage='combined')
 for (stage in stages) {
     utr3_stats <- rbind(utr3_stats,
                         cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage=stage))
 }
 
+# Add NA placeholders for genes where the feature length was determined in 
+# one stage, but not one or more of the others
+all_utr5 <- unique(utr5_stats$name)
+all_utr3 <- unique(utr3_stats$name)
+
+for (stg in stages) {
+    # grab stage-specific 5'UTR stats
+    stage_specific_utr5 <- utr5_stats %>% 
+        filter(stage == stg)
+    stage_specific_utr3 <- utr3_stats %>% 
+        filter(stage == stg)
+
+    # create rows for each gene missing in the stage
+    utr5_missing <- all_utr5[!all_utr5 %in% stage_specific_utr5$name]
+
+    if (length(utr5_missing) > 0) {
+        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, stg)
+        colnames(placeholders) <- colnames(utr5_stats)
+        utr5_stats <- rbind(utr5_stats, placeholders)
+    }
+
+    utr3_missing <- all_utr3[!all_utr3 %in% stage_specific_utr3$name]
+
+    if (length(utr3_missing) > 0) {
+        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, stg)
+        colnames(placeholders) <- colnames(utr3_stats)
+
+        # add to main dataframe
+        utr3_stats <- rbind(utr3_stats, placeholders)
+    }
+}
+```
+
+### Filter out low confidence UTR assignments
+
+```{r}
+utr5_low_count_genes <- (utr5_stats %>% 
+                            filter(stage=='combined' & 
+                                   num_reads < CONFIG$min_read_support_5utr))$name
+utr5_stats <- utr5_stats %>% filter(!name %in% utr5_low_count_genes)
+
+utr3_low_count_genes <- (utr3_stats %>% 
+                            filter(stage=='combined' & 
+                                   num_reads < CONFIG$min_read_support_3utr))$name
+utr3_stats <- utr3_stats %>% filter(!name %in% utr3_low_count_genes)
+
+```
+
+```{r}
 # For convenience, we will also create version of the above containing just the
 # combined stats
 utr5_stats_combined <- utr5_stats %>% filter(stage == 'combined')

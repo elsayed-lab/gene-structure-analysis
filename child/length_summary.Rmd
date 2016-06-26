@@ -1,0 +1,24 @@
+### Summary of UTR and CDS lengths
+
+```{r gene_structure_summary_table, results='asis'}
+# Table 1: Gene Structure Summary
+summary_dat <- gene_structure_summary(utr5_stats_combined$length,
+                                      as.numeric(genes$size),
+                                      utr3_stats_combined$length)
+kable(summary_dat, caption='**Table 1** Gene structure summary table.')
+```
+
+### Comparison of UTR lengths across stages
+
+Median UTR length for each development stage.
+
+```{r lengths_by_developmental_stage, results='asis'}
+df <- cbind(
+	stage=stages,
+	utr5=(utr5_summary %>% filter(stage != 'combined'))$median,
+	utr3=(utr3_summary %>% filter(stage != 'combined'))$median
+)
+colnames(df) <- c('stage', "5'UTR", "3'UTR")
+
+kable(df, caption='**Table 2**: Stage-specific UTR lengths.')
+```

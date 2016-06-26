@@ -49,6 +49,9 @@ polya_input = list(
 default_5utr_width = 250
 default_3utr_width = 545
 
+# Minimum number of reads for UTR to be used for analysis
+min_read_support   = 5
+
 # Non-coding RNA filters
 id_filter_string   = 'rRNA|5SRRNA|snRNA|snoRNA|SLRNA|TRNA|SRP'
 type_filter_string = 'rRNAencoding|snRNAencoding|snoRNAencoding|tRNAencoding'
