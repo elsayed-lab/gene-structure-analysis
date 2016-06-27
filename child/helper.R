@@ -25,6 +25,12 @@ plot_gene_structure <- function(utr5, cds, utr3, utr_color='#6a839c', cds_color=
 # gene_structure_summary
 #
 gene_structure_summary <- function(utr5_lengths, cds_lengths, utr3_lengths) {
+    # equalize lengths
+    max_length <- max(length(utr5_lengths), length(cds_lengths), length(utr3_lengths))
+    utr5_lengths <- c(utr5_lengths, rep(NA, max_length - length(utr5_lengths)))
+    cds_lengths  <- c(cds_lengths,  rep(NA, max_length - length(cds_lengths)))
+    utr3_lengths <- c(utr3_lengths, rep(NA, max_length - length(utr3_lengths)))
+
     mat <- cbind(utr5_lengths, cds_lengths, utr3_lengths)
 
     summary_dat <- data.frame(
@@ -41,13 +47,16 @@ gene_structure_summary <- function(utr5_lengths, cds_lengths, utr3_lengths) {
 #
 # get_intergenic_lengths
 #
-get_intergenic_lengths <- function(gr) {
+get_intergenic_lengths <- function(gr, min_read_support=1) {
     # Vector to keep track of intergenic lengths
     result <- data.frame()
 
     # Make sure the GenomicRanges instance is in sorted order
     gr <- sortSeqlevels(gr)
     gr <- sort(gr, ignore.strand=TRUE)
+
+    # UTR GFF feature annotations
+    utr_types <- c('five_prime_UTR', 'three_prime_UTR')
 
     # Iterate over chromosome
     for (ch in levels(seqnames(gr))) {
@@ -58,35 +67,31 @@ get_intergenic_lengths <- function(gr) {
         # we can skip the last feature since it cannot fall between two genes
         # on the same strand
         for (i in 1:(length(gr_ch) - 1)) {
-            feature <- gr_ch[i]
-            next_feature <- gr_ch[i + 1]
+            left  <- gr_ch[i]
+            right <- gr_ch[i + 1]
 
-            # Positive strand (3'UTR followed by 5'UTR)
-            if (as.logical(strand(feature) == '+' & feature$type == 'three_prime_UTR')) {
-                # If next feature is a 5'UTR on the same strand, then use it
-                # to determine the intergenic region length
-                if (as.logical(strand(next_feature) == '+' &  
-                               next_feature$type == 'five_prime_UTR')) {
-                    intergenic_length <- start(next_feature) - end(feature)
-                    result <- rbind(result, c(feature$ID, next_feature$ID, intergenic_length))
-                    #message(sprintf("%s (i=%d): %d", ch, i, intergenic_length))
+            # Check for adjacent UTRs
+            # TODO: add max distance to exclude inter-PTU regions
+            if (left$type %in% utr_types && right$type %in% utr_types) {
+                # Check to make sure lefts have minimum required read
+                # support
+                if (left$score < min_read_support || right$score < min_read_support) {
+                    next
                 }
-            } else if (as.logical(strand(feature) == '-' & feature$type == 'five_prime_UTR')) {
-                # Negative strand (5'UTR followed by 3'UTR)
-
-                # If next feature is a 3'UTR on the same strand, then use it
-                # to determine the intergenic region length
-                if (as.logical(strand(next_feature) == '-' &  
-                               next_feature$type == 'three_prime_UTR')) {
-                    intergenic_length <- start(next_feature) - end(feature)
-                    result <- rbind(result, c(feature$ID, next_feature$ID, intergenic_length))
-                    message(sprintf("%s (i=%d): %d", ch, i, intergenic_length))
+                
+                # Skip cases where type is same (can only occur at switch
+                # sites).
+                if (left$type == right$type) {
+                    next
                 }
+                intergenic_length <- start(right) - end(left)
+                result <- rbind(result, c(left$ID, right$ID, intergenic_length))
+                message(sprintf("%s (i=%d): %d", ch, i, intergenic_length))
             }
         }
     }
     colnames(result) <- c("left", "right", "length")
-    result <- as.numeric(result$length)
+    result$length <- as.numeric(result$length)
 
     return(result)
 }

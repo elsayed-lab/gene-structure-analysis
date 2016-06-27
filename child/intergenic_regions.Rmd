@@ -1,7 +1,12 @@
 ### Intergenic length distribution
 
-```{r intergenic_lengths_table, results='asis'}
-intergenic_regions <- get_intergenic_lengths(gff)
+```{r intergenic_lengths_table, results='asis',  message=FALSE}
+min_read_support = min(CONFIG$min_read_support_5utr,
+                       CONFIG$min_read_support_3utr)
+intergenic_regions <- get_intergenic_lengths(gff, min_read_support)
+intergenic_lengths <- intergenic_regions$length
+message(sprintf("Computing intergenic region statistics for %d genes.",
+        nrow(intergenic_regions)))
 
 # Table 5: Intergenic region lengths
 df <- data.frame(length=c(min(intergenic_lengths), mean(intergenic_lengths),
@@ -10,6 +15,9 @@ rownames(df) <- c('min', 'mean', 'median', 'max')
 kable(t(df), caption='**Table 5** Intergenic length statistics.')
 ```
 
-```{r intergenic_lengths_dist, fig.cap='**Figure 4**: Distribution of intergenic lengths'}
-plot(density(intergenic_lengths), main='Distribution of intergenic lengths')
+```{r intergenic_lengths_dist, fig.cap='**Figure 4**: Distribution of intergenic lengths (outliers removed)'}
+# Plot: Kernel density plot of intergenic length (trimmed upper quantile)
+clip_upper <- as.numeric(quantile(intergenic_lengths, 0.99)) 
+plot(density(intergenic_lengths[intergenic_lengths < clip_upper]), 
+     main='Distribution of intergenic lengths')
 ```

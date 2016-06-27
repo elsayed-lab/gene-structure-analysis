@@ -54,8 +54,8 @@ CONFIG <- list(
     'type_filter_string' = 'rRNAencoding|snRNAencoding|snoRNAencoding|tRNAencoding',
 
     # Minimum number of reads for UTR to be used for analysis
-    'min_read_support_5utr'   = 5,
-    'min_read_support_3utr'   = 2
+    'min_read_support_5utr'   = 3,
+    'min_read_support_3utr'   = 3
 
     # Total number of reads mapped (used to determine % SL-/Poly(A)-containing
 )

@@ -150,6 +150,18 @@ for (stage in stages) {
                         cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage=stage))
 }
 
+# Remove any genes for which UTR boundaries were assigned within one or more
+# of the developmental stages, but could not be assigned when data from all
+# stages were considered together (e.g. primary sites with most support in 
+# wrong orientation). This occurs infrequently (~1.5% of assignments for T. cruzi).
+utr5_combined_genes <- (utr5_stats %>% filter(stage == 'combined'))$name
+utr5_stats <- utr5_stats %>%
+    filter(name %in% utr5_combined_genes)
+
+utr3_combined_genes <- (utr3_stats %>% filter(stage == 'combined'))$name
+utr3_stats <- utr3_stats %>%
+    filter(name %in% utr3_combined_genes)
+
 # Add NA placeholders for genes where the feature length was determined in 
 # one stage, but not one or more of the others
 all_utr5 <- unique(utr5_stats$name)
@@ -180,6 +192,12 @@ for (stg in stages) {
         # add to main dataframe
         utr3_stats <- rbind(utr3_stats, placeholders)
     }
+}
+
+# Fix types
+for (x in c('length', 'num_reads', 'gc', 'ct')) {
+    utr5_stats[[x]] <- as.numeric(utr5_stats[[x]])
+    utr3_stats[[x]] <- as.numeric(utr3_stats[[x]])
 }
 ```
 
