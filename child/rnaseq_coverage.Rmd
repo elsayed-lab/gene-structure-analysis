@@ -1,5 +1,33 @@
 ### RNA-Seq coverage support for UTR boundaries
 
+#### All detected sites
+
+```{r, results='asis'}
+utr5_counter <- 0
+utr3_counter <- 0
+
+utr5_genes <- c()
+utr3_genes <- c()
+
+for (stage in stages) {
+    # Number of reads
+    utr5_counter <- utr5_counter + sum(sl_gffs[[stage]]$score)
+    utr3_counter <- utr3_counter + sum(polya_gffs[[stage]]$score)
+
+    # Genes
+    utr5_genes <- unique(c(utr5_genes, sl_gffs[[stage]]$Name))
+    utr3_genes <- unique(c(utr3_genes, polya_gffs[[stage]]$Name))
+}
+```
+
+#### Primary UTR boundaries
+
+```{r, results='asis'}
+df <- cbind(c("5'UTR", "3'UTR"), 
+            c(sum(utr5_stats$num_reads, na.rm=TRUE), sum(utr3_stats$num_reads, na.rm=TRUE)))
+xkable(df, caption='**Table 4**: Number of reads supporting the primary UTR boundaries')
+```
+
 ```{r coverage_mapped_read_densities, fig.show='hold', out.width='450px', fig.cap="**Figure 3**: Distribution of number of SL- and Poly(A)-containing reads."}
 # number of reads containing SL- or Poly(A) sequence
 hist(log(utr5_stats_combined$num_reads + 1), main='# SL-containing reads')
@@ -28,5 +56,5 @@ polya_pcts <- round(polya_pcts, 4) * 100
 # summary data frame
 df <- cbind(N=nvals, SL=sl_pcts, PolyA=polya_pcts)
 
-kable(df, caption='**Table 4**: Percent genes containing N or more reads mapping to the specified feature.')
+xkable(df, caption='**Table 5**: Percent genes containing N or more reads mapping to the specified feature.')
 ```

@@ -5,7 +5,7 @@
 summary_dat <- gene_structure_summary(utr5_stats_combined$length,
                                       as.numeric(genes$size),
                                       utr3_stats_combined$length)
-kable(summary_dat, caption='**Table 1** Gene structure summary table.')
+xkable(summary_dat, caption='**Table 1** Gene structure summary table.')
 ```
 
 ### Comparison of UTR lengths across stages
@@ -20,5 +20,5 @@ df <- cbind(
 )
 colnames(df) <- c('stage', "5'UTR", "3'UTR")
 
-kable(df, caption='**Table 2**: Stage-specific UTR lengths.')
+xkable(df, caption='**Table 2**: Stage-specific UTR lengths.')
 ```

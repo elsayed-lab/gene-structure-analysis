@@ -12,7 +12,7 @@ message(sprintf("Computing intergenic region statistics for %d genes.",
 df <- data.frame(length=c(min(intergenic_lengths), mean(intergenic_lengths),
                          median(intergenic_lengths), max(intergenic_lengths)))
 rownames(df) <- c('min', 'mean', 'median', 'max')
-kable(t(df), caption='**Table 5** Intergenic length statistics.')
+xkable(t(df), caption='**Table 5** Intergenic length statistics.')
 ```
 
 ```{r intergenic_lengths_dist, fig.cap='**Figure 4**: Distribution of intergenic lengths (outliers removed)'}

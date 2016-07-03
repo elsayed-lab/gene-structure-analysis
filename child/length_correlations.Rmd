@@ -40,5 +40,5 @@ table4 <- as.data.frame(c(
 rownames(table4) <- c("5'UTR vs. CDS", "3'UTR vs. CDS", "5'UTR vs. 3'UTR")
 colnames(table4) <- c("Spearman's rho")
 
-kable(table4, caption='**Table 4**: Percent genes containing N or more reads mapping to the specified feature.')
+xkable(table4, caption='**Table 4**: Percent genes containing N or more reads mapping to the specified feature.')
 ```

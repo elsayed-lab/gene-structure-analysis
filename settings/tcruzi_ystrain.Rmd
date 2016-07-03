@@ -1,9 +1,15 @@
 ```{r settings}
+# Input files generated specifically for this analysis
+input_dir <- file.path('..', 'input', 'tcruzi_ystrain')
+
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
                                   '06-gene-structure/01-gene-structure-determination')
-utr_analysis_indir  <- file.path(utr_analysis_basedir, 'input/tcruzi_ystrain')
-utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output/tcruzi_ystrain')
+utr_analysis_suffix <- 'tcruzi_ystrain/sl-min5_polya-min5_mindiff-2'
+utr_analysis_indir  <- file.path(utr_analysis_basedir, 'input', utr_analysis_suffix)
+utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output', utr_analysis_suffix)
+
+# Sample metadata
 
 CONFIG <- list(
     # species information
@@ -13,6 +19,12 @@ CONFIG <- list(
 
     # Output verbosity
     'verbose' = FALSE,
+
+    # Sample metadata
+    'samples' = read.csv('tcruzi_ystrain_samples.csv'),
+
+    # Order to use when displaying conditions
+    'condition_order' = c('trypo', 'epi', '4', '6', '12', '20', '24', '48', '72'),
 
     # output file prefix
     'outfile_prefix' = 'tcruzi_ystrain',
@@ -55,9 +67,16 @@ CONFIG <- list(
 
     # Minimum number of reads for UTR to be used for analysis
     'min_read_support_5utr'   = 3,
-    'min_read_support_3utr'   = 3
+    'min_read_support_3utr'   = 3,
 
-    # Total number of reads mapped (used to determine % SL-/Poly(A)-containing
+    # Number of reads mapped
+    'reads_mapped_total'    = file.path(input_dir, 'S01_num_reads_total.csv'),
+    'reads_mapped_host'     = file.path(input_dir, 'S01_num_reads_host.csv'),
+    'reads_mapped_parasite' = file.path(input_dir, 'S01_num_reads_parasite.csv'),
+
+    # Number of reads with Sl/Poly(A) sites detected
+    'reads_mapped_sl'       = file.path(input_dir, 'S01_num_reads_sl.csv'),
+    'reads_mapped_polya'    = file.path(input_dir, 'S01_num_reads_polya.csv')
 )
 
 rm(utr_analysis_basedir, utr_analysis_indir, utr_analysis_outdir)

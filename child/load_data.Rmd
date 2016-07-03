@@ -136,6 +136,8 @@ for (stage in stages) {
 
 ### Load 5' and 3'UTR summary statistics
 
+Summary statistics describing the _primary_ 5' and 3'UTR boundaries.
+
 ```{r}
 # Create data.frames containing the 5' and 3' length stats
 utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[['combined']]), stage='combined')
@@ -203,7 +205,15 @@ for (x in c('length', 'num_reads', 'gc', 'ct')) {
 
 ### Filter out low confidence UTR assignments
 
+Create alternate versions of the 5' and 3'UTR statistics data frames which only
+include sites with some minimum specified coverage level.
+
 ```{r}
+# create a copy of original unfiltered stats
+utr5_stats_unfiltered <- utr5_stats
+utr3_stats_unfiltered <- utr3_stats
+
+# remove low-support sites from main dataframes
 utr5_low_count_genes <- (utr5_stats %>% 
                             filter(stage=='combined' & 
                                    num_reads < CONFIG$min_read_support_5utr))$name
@@ -213,7 +223,6 @@ utr3_low_count_genes <- (utr3_stats %>%
                             filter(stage=='combined' & 
                                    num_reads < CONFIG$min_read_support_3utr))$name
 utr3_stats <- utr3_stats %>% filter(!name %in% utr3_low_count_genes)
-
 ```
 
 ```{r}
@@ -221,4 +230,38 @@ utr3_stats <- utr3_stats %>% filter(!name %in% utr3_low_count_genes)
 # combined stats
 utr5_stats_combined <- utr5_stats %>% filter(stage == 'combined')
 utr3_stats_combined <- utr3_stats %>% filter(stage == 'combined')
+```
+
+### Load RNA-Seq read counts
+
+Total number of RNA-Seq reads used in analysis and total number of reads which
+mapped to the host and parasite genomes.
+
+```{r load_mapping_stats}
+num_reads_host      <- read_csv(CONFIG$reads_mapped_host)
+num_reads_parasite  <- read_csv(CONFIG$reads_mapped_parasite)
+num_reads_total     <- read_csv(CONFIG$reads_mapped_total)
+num_reads_sl        <- read_csv(CONFIG$reads_mapped_sl)
+num_reads_polya     <- read_csv(CONFIG$reads_mapped_polya)
+
+# add zero-count rows to host
+parasite_only_samples <- num_reads_total$sample_id[!num_reads_total$sample_id 
+                                                   %in% num_reads_host$sample_id]
+num_reads_host <- rbind(num_reads_host, cbind(sample_id=parasite_only_samples, num_reads_host=0))
+num_reads_host$num_reads_host <- as.integer(num_reads_host$num_reads_host)
+
+# combine into a single data frame, including sample metadata
+mapping_stats <- merge(merge(merge(merge(merge(CONFIG$samples, 
+                                   num_reads_host, by='sample_id'),
+                                   num_reads_parasite, by='sample_id'),
+                                   num_reads_total, by='sample_id'),
+                                   num_reads_sl, by='sample_id'),
+                                   num_reads_polya, by='sample_id')
+
+# num_parasite_reads initially only counts the non-SL/Poly(A) reads; update
+# the totals to include these
+mapping_stats$num_parasite_reads <- mapping_stats$num_reads_parasite +
+                                    mapping_stats$num_reads_sl +
+                                    mapping_stats$num_reads_polya
+
 ```

@@ -38,17 +38,22 @@ opts_chunk$set(fig.width=1080/96,
 options(digits=4)
 options(stringsAsFactors=FALSE)
 options(knitr.duplicate.label='allow')
+
+# If rmarkdown.pandoc.to not specified, have it default to 'latex' output
+if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
+    opts_knit$set(rmarkdown.pandoc.to='latex')
+}
 ```
 
 ```{r load_libraries, message=FALSE, warning=FALSE}
-library(GenomicRanges)
-library(Biostrings)
-library(rtracklayer)
-library(ggplot2)
-library(reshape2)
-library(dplyr)
-library(readr)
-library(MASS)
+library('GenomicRanges')
+library('Biostrings')
+library('rtracklayer')
+library('ggplot2')
+library('reshape2')
+library('dplyr')
+library('readr')
+library('MASS')
 source('child/helper.R')
 ```
 
@@ -80,7 +85,17 @@ CDS/UTRs
 Intergenic Regions
 ------------------
 
-```{r child='child/intergenic_regions.Rmd'}
+- **Note**: temporarily skipping to speed up development; will re-enable
+     later.
+<!--
+``{r child='child/intergenic_regions.Rmd'}
+``
+-->
+
+Mapping statistics
+------------------
+
+```{r child='child/mapping_statistics.Rmd'}
 ```
 
 System Info

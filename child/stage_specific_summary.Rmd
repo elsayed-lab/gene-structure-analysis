@@ -20,6 +20,6 @@ for (stage in c('combined', stages)) {
 	summary_dat <- gene_structure_summary(utr5_stats[[stage]]$length,
 										as.numeric(genes$size),
 										utr3_stats[[stage]]$length)
-	print(kable(summary_dat, caption='**Table 1** Gene structure summary table.'))
+	print(xkable(summary_dat, caption='**Table 1** Gene structure summary table.'))
 	cat('\n\n')
 }
