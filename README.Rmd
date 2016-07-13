@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi v0.3)
+title: Trypanosome Gene Structure Analysis (T. cruzi v0.4)
 author: Keith Hughitt
 output:
   html_document:
@@ -50,10 +50,12 @@ library('GenomicRanges')
 library('Biostrings')
 library('rtracklayer')
 library('ggplot2')
+library('gridExtra')
 library('reshape2')
 library('dplyr')
 library('readr')
 library('MASS')
+source('../../../2015/00-shared/R/util.R')
 source('child/helper.R')
 ```
 

@@ -22,3 +22,33 @@ colnames(df) <- c('stage', "5'UTR", "3'UTR")
 
 xkable(df, caption='**Table 2**: Stage-specific UTR lengths.')
 ```
+
+```{r, fig.cap='**Figure 1** Characterization of _T. cruzi_ gene structure', warning=FALSE}
+p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
+        geom_density(fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        xlim(0, 1500) +
+        labs(x="5'UTR length (nt)", y="Transcript density")
+
+p2 <- ggplot(utr3_stats_combined, aes(x=length)) + 
+        geom_density(fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        xlim(0, 1500) +
+        labs(x="3'UTR length (nt)", y="Transcript density")
+
+cds_lengths <- as.data.frame(as.numeric(genes$size))
+colnames(cds_lengths) <- 'length'
+
+p3 <- ggplot(cds_lengths, aes(x=length)) + 
+        geom_density(fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        xlim(0, 1500) +
+        labs(x="CDS length (nt)", y="Transcript density")
+
+# normalize plot y-axis heights
+get_ylim <- function (plt) {
+    ggplot_build(plt)$panel$ranges[[1]]$y.range[2]
+}
+plt_ylim <- max(sapply(list(p1, p2, p3), get_ylim))
+
+grid.arrange(p1 + ylim(0, plt_ylim), 
+             p2 + ylim(0, plt_ylim),
+             p3 + ylim(0, plt_ylim), ncol=2)
+```

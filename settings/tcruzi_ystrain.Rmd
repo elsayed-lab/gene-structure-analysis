@@ -17,6 +17,12 @@ CONFIG <- list(
     'host'     = 'H. sapiens',
     'stages'  = c('trypomastigote', 'amastigote', 'epimastigote'),
 
+    # Discrete color palette and stroke color to use for plots
+
+    # http://www.colourlovers.com/palette/443995/i_demand_a_pancake
+    'colors' = c('#45ADA8','#9DE0AD','#547980','#E5FCC2'),
+    'stroke' = '#594F4F',
+
     # Output verbosity
     'verbose' = FALSE,
 
@@ -30,7 +36,7 @@ CONFIG <- list(
     'outfile_prefix' = 'tcruzi_ystrain',
 
     # TriTrypDB GFF genome annotations (all stages)
-    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
+    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-28_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like/genome/'),
