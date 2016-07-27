@@ -36,7 +36,7 @@ CONFIG <- list(
     'outfile_prefix' = 'tcruzi_ystrain',
 
     # TriTrypDB GFF genome annotations (all stages)
-    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-28_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
+    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like/genome/'),
@@ -85,5 +85,9 @@ CONFIG <- list(
     'reads_mapped_polya'    = file.path(input_dir, 'S01_num_reads_polya.csv')
 )
 
+# add intra/extracellular field to samples
+CONFIG$samples$stage <- ifelse(CONFIG$samples$condition %in% c('epi', 'trypo'),
+                               'Extracellular', 'Intracellular')
 rm(utr_analysis_basedir, utr_analysis_indir, utr_analysis_outdir)
 ```
+

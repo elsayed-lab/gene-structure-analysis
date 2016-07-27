@@ -24,6 +24,13 @@ Here, we expand on these analyses and attempt to map out the gene structure
 for each of the parasites, and explore some of the basic properties and features 
 of the trypanosome gene structure.
 
+In order to ensure that the results are as easily reproduced as possible, all
+relevant figures and tables are shown with the code used to generate them.
+
+In a few instances where it is easier to extract the required information
+outside of the R environment (for example, read mapping statistics), external
+scripts are provided in the `scripts/` folder.
+
 ```{r include=FALSE}
 library(knitr)
 knit('settings/tcruzi_ystrain.Rmd', quiet=TRUE, output=tempfile())
@@ -52,11 +59,14 @@ library('rtracklayer')
 library('ggplot2')
 library('gridExtra')
 library('reshape2')
+library('MASS')
 library('dplyr')
 library('readr')
-library('MASS')
 source('../../../2015/00-shared/R/util.R')
 source('child/helper.R')
+
+# fix namespace for dplyr functions
+assign('select', dplyr::select, envir=.GlobalEnv)
 ```
 
 ```{r include=FALSE}
@@ -69,19 +79,22 @@ Results
 Overview
 --------
 
-```{r child='child/gene_structure_overview.Rmd'}
+```{r child='child/figure_01.Rmd'}
 ```
 
 CDS/UTRs
 --------
 
+```{r child='child/table_01.Rmd'}
+```
+
+```{r child='child/rnaseq_coverage.Rmd'}
+```
+
 ```{r child='child/length_summary.Rmd'}
 ```
 
 ```{r child='child/length_correlations.Rmd'}
-```
-
-```{r child='child/rnaseq_coverage.Rmd'}
 ```
 
 Intergenic Regions

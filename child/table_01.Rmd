@@ -1,0 +1,19 @@
+### RNA-Seq coverage support for UTR boundaries
+
+#### All detected sites
+
+```{r, results='asis'}
+# see also: scripts/tcruzi_ystrain/S01_*   
+df <- num_reads %>% 
+    mutate(pct_reads_sl=(num_reads_sl/num_reads_parasite) * 100,
+           pct_reads_polya=(num_reads_polya/num_reads_parasite) * 100) %>%
+    group_by(stage) %>%
+    summarize("Human (millions)"=sum(num_reads_host, na.rm=TRUE) / 1E6,
+              "T. cruzi (millions)"=sum(num_reads_parasite) / 1E6,
+              "SL-containing reads"=mean(pct_reads_sl),
+              "Poly(A)-containing reads"=mean(pct_reads_polya)) %>%
+    rename("Parasite Stage"=stage)
+
+xkable(df, caption='**Table 1**: Summary of mapping statistics.')
+```
+

@@ -15,13 +15,11 @@ for x in $SCRATCH/utr_analysis/tcruzi_ystrain/tcruzi-infecting-hsapiens-*/input/
     # SL
     infiles=($SCRATCH/utr_analysis/tcruzi_ystrain/*/*spliced_leader/minlength6_mindiff-3/${sample_id}/results/matched_reads_*.csv)
     num_reads=$(wc -l $infiles | tail -1 | egrep -o "[0-9]+")
-    echo $num_reads
 	printf "%s,%d\n" $sample_id $num_reads >> $sl_outfile
 
     # Poly(A)
     infiles=($SCRATCH/utr_analysis/tcruzi_ystrain/*/poly*/minlength6_mindiff-3/${sample_id}/results/matched_reads_*.csv)
     num_reads=$(wc -l $infiles | tail -1 | egrep -o "[0-9]+")
-    echo $num_reads
 	printf "%s,%d\n" $sample_id $num_reads >> $polya_outfile
 done
 

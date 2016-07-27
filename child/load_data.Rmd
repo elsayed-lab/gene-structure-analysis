@@ -244,11 +244,19 @@ num_reads_total     <- read_csv(CONFIG$reads_mapped_total)
 num_reads_sl        <- read_csv(CONFIG$reads_mapped_sl)
 num_reads_polya     <- read_csv(CONFIG$reads_mapped_polya)
 
+# create a combined version of the coverage stats data, including sample
+# metadata
+dfs <- list(CONFIG$samples, num_reads_host, num_reads_parasite,
+            num_reads_total, num_reads_sl, num_reads_polya)
+num_reads = Reduce(function(...) merge(..., all=T), dfs)
+
 # add zero-count rows to host
 parasite_only_samples <- num_reads_total$sample_id[!num_reads_total$sample_id 
                                                    %in% num_reads_host$sample_id]
 num_reads_host <- rbind(num_reads_host, cbind(sample_id=parasite_only_samples, num_reads_host=0))
 num_reads_host$num_reads_host <- as.integer(num_reads_host$num_reads_host)
+
+
 
 # combine into a single data frame, including sample metadata
 mapping_stats <- merge(merge(merge(merge(merge(CONFIG$samples, 
