@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi v0.4)
+title: Trypanosome Gene Structure Analysis (T. cruzi v0.5)
 author: Keith Hughitt
 output:
   html_document:
@@ -82,11 +82,17 @@ Overview
 ```{r child='child/figure_01.Rmd'}
 ```
 
-CDS/UTRs
---------
+Coverage Statistics
+-------------------
 
 ```{r child='child/table_01.Rmd'}
 ```
+
+```{r child='child/table_s01.Rmd'}
+```
+
+CDS/UTRs
+--------
 
 ```{r child='child/rnaseq_coverage.Rmd'}
 ```
@@ -106,6 +112,12 @@ Intergenic Regions
 ``{r child='child/intergenic_regions.Rmd'}
 ``
 -->
+
+Alternative trans-splicing and polyadenylation
+----------------------------------------------
+
+```{r child='child/figure_04a.Rmd'}
+```
 
 Mapping statistics
 ------------------

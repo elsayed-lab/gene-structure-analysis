@@ -7,14 +7,33 @@ The sources of data and annotations are:
 
 1. [TriTrypDB genome sequence (FASTA)](http://tritrypdb.org/tritrypdb/)
 2. [TriTrypDB genome annotations (GFF)](http://tritrypdb.org/tritrypdb/)
-3. Stage-specific spliced leader and poly(A) site GFFs (Generated from the [UTR analysis pipeline](https://github.com/elsayed-lab/utr_analysis))
+3. Stage-specific spliced leader and poly(A) site CSV files)
    - Separate files for each stage, and for each site type (SL/Poly(A).
    - One entry for each detected site, including read coverage information.
-4. Summary 5'UTR and 3'UTR statistics (Generated in [previous UTR
-   analysis](http://www.umiacs.umd.edu/~keith/research/2015/110-utr-lengths/))
+4. Summary 5'UTR, 3'UTR, trans-splicing and polyadenylation statistics.
    - 5' and 3'UTRs as defined by the primary acceptor and poly-adenylation
      sites detected when aggregating data across all parasite developmental
      stages.
+
+To generate the above data files described in 3) and 4) above from the original
+RNA-Seq samples, the following two analysis pipelines may be applied sequently:
+
+1. [UTR analysis pipeline](https://github.com/elsayed-lab/utr_analysis)
+   - Analyzes FASTQ files and detects trans-splicing and polyadenylation
+     events.
+   - Outputs GFF files containing all detected sites.
+2. [Gene structure determination pipeline](https://github.com/elsayed-lab/gene-structure-determination)
+   - Takes the raw trans-splicing site and polyadenylation site data from the
+     UTR analysis pipeline and defines primary UTR boundaries for each gene
+     where sufficient data is available.
+   - Outputs include:
+        - An extended version of a TriTrypDB GFF file containing the annotated
+          UTR bounaries
+        - CSV summary statistics for primary UTR boundaries
+        - CSV files containing all trans-splicing and polyadenylation sites
+          for the inter-CDS regions where primary UTR boundaries could be
+          assigned, with each site assigned as being 'primary' or
+          'alternative'.
 
 ## Load sequence and annotations
 
@@ -82,55 +101,15 @@ gene_ids <- genes$Name
 ## Load spliced leader and poly(A) site coordinates
 
 ```{r load_acceptor_sites, warning=FALSE}
-sl_gffs <- list()
-polya_gffs <- list()
+sl_sites <- list()
+polya_sites <- list()
 
 # names of developmental stages being analyzed
-stages <- names(CONFIG$sl_sites)
+stages <- c(CONFIG$stages, 'combined')
 
 for (stage in stages) {
-    # SL acceptor sites
-    fp <- gzfile(CONFIG$sl_sites[[stage]])
-    sl_gffs[stage] <- import.gff3(fp)
-    close(fp)
-    sl_gffs[stage] <- sl_gffs[[stage]][sl_gffs[[stage]]$Name %in% gene_ids]
-
-    # Poly(A) sites
-    fp <- gzfile(CONFIG$polya_sites[[stage]])
-    polya_gffs[stage] <- import.gff3(fp)
-    close(fp)
-    polya_gffs[stage] <- polya_gffs[[stage]][polya_gffs[[stage]]$Name %in% gene_ids]
-}
-
-# Normalize seqinfo (e.g. when reads cover differing sets of contigs)
-sl_seqinfo <- seqinfo(sl_gffs[[stages[1]]])
-polya_seqinfo <- seqinfo(polya_gffs[[stages[1]]])
-
-if (length(stages) > 1) {
-    for (stage in stages[2:length(stages)]) {
-        sl_seqinfo <- suppressWarnings(merge(sl_seqinfo, seqinfo(sl_gffs[[stage]])))
-        polya_seqinfo <- suppressWarnings(merge(polya_seqinfo, seqinfo(polya_gffs[[stage]])))
-    }
-}
-
-# Normalize seqlevels
-for (stage in stages) {
-    # Add levels that aren't already represented
-    sl_levels <- seqlevels(sl_seqinfo)[!seqlevels(sl_seqinfo) 
-                                        %in% seqlevels(sl_gffs[[stage]])]
-    seqlevels(sl_gffs[[stage]]) <- c(seqlevels(sl_gffs[[stage]]), sl_levels)
-
-    # Reorder levels
-    seqlevels(sl_gffs[[stage]]) <- sort(seqlevels(sl_gffs[[stage]]))
-
-    # Add levels that aren't already represented
-    polya_levels <- seqlevels(polya_seqinfo)[!seqlevels(polya_seqinfo) 
-                                         %in% seqlevels(polya_gffs[[stage]])]
-    seqlevels(polya_gffs[[stage]]) <- c(seqlevels(polya_gffs[[stage]]), 
-                                       polya_levels)
-
-    # Reorder levels
-    seqlevels(polya_gffs[[stage]]) <- sort(seqlevels(polya_gffs[[stage]]))
+    sl_sites[stage]    <- read_csv(CONFIG$sl_sites[[stage]])
+    polya_sites[stage] <- read_csv(CONFIG$polya_sites[[stage]])
 }
 ```
 

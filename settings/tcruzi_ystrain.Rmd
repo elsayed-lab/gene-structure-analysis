@@ -5,12 +5,26 @@ input_dir <- file.path('..', 'input', 'tcruzi_ystrain')
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
                                   '06-gene-structure/01-gene-structure-determination')
-utr_analysis_suffix <- 'tcruzi_ystrain/sl-min5_polya-min5_mindiff-2'
+utr_analysis_suffix <- 'tcruzi_ystrain/sl-min4_polya-min4_mindiff-3'
 utr_analysis_indir  <- file.path(utr_analysis_basedir, 'input', utr_analysis_suffix)
 utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output', utr_analysis_suffix)
 
-# Sample metadata
+# stage-specific inputs
+stages = c('trypomastigote', 'amastigote', 'epimastigote', 'combined')
 
+utr5_stats <- as.list(file.path(utr_analysis_outdir, stages, '5utr_stats.csv'))
+names(utr5_stats) <- stages
+
+utr3_stats <- as.list(file.path(utr_analysis_outdir, stages, '3utr_stats.csv'))
+names(utr3_stats) <- stages
+
+sl_sites <- as.list(file.path(utr_analysis_outdir, stages, 'trans_splice_sites.csv'))
+names(sl_sites) <- stages
+
+polya_sites <- as.list(file.path(utr_analysis_outdir, stages, 'polyadenylation_sites.csv'))
+names(polya_sites) <- stages
+
+# Sample metadata
 CONFIG <- list(
     # species information
     'parasite' = 'T. cruzi Y strain',
@@ -30,42 +44,26 @@ CONFIG <- list(
     'samples' = read.csv('tcruzi_ystrain_samples.csv'),
 
     # Order to use when displaying conditions
-    'condition_order' = c('trypo', 'epi', '4', '6', '12', '20', '24', '48', '72'),
+    'condition_order' = c('trypo', 'epi', '4', '6', '12', '24', '48', '72'),
 
     # output file prefix
     'outfile_prefix' = 'tcruzi_ystrain',
 
-    # TriTrypDB GFF genome annotations (all stages)
-    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
-
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like/genome/'),
 
-    'utr5_stats' = list(
-        amastigote    =file.path(utr_analysis_outdir, 'amastigote',     '5utr_stats.csv'),
-        combined      =file.path(utr_analysis_outdir, 'combined',       '5utr_stats.csv'),
-        trypomastigote=file.path(utr_analysis_outdir, 'trypomastigote', '5utr_stats.csv'),
-        epimastigote  =file.path(utr_analysis_outdir, 'epimastigote',   '5utr_stats.csv')
-    ),
+    # Stage-specific GFFs containing genes and annotated UTRs
+    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
 
-    'utr3_stats' = list(
-        amastigote    =file.path(utr_analysis_outdir, 'amastigote',     '3utr_stats.csv'),
-        combined      =file.path(utr_analysis_outdir, 'combined',       '3utr_stats.csv'),
-        trypomastigote=file.path(utr_analysis_outdir, 'trypomastigote', '3utr_stats.csv'),
-        epimastigote  =file.path(utr_analysis_outdir, 'epimastigote',   '3utr_stats.csv')
-    ),
+    # Stage-specific primary site / UTR statistics
+    'utr5_stats' = utr5_stats,
 
-    'sl_sites' = list(
-        amastigote    =file.path(utr_analysis_indir, 'tcruzi_infecting_hsapiens_amastigote_sl_sorted.gff.gz'),
-        trypomastigote=file.path(utr_analysis_indir, 'tcruzi_infecting_hsapiens_trypomastigote_sl_sorted.gff.gz'),
-        epimastigote  =file.path(utr_analysis_indir, 'tcruzi_infecting_hsapiens_epimastigote_sl_sorted.gff.gz')
-    ),
+    'utr3_stats' = utr3_stats,
 
-    'polya_sites' = list(
-        amastigote    =file.path(utr_analysis_indir, 'tcruzi_infecting_hsapiens_amastigote_polya_sorted.gff.gz'),
-        trypomastigote=file.path(utr_analysis_indir, 'tcruzi_infecting_hsapiens_trypomastigote_polya_sorted.gff.gz'),
-        epimastigote  =file.path(utr_analysis_indir, 'tcruzi_infecting_hsapiens_epimastigote_polya_sorted.gff.gz')
-    ),
+    # SL / Poly(A) detection data
+    'sl_sites' = sl_sites,
+
+    'polya_sites' = polya_sites,
 
     # Non-coding RNA filters
     'id_filter_string'   = 'rRNA|5SRRNA|snRNA|snoRNA|SLRNA|TRNA|SRP',
@@ -88,6 +86,9 @@ CONFIG <- list(
 # add intra/extracellular field to samples
 CONFIG$samples$stage <- ifelse(CONFIG$samples$condition %in% c('epi', 'trypo'),
                                'Extracellular', 'Intracellular')
-rm(utr_analysis_basedir, utr_analysis_indir, utr_analysis_outdir)
+
+# clean-up
+rm(utr_analysis_basedir, utr_analysis_indir, utr_analysis_outdir, input_gffs,
+   utr5_stats, utr3_stats, sl_sites, polya_sites)
 ```
 
