@@ -1,0 +1,64 @@
+### Differences in trans-splicing acceptor site usage across developmental stage
+
+```{r, fig.cap="**Figure 4a** UTR length across developmental stage."}
+# feature name
+feature_name <- 'SL'
+
+# stages to compare
+s1_name <- 'amastigote'
+s2_name <- 'trypomastigote'
+
+s1 <- sl_sites[[s1_name]] %>% 
+    filter(type=='primary') %>%
+    arrange(gene)
+s2 <- sl_sites[[s2_name]] %>% 
+    filter(type=='primary') %>%
+    arrange(gene)
+
+# limit to genes for which primary acceptor site was detected in both stages
+common_genes <- intersect(s1$gene, s2$gene)
+
+s1 <- s1 %>% filter(gene %in% common_genes)
+s2 <- s2 %>% filter(gene %in% common_genes)
+
+# combine into a single dataframe (both data frames have been previously sorted
+# by gene id to ensure correct order)
+dat <- data_frame(
+    gene=s1$gene,
+    s1_len=s1$utr_length,
+    s2_len=s2$utr_length,
+    s1_num_reads=s1$num_reads,
+    s2_num_reads=s2$num_reads
+)
+
+# ignore UTRs of the same length (uninteresting) and add difference column
+dat <- dat %>% 
+    filter(s1_len != s2_len) %>% 
+    mutate(len_diff=abs(s1_len - s2_len))
+
+# use log of min read support as a measure of our confidence
+#dat <- dat %>% 
+#    mutate(min_num_reads=pmin(s1_num_reads, s2_num_reads)) %>%
+#    mutate(log_min_num_reads=log(min_num_reads))
+
+# only show sites with > 10 reads in both stages
+dat <- dat %>% filter(min_num_reads >= 10)
+
+# plot UTR length differences across developmental stages
+plt <- ggplot(dat, aes(s1_len, s2_len, color=min_num_reads, size=min_num_reads)) + 
+    geom_abline(slope=1, intercept=0, color='#CCCCCC', lwd=0.5) +
+    geom_abline(slope=1, intercept=300, color='#666666', lwd=0.5) +
+    geom_abline(slope=1, intercept=-300, color='#666666', lwd=0.5) +
+    geom_point() +
+    xlab(s1_name) + ylab(s2_name) +
+    scale_color_gradient2(low="black", mid="blue", high="red") + 
+    scale_size_continuous() +
+    scale_x_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) +
+    scale_y_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) + 
+    #geom_text(data=subset(dat, min_num_reads >= 100 & len_diff > 300),
+    #          aes(s1_len, s2_len, label=gene),
+    #          color='#000000', size=4, angle=45, hjust=0, vjust=0) +
+    ggtitle(sprintf("%s site usage: %s vs. %s (All genes)", feature_name, s1_name, s2_name)) +
+    theme(text=element_text(size=12, family='DejaVu Sans'),
+          plot.title=element_text(size=rel(1)))
+```

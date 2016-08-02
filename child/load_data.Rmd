@@ -108,8 +108,8 @@ polya_sites <- list()
 stages <- c(CONFIG$stages, 'combined')
 
 for (stage in stages) {
-    sl_sites[stage]    <- read_csv(CONFIG$sl_sites[[stage]])
-    polya_sites[stage] <- read_csv(CONFIG$polya_sites[[stage]])
+    sl_sites[[stage]]    <- read_csv(CONFIG$sl_sites[[stage]])
+    polya_sites[[stage]] <- read_csv(CONFIG$polya_sites[[stage]])
 }
 ```
 
@@ -135,18 +135,18 @@ for (stage in stages) {
 # of the developmental stages, but could not be assigned when data from all
 # stages were considered together (e.g. primary sites with most support in 
 # wrong orientation). This occurs infrequently (~1.5% of assignments for T. cruzi).
-utr5_combined_genes <- (utr5_stats %>% filter(stage == 'combined'))$name
+utr5_combined_genes <- (utr5_stats %>% filter(stage == 'combined'))$gene
 utr5_stats <- utr5_stats %>%
-    filter(name %in% utr5_combined_genes)
+    filter(gene %in% utr5_combined_genes)
 
-utr3_combined_genes <- (utr3_stats %>% filter(stage == 'combined'))$name
+utr3_combined_genes <- (utr3_stats %>% filter(stage == 'combined'))$gene
 utr3_stats <- utr3_stats %>%
-    filter(name %in% utr3_combined_genes)
+    filter(gene %in% utr3_combined_genes)
 
 # Add NA placeholders for genes where the feature length was determined in 
 # one stage, but not one or more of the others
-all_utr5 <- unique(utr5_stats$name)
-all_utr3 <- unique(utr3_stats$name)
+all_utr5 <- unique(utr5_stats$gene)
+all_utr3 <- unique(utr3_stats$gene)
 
 for (stg in stages) {
     # grab stage-specific 5'UTR stats
@@ -156,18 +156,18 @@ for (stg in stages) {
         filter(stage == stg)
 
     # create rows for each gene missing in the stage
-    utr5_missing <- all_utr5[!all_utr5 %in% stage_specific_utr5$name]
+    utr5_missing <- all_utr5[!all_utr5 %in% stage_specific_utr5$gene]
 
     if (length(utr5_missing) > 0) {
-        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, stg)
+        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, NA, stg)
         colnames(placeholders) <- colnames(utr5_stats)
         utr5_stats <- rbind(utr5_stats, placeholders)
     }
 
-    utr3_missing <- all_utr3[!all_utr3 %in% stage_specific_utr3$name]
+    utr3_missing <- all_utr3[!all_utr3 %in% stage_specific_utr3$gene]
 
     if (length(utr3_missing) > 0) {
-        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, stg)
+        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, NA, stg)
         colnames(placeholders) <- colnames(utr3_stats)
 
         # add to main dataframe
@@ -195,13 +195,13 @@ utr3_stats_unfiltered <- utr3_stats
 # remove low-support sites from main dataframes
 utr5_low_count_genes <- (utr5_stats %>% 
                             filter(stage=='combined' & 
-                                   num_reads < CONFIG$min_read_support_5utr))$name
-utr5_stats <- utr5_stats %>% filter(!name %in% utr5_low_count_genes)
+                                   num_reads < CONFIG$min_read_support_5utr))$gene
+utr5_stats <- utr5_stats %>% filter(!gene %in% utr5_low_count_genes)
 
 utr3_low_count_genes <- (utr3_stats %>% 
                             filter(stage=='combined' & 
-                                   num_reads < CONFIG$min_read_support_3utr))$name
-utr3_stats <- utr3_stats %>% filter(!name %in% utr3_low_count_genes)
+                                   num_reads < CONFIG$min_read_support_3utr))$gene
+utr3_stats <- utr3_stats %>% filter(!gene %in% utr3_low_count_genes)
 ```
 
 ```{r}
