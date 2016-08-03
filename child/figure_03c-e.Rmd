@@ -1,0 +1,35 @@
+### Primary vs. secondary trans-splicing site usage
+
+```{r}
+# iterate over genes for which primary trans-splicing site was detected
+for (developmental_stage in stages) {
+    sites <- sl_sites[[developmental_stage]]
+
+    # filter sites with low read coverage
+    sites <- sites %>% filter(num_reads >= CONFIG$min_read_support_5utr)
+
+    # get primary and secondary sites
+    print(plot_alt_site_distance_hist(sites, developmental_stage,
+                                      upstream_color=CONFIG$colors[4],
+                                      downstream_color=CONFIG$colors[1],
+                                      stroke_color=CONFIG$stroke))
+}
+```
+
+### Primary vs. secondary polyadenylation site usage
+
+```{r}
+# iterate over genes for which primary trans-splicing site was detected
+for (developmental_stage in stages) {
+    sites <- polya_sites[[developmental_stage]]
+
+    # filter sites with low read coverage
+    sites <- sites %>% filter(num_reads >= CONFIG$min_read_support_3utr)
+
+    # get primary and secondary sites
+    print(plot_alt_site_distance_hist(sites, developmental_stage,
+                                      upstream_color=CONFIG$colors[4],
+                                      downstream_color=CONFIG$colors[1],
+                                      stroke_color=CONFIG$stroke))
+}
+```

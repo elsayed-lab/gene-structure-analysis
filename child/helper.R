@@ -141,3 +141,114 @@ detect_polypyrimidine_tracts <- function() {
 
 }
 
+#' 
+#' create_utr_comparison_df
+#' 
+create_utr_comparison_df <- function(sites, s1_name, s2_name) {
+    # Get sites for specified developmental stages
+    s1 <- sites[[s1_name]] %>% 
+        filter(type=='primary') %>%
+        arrange(gene)
+    s2 <- sites[[s2_name]] %>% 
+        filter(type=='primary') %>%
+        arrange(gene)
+
+    # limit to genes for which primary acceptor site was detected in both stages
+    common_genes <- intersect(s1$gene, s2$gene)
+
+    s1 <- s1 %>% filter(gene %in% common_genes)
+    s2 <- s2 %>% filter(gene %in% common_genes)
+
+    # combine into a single dataframe (both data frames have been previously sorted
+    # by gene id to ensure correct order)
+    dat <- data_frame(
+        gene=s1$gene,
+        s1_len=s1$utr_length,
+        s2_len=s2$utr_length,
+        s1_num_reads=s1$num_reads,
+        s2_num_reads=s2$num_reads
+    )
+
+    # ignore UTRs of the same length (uninteresting) and add difference column
+    dat <- dat %>% 
+        filter(s1_len != s2_len) %>% 
+        mutate(len_diff=abs(s1_len - s2_len))
+
+    # use log of min read support as a measure of our confidence
+    dat <- dat %>% 
+        mutate(min_num_reads=pmin(s1_num_reads, s2_num_reads))
+    #    mutate(log_min_num_reads=log(min_num_reads))
+
+    # only show sites with > 10 reads in both stages
+    dat <- dat %>% filter(min_num_reads >= 10)
+
+    dat
+}
+
+plot_diff_utrs <- function(dat, feature_name) {
+    # plot UTR length differences across developmental stages
+    ggplot(dat, aes(s1_len, s2_len, color=min_num_reads, size=min_num_reads)) + 
+        geom_abline(slope=1, intercept=0, color='#CCCCCC', lwd=0.5) +
+        geom_abline(slope=1, intercept=300, color='#666666', lwd=0.5) +
+        geom_abline(slope=1, intercept=-300, color='#666666', lwd=0.5) +
+        geom_point() +
+        xlab(s1_name) + ylab(s2_name) +
+        scale_color_gradient2(low="black", mid="blue", high="red") + 
+        scale_size_continuous() +
+        scale_x_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) +
+        scale_y_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) + 
+        #geom_text(data=subset(dat, min_num_reads >= 100 & len_diff > 300),
+        #          aes(s1_len, s2_len, label=gene),
+        #          color='#000000', size=4, angle=45, hjust=0, vjust=0) +
+        ggtitle(sprintf("%s site usage: %s vs. %s (All genes)", feature_name, s1_name, s2_name)) +
+        theme(text=element_text(size=12, family='DejaVu Sans'),
+            plot.title=element_text(size=rel(1)))
+}
+
+#'
+#' plot_alt_site_distance_hist
+#'
+plot_alt_site_distance_hist <- function(sites, stage, upstream_color='red',
+                                        downstream_color='blue', 
+                                        stroke_color='#333333') {
+    # get primary and alternative sites
+    primary_sites <- sites %>% 
+        filter(type=='primary') %>%
+        select(gene, loc) %>%
+        rename(loc_primary=loc) %>%
+        arrange(gene)
+
+    secondary_sites <- sites %>% 
+        filter(type=='alternative') %>%
+        select(gene, loc) %>%
+        rename(loc_secondary=loc) %>%
+        arrange(gene)
+
+    # exclude genes with no detected alternative sites
+    primary_sites <- primary_sites %>% filter(gene %in% secondary_sites$gene)
+
+    # combine into a single dataframe
+    dat <- merge(primary_sites, secondary_sites, by='gene', all=TRUE)
+
+    # add strand information
+    dat <- merge(dat, gene_strands)
+
+    # determine distance and direction of secondary sites relative to primary ones
+    dat <- dat %>% mutate(dist=ifelse(strand == '+', 
+                                    loc_secondary - loc_primary,
+                                    loc_primary - loc_secondary)) %>%
+                mutate(direction=factor(sign(dist), 
+                                        labels=c('upstream', 'downstream')))
+
+    # limit to sites in range [-2500, 2500]
+    dat <- dat %>% filter(abs(dist) <= 2500)
+
+    # plot distribution, coloring upstream and downstream sites differentially
+    main <- sprintf("Alternative site distance from primary site (%s)", stage)
+
+    ggplot(dat, aes(dist, fill=direction)) +
+        geom_histogram(breaks=seq(-2500, 2500, by=50), color=stroke_color) +
+        scale_fill_manual(values=c(upstream_color, downstream_color)) +
+        ggtitle(main)
+}
+

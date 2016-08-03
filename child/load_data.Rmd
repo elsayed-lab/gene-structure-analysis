@@ -98,6 +98,12 @@ genes <- genes[!ncrna_mask,]
 gene_ids <- genes$Name
 ```
 
+## Create a dataframe containing strand information for each gene
+
+```{r}
+gene_strands <- data_frame(gene=genes$Name, strand=as.vector(genes@strand))
+```
+
 ## Load spliced leader and poly(A) site coordinates
 
 ```{r load_acceptor_sites, warning=FALSE}
