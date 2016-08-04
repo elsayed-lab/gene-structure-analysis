@@ -8,9 +8,15 @@ utr3_summary <- utr3_stats %>%
 	group_by(stage) %>% 
 	summarise(median=median(length, na.rm=TRUE))
 
+#pp_tract_summary <- polypyrimidine_tracts %>%
+#    group_by(stage) %>% 
+#    summarise(median=median(end - start, na.rm=TRUE))
+#median_ppt  <- (pp_tract_summary %>% filter(stage == 'combined'))$median
+
 median_5utr <- (utr5_summary %>% filter(stage == 'combined'))$median
 median_cds  <- median(as.numeric(genes$size))
 median_3utr <- (utr3_summary %>% filter(stage == 'combined'))$median
 
-plot_gene_structure(median_5utr, median_cds, median_3utr)
+plot_gene_structure(median_5utr, median_cds, median_3utr,
+                    utr_color=CONFIG$colors[2], cds_color=CONFIG$colors[1])
 ```

@@ -119,6 +119,18 @@ for (stage in stages) {
 }
 ```
 
+## Load polypyrimidine tract information
+
+```{r load_polypyr_tracts, warning=FALSE}
+polypyrimidine_tracts <- cbind(read_csv(CONFIG$polypyrimidine_tracts[['combined']]),
+                               stage='combined')
+
+for (stage in CONFIG$stages) {
+    dat <- read_csv(CONFIG$polypyrimidine_tracts[[stage]])
+    polypyrimidine_tracts <- rbind(polypyrimidine_tracts, cbind(dat, stage=stage))
+}
+```
+
 ### Load 5' and 3'UTR summary statistics
 
 Summary statistics describing the _primary_ 5' and 3'UTR boundaries.
@@ -126,13 +138,13 @@ Summary statistics describing the _primary_ 5' and 3'UTR boundaries.
 ```{r}
 # Create data.frames containing the 5' and 3' length stats
 utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[['combined']]), stage='combined')
-for (stage in stages) {
+for (stage in CONFIG$stages) {
     utr5_stats <- rbind(utr5_stats, 
                         cbind(read_csv(CONFIG$utr5_stats[[stage]]), stage=stage))
 }
 
 utr3_stats <- cbind(read_csv(CONFIG$utr3_stats[['combined']]), stage='combined')
-for (stage in stages) {
+for (stage in CONFIG$stages) {
     utr3_stats <- rbind(utr3_stats,
                         cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage=stage))
 }

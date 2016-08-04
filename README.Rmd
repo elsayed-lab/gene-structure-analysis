@@ -79,7 +79,7 @@ Results
 Overview
 --------
 
-```{r child='child/figure_01.Rmd'}
+```{r child='child/gene_structure_overview.Rmd'}
 ```
 
 Coverage Statistics
@@ -116,10 +116,10 @@ Intergenic Regions
 Alternative trans-splicing and polyadenylation
 ----------------------------------------------
 
-```{r child='child/figure_03c-e.Rmd'}
+```{r child='child/alternative_site_usage.Rmd'}
 ```
 
-```{r child='child/figure_04a.Rmd'}
+```{r child='child/stage_specific_site_usage.Rmd'}
 ```
 
 Mapping statistics

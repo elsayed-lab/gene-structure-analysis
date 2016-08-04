@@ -24,6 +24,9 @@ names(sl_sites) <- stages
 polya_sites <- as.list(file.path(utr_analysis_outdir, stages, 'polyadenylation_sites.csv'))
 names(polya_sites) <- stages
 
+polypyr_tracts <- as.list(file.path(utr_analysis_outdir, stages, 'polypyrimidine_tracts.csv'))
+names(polypyr_tracts) <- stages
+
 # Sample metadata
 CONFIG <- list(
     # species information
@@ -62,8 +65,10 @@ CONFIG <- list(
 
     # SL / Poly(A) detection data
     'sl_sites' = sl_sites,
-
     'polya_sites' = polya_sites,
+
+    # Polypyrimidine tract information
+    'polypyrimidine_tracts' = polypyr_tracts,
 
     # Non-coding RNA filters
     'id_filter_string'   = 'rRNA|5SRRNA|snRNA|snoRNA|SLRNA|TRNA|SRP',
@@ -89,6 +94,6 @@ CONFIG$samples$stage <- ifelse(CONFIG$samples$condition %in% c('epi', 'trypo'),
 
 # clean-up
 rm(utr_analysis_basedir, utr_analysis_indir, utr_analysis_outdir, input_gffs,
-   utr5_stats, utr3_stats, sl_sites, polya_sites)
+   utr5_stats, utr3_stats, sl_sites, polya_sites, polypyr_tracts)
 ```
 

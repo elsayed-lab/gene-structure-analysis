@@ -10,7 +10,7 @@ for (developmental_stage in stages) {
 
     # get primary and secondary sites
     print(plot_alt_site_distance_hist(sites, developmental_stage,
-                                      upstream_color=CONFIG$colors[4],
+                                      upstream_color=CONFIG$colors[2],
                                       downstream_color=CONFIG$colors[1],
                                       stroke_color=CONFIG$stroke))
 }
@@ -28,7 +28,7 @@ for (developmental_stage in stages) {
 
     # get primary and secondary sites
     print(plot_alt_site_distance_hist(sites, developmental_stage,
-                                      upstream_color=CONFIG$colors[4],
+                                      upstream_color=CONFIG$colors[2],
                                       downstream_color=CONFIG$colors[1],
                                       stroke_color=CONFIG$stroke))
 }
