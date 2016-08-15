@@ -7,6 +7,9 @@ output:
     toc: true
     toc_float: true
     number_sections: true
+  pdf_document:
+    header-includes:
+    - \usepackage{texshade}
 ---
 
 Introduction
@@ -55,18 +58,26 @@ if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
 ```{r load_libraries, message=FALSE, warning=FALSE}
 library('GenomicRanges')
 library('Biostrings')
+library('dynamicTreeCut')
 library('rtracklayer')
 library('ggplot2')
+library('gplots')
 library('gridExtra')
 library('reshape2')
 library('MASS')
 library('dplyr')
 library('readr')
+library('viridis')
+library('msa')
+library('seqLogo')
 source('../../../2015/00-shared/R/util.R')
 source('child/helper.R')
 
 # fix namespace for dplyr functions
 assign('select', dplyr::select, envir=.GlobalEnv)
+
+# random seed
+set.seed(1)
 ```
 
 ```{r include=FALSE}
@@ -120,6 +131,12 @@ Alternative trans-splicing and polyadenylation
 ```
 
 ```{r child='child/stage_specific_site_usage.Rmd'}
+```
+
+Polypyrimidine tracts
+---------------------
+
+```{r child='child/polypyrimidine_tract.Rmd'}
 ```
 
 Mapping statistics

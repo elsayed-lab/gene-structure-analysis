@@ -1,0 +1,107 @@
+## Similarity of polypyrimidine tract sequences
+
+### Pairwise similarity between polypyrimidine sequences
+
+```{r, cache=TRUE, autodep=TRUE}
+# get polypyrimidine tract sequences
+polypyr_combined <- polypyrimidine_tracts %>% filter(stage == 'combined')
+
+seqs <- polypyr_combined$seq
+
+num_seqs <- length(seqs)
+
+# Sequence similarity matrix
+sim_mat <- matrix(0, nrow=num_seqs, ncol=num_seqs)
+
+# Scoring matrix
+submat <- nucleotideSubstitutionMatrix(match=1, mismatch=-1, baseOnly=TRUE)
+
+for (i in 1:num_seqs) {
+    sim_mat[i,] <- pairwiseAlignment(pattern=seqs, subject=seqs[i],
+                                     substitutionMatrix=submat, gapOpening=0,
+                                     gapExtension=0)@score
+}
+rownames(sim_mat) <- colnames(sim_mat) <- polypyr_combined$primary_sl
+
+# set diagonal to zero (improves dynamic range of other values)
+diag(sim_mat) <- 0
+
+# for visualization purposes, we will we will subsample the sequences to speed
+# things up a bit
+ind <- sample(1:nrow(polypyr_combined), 1500)
+
+heatmap.2(sim_mat[ind,ind], trace='none', 
+          symkey=FALSE, cex_lab=0.3, col=viridis, labCol=FALSE,
+          labRow=FALSE,
+          main='Pairwise Polypyrimidine Tract Sequence Alignments')
+```
+
+### Visualization of polypyrimidine sequence clusters
+
+```{r, cluster_sequences, results='asis', cache=TRUE, autodep=TRUE}
+# convert to distance matrix and find clusters of similar polypyrimidine tract
+# sequences 
+dist_mat <- 1 - ((sim_mat - min(sim_mat)) / max(sim_mat))
+tree <- hclust(as.dist(dist_mat), method='average')
+
+# work-around for cutree bug
+tree$height = round(tree$height, 10)
+
+#clusters <- cutree(tree, h=0.6)
+#plot(tree, xlab="Polypyrimidine tract sequences", sub="", labels=FALSE)
+#abline(h=0.6, col='red', lty=2)
+
+clusters <- cutreeDynamicTree(dendro=tree, minModuleSize=30)
+table(clusters)
+
+# get average similarity within each cluster
+avg_similarities <- c()
+
+for (i in sort(unique(clusters))) {
+    cluster_ind <- clusters == i
+
+    avg_similarities <- c(avg_similarities, median(sim_mat[cluster_ind,
+                                                           cluster_ind]))
+}
+
+df <- data_frame(cluster=sort(unique(clusters)), 
+                 avg_similarity=avg_similarities,
+                 num_seqs=table(clusters))
+df <- df %>% arrange(desc(avg_similarity))
+```
+
+```{r, results='asis', cache=TRUE, autodep=TRUE}
+# Iterate over top N clusters and generate a sequence logo for each
+n <- 10
+
+for (i in 1:n) {
+    cluster_choice <- (df %>% arrange(desc(avg_similarity)))$cluster[i]
+    cluster_seqs <- DNAStringSet(seqs[clusters == cluster_choice])
+
+    # perform an MSA
+    alignment <- msa(cluster_seqs)
+
+    # convert to a PFM, and then to a PWM
+    pfm <- consensusMatrix(alignment@unmasked)[DNA_BASES,]
+
+    # same as apply(pfm, 2, function(x) { x / sum(x) })
+    pwm <- prop.table(pfm, 2)
+
+    # find boundaries of main alignment (here, positions where at least 75% of
+    # the sequence aligned)
+    indices <- which(colSums(pfm) >= 0.75 * length(cluster_seqs))
+
+    from <- indices[1]
+    to <- last(indices)
+
+    cat(sprintf("\n### Polypyrimidine tract cluster %d (%d genes)\n\n", i, df$num_seqs[i]))
+
+    seqLogo(pwm[,from:to])
+
+    # visualize result (PDF output only)
+    #msaPrettyPrint(alignment, output="asis", 
+    #               subset=sample(1:length(cluster_seqs), 10), showNames="none",
+    #               showLogo="top", logoColors="rasmol", shadingMode="similar",
+    #               showLegend=FALSE, askForOverwrite=FALSE)
+}
+```
