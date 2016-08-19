@@ -26,17 +26,19 @@ xkable(df, caption='**Table 2**: Stage-specific UTR lengths.')
 ### Average lengths
 
 ```{r, fig.cap='**Figure x** Characterization of _T. cruzi_ gene structure', warning=FALSE}
-# Combined length distribution
+# Average 5'UTR length
 p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
         geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="5'UTR length (nt)", y="Transcript density")
 
+# Average 3'UTR length
 p2 <- ggplot(utr3_stats_combined, aes(x=length)) + 
         geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="3'UTR length (nt)", y="Transcript density")
 
+# Average CDS length
 cds_lengths <- as.data.frame(as.numeric(genes$size))
 colnames(cds_lengths) <- 'length'
 
@@ -44,6 +46,23 @@ p3 <- ggplot(cds_lengths, aes(x=length)) +
         geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="CDS length (nt)", y="Transcript density")
+
+# Average Polypyrimidine tract length
+p4 <- ggplot(polypyrimidine_tracts, aes(x=length)) + 
+        geom_histogram(binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        labs(x="Polypyrimidine tract length (nt)", y="Transcript density")
+
+# Average distance between primary SL site and polypyrimidine tract
+p5 <- ggplot(polypyrimidine_tracts, aes(x=sl_dist)) +
+        geom_histogram(binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        xlim(0, 1500) +
+        labs(x="Distance between primary trans-splicing site and polypyrimidine tract (nt)", y="Transcript density")
+
+# Average distance between primary poly(A) site and polypyrimidine tract
+p6 <- ggplot(polypyrimidine_tracts, aes(x=polya_dist)) +
+        geom_histogram(binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        xlim(0, 1500) +
+        labs(x="Distance between primary polyadenylation site and polypyrimidine tract (nt)", y="Transcript density")
 
 # normalize plot y-axis heights
 get_ylim <- function (plt) {
@@ -54,6 +73,12 @@ plt_ylim <- max(sapply(list(p1, p2, p3), get_ylim))
 grid.arrange(p1 + ylim(0, plt_ylim), 
              p2 + ylim(0, plt_ylim),
              p3 + ylim(0, plt_ylim), ncol=2)
+
+plt_ylim <- max(sapply(list(p4, p5, p6), get_ylim))
+
+grid.arrange(p4 + ylim(0, plt_ylim), 
+             p5 + ylim(0, plt_ylim), 
+             p6 + ylim(0, plt_ylim), ncol=2)
 ```
 
 ### Stage-specific UTR lengths

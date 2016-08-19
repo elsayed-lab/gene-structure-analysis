@@ -3,8 +3,8 @@
 ```{r intergenic_lengths_table, results='asis',  message=FALSE}
 min_read_support = min(CONFIG$min_read_support_5utr,
                        CONFIG$min_read_support_3utr)
-intergenic_regions <- get_intergenic_lengths(gff, min_read_support)
-intergenic_lengths <- intergenic_regions$length
+#intergenic_regions <- get_intergenic_lengths(gff, min_read_support)
+#intergenic_lengths <- intergenic_regions$length
 message(sprintf("Computing intergenic region statistics for %d genes.",
         nrow(intergenic_regions)))
 

@@ -117,12 +117,8 @@ CDS/UTRs
 Intergenic Regions
 ------------------
 
-- **Note**: temporarily skipping to speed up development; will re-enable
-     later.
-<!--
-``{r child='child/intergenic_regions.Rmd'}
-``
--->
+```{r child='child/intergenic_regions.Rmd'}
+```
 
 Alternative trans-splicing and polyadenylation
 ----------------------------------------------
