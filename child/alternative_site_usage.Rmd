@@ -1,6 +1,6 @@
 ### Primary vs. secondary trans-splicing site usage
 
-```{r}
+```{r figure_x_alt_ts}
 # iterate over genes for which primary trans-splicing site was detected
 for (developmental_stage in stages) {
     sites <- sl_sites[[developmental_stage]]
@@ -18,7 +18,7 @@ for (developmental_stage in stages) {
 
 ### Primary vs. secondary polyadenylation site usage
 
-```{r}
+```{r figure_x_alt_polya}
 # iterate over genes for which primary trans-splicing site was detected
 for (developmental_stage in stages) {
     sites <- polya_sites[[developmental_stage]]

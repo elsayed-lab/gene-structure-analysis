@@ -1,3 +1,20 @@
+### RNA-Seq coverage support for UTR boundaries
+
+```{r table_01, results='asis'}
+# see also: scripts/tcruzi_ystrain/S01_*   
+table_01 <- num_reads %>% 
+    mutate(pct_reads_sl=(num_reads_sl/num_reads_parasite) * 100,
+           pct_reads_polya=(num_reads_polya/num_reads_parasite) * 100) %>%
+    group_by(stage) %>%
+    summarize("Human (millions)"=sum(num_reads_host, na.rm=TRUE) / 1E6,
+              "T. cruzi (millions)"=sum(num_reads_parasite) / 1E6,
+              "SL-containing reads"=mean(pct_reads_sl),
+              "Poly(A)-containing reads"=mean(pct_reads_polya)) %>%
+    rename("Parasite Stage"=stage)
+
+xkable(table_01, caption='**Table 1**: Summary of mapping statistics.')
+```
+
 ```{r, results='asis'}
 # human-readable condition names
 condition_mapping <- data.frame(from=c('4', '6', '12', '20', '24', '48', '72',
@@ -9,7 +26,7 @@ condition_mapping <- data.frame(from=c('4', '6', '12', '20', '24', '48', '72',
                                         'Trypomastigote'))
 num_reads$condition_long <- condition_mapping$to[match(num_reads$condition, 
                                                        condition_mapping$from)]
-table_s01 <- num_reads %>%
+table_S01 <- num_reads %>%
     mutate("Infected"=ifelse(condition %in% c('epi', 'trypo'), 'N', 'Y'),
            num_reads_host=replace(num_reads_host, is.na(num_reads_host), 0),
            num_reads_parasite=replace(num_reads_parasite, is.na(num_reads_parasite), 0)) %>%
@@ -30,6 +47,7 @@ table_s01 <- num_reads %>%
            "Reads mapped to hg19"=num_reads_host,
            "% of mapped reads belonging to T. cruzi Esmeraldo haplotype"=parasite_mapped_pct,
            "% of mapped reads belonging to hg19"=host_mapped_pct)
-xkable(table_s01, digits=3, 
+xkable(table_S01, digits=3, 
        caption='**Table S1**: Summary of samples collected and mapping statistics')
 ```
+

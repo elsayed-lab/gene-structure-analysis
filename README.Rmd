@@ -60,6 +60,7 @@ library('GenomicRanges')
 library('Biostrings')
 library('dynamicTreeCut')
 library('rtracklayer')
+library('edgeR')
 library('ggplot2')
 library('gplots')
 library('gridExtra')
@@ -70,6 +71,7 @@ library('readr')
 library('viridis')
 library('msa')
 library('seqLogo')
+library('tibble')
 source('../../../2015/00-shared/R/util.R')
 source('child/helper.R')
 
@@ -96,17 +98,14 @@ Overview
 Coverage Statistics
 -------------------
 
-```{r child='child/table_01.Rmd'}
+```{r child='child/coverage_summary_statistics.Rmd'}
 ```
 
-```{r child='child/table_s01.Rmd'}
+```{r child='child/coverage_utrs.Rmd'}
 ```
 
-CDS/UTRs
---------
-
-```{r child='child/rnaseq_coverage.Rmd'}
-```
+UTR lengths
+-----------
 
 ```{r child='child/length_summary.Rmd'}
 ```
@@ -135,6 +134,12 @@ Polypyrimidine tracts
 ```{r child='child/polypyrimidine_tract.Rmd'}
 ```
 
+Expression across developmental stages
+--------------------------------------
+
+```{r child='child/expression_summary.Rmd'}
+```
+
 Mapping statistics
 ------------------
 
@@ -146,5 +151,23 @@ System Info
 
 ```{r}
 sessionInfo()
+```
+
+```{r include=FALSE}
+# write tables to file
+table_dir <- file.path(CONFIG$output_dir, 'table')
+dir.create(table_dir, recursive=TRUE)
+
+for (table_name in ls()[grepl('^table', ls())]) {
+    if (table_name %in% c('table_dir', 'table_name')) {
+        next
+    }
+    filename <- sprintf("%s.csv", table_name)
+    write.csv(get(table_name), file=file.path(table_dir, filename))
+}
+
+# copy HTML and figures
+system(sprintf('(sleep 30 && cp -r README.html %s) &', CONFIG$output_dir))
+system(sprintf('cp -r README_files/figure-html %s/figure', CONFIG$output_dir))
 ```
 

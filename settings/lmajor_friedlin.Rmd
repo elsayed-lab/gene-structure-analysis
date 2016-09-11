@@ -2,12 +2,12 @@
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
                                   '06-gene-structure/01-gene-structure-determination')
-utr_analysis_suffix <- 'tcruzi_ystrain/sl-min4_polya-min4_mindiff-3'
+utr_analysis_suffix <- 'lmajor_friedlin/sl-min4_polya-min4_mindiff-2'
 utr_analysis_indir  <- file.path(utr_analysis_basedir, 'input', utr_analysis_suffix)
 utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output', utr_analysis_suffix)
 
 # stage-specific inputs
-stages = c('trypomastigote', 'amastigote', 'epimastigote', 'combined')
+stages = c('procyclic', 'metacyclic', 'amastigote', 'combined')
 
 utr5_stats <- as.list(file.path(utr_analysis_outdir, stages, '5utr_stats.csv'))
 names(utr5_stats) <- stages
@@ -28,14 +28,14 @@ polypyr_tracts <- as.list(file.path(utr_analysis_outdir, stages, 'polypyrimidine
 names(polypyr_tracts) <- stages
 
 # Directory containing input files generated specifically for this analysis
-input_dir <- file.path('..', 'input', 'tcruzi_ystrain')
+input_dir <- file.path('..', 'input', 'lmajor_friedlin')
 
 # Sample metadata
 CONFIG <- list(
     # species information
-    'parasite' = 'T. cruzi Y strain',
+    'parasite' = 'L. major Friedlin',
     'host'     = 'H. sapiens',
-    'stages'  = c('trypomastigote', 'amastigote', 'epimastigote'),
+    'stages'  = c('procyclic', 'metacyclic', 'amastigote'),
 
     # Discrete color palette and stroke color to use for plots
 
@@ -47,13 +47,13 @@ CONFIG <- list(
     'verbose' = FALSE,
 
     # Sample metadata
-    'samples' = read.csv('tcruzi_ystrain_samples.csv'),
+    'samples' = read.csv('lmajor_friedlin_samples.csv'),
 
     # Order to use when displaying conditions
     'condition_order' = c('trypo', 'epi', '4', '6', '12', '24', '48', '72'),
 
     # output directory
-    'output_dir' = 'output/tcruzi_ystrain/1.0',
+    'output_dir' = 'output/lmajor_friedlin/1.0',
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like/genome/'),

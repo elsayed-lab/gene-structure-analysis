@@ -1,11 +1,11 @@
 ### Summary of UTR and CDS lengths
 
-```{r gene_structure_summary_table, results='asis'}
+```{r table_01b, results='asis'}
 # Table 1: Gene Structure Summary
-summary_dat <- gene_structure_summary(utr5_stats_combined$length,
+table_01b <- gene_structure_summary(utr5_stats_combined$length,
                                       as.numeric(genes$size),
                                       utr3_stats_combined$length)
-xkable(summary_dat, caption='**Table 1** Gene structure summary table.')
+xkable(table_01b, caption='**Table 1b** Gene structure summary table.')
 ```
 
 ### Comparison of UTR lengths across stages
@@ -13,19 +13,19 @@ xkable(summary_dat, caption='**Table 1** Gene structure summary table.')
 Median UTR length for each development stage.
 
 ```{r lengths_by_developmental_stage, results='asis'}
-df <- cbind(
+table_02 <- cbind(
 	stage=stages,
 	utr5=(utr5_summary %>% filter(stage != 'combined'))$median,
 	utr3=(utr3_summary %>% filter(stage != 'combined'))$median
 )
-colnames(df) <- c('stage', "5'UTR", "3'UTR")
+colnames(table_02) <- c('stage', "5'UTR", "3'UTR")
 
-xkable(df, caption='**Table 2**: Stage-specific UTR lengths.')
+xkable(table_02, caption='**Table 2**: Stage-specific UTR lengths.')
 ```
 
 ### Average lengths
 
-```{r, fig.cap='**Figure x** Characterization of _T. cruzi_ gene structure', warning=FALSE}
+```{r figure_x_average_lengths, fig.cap='**Figure x** Characterization of _T. cruzi_ gene structure', warning=FALSE}
 # Average 5'UTR length
 p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
         geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
@@ -85,7 +85,7 @@ grid.arrange(p4 + ylim(0, plt_ylim),
 
 #### 5'UTR
 
-```{r, warning=FALSE}
+```{r figure_x_5utr_lengths, warning=FALSE}
 # Stage-specific distributions
 ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +
@@ -97,7 +97,7 @@ ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fil
 
 #### 3'UTR
 
-```{r, warning=FALSE}
+```{r figure_x_3utr_lengths, warning=FALSE}
 # Stage-specific distributions
 ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +

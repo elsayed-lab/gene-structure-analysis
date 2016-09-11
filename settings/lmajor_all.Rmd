@@ -15,8 +15,8 @@ verbose = TRUE,
 
 max_plots = 10
 
-# output file prefix
-outfile_prefix = 'lmajor_all_separate'
+# output location
+'output_dir' = 'output/lmajor_friedlin',
 
 # fasta/gff
 input_gff   = file.path(Sys.getenv('REF'), 'lmajor_friedlin',

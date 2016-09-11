@@ -1,4 +1,4 @@
-```{r fig.height=250/96, fig.cap="**Figure 1**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
+```{r figure_01, fig.height=250/96, fig.cap="**Figure 1**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
 # Summary of gene structure
 utr5_summary <- utr5_stats %>% 
 	group_by(stage) %>% 
@@ -21,4 +21,20 @@ median_ppt  <- (pp_tract_summary %>% filter(stage == 'combined'))$median
 
 plot_gene_structure(median_5utr, median_cds, median_3utr,
                     utr_color=CONFIG$colors[2], cds_color=CONFIG$colors[1])
+```
+
+```{r cross_species_comparison}
+# T. brucei gene structure stats (Kolev et al., 2010)
+# Median CDS size computed using all `gene` entries from TriTrypDB-27_TbruceiTREU927.gff
+tb_median_cds <- 1470
+
+# L. major Friedlin structure stats
+# Median CDS size computed using all `gene` entries from 
+#
+# filepath  = '/path/to/TriTrypDB-27_LmajorFriedlin.gff'
+# gff <- import.gff3(filepath)
+# genes <- gff[gff$type == 'gene']
+# median(as.numeric(genes$size))
+#
+lm_median_cds <- 1269
 ```

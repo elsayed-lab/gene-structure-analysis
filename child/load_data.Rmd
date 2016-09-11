@@ -10,7 +10,8 @@ The sources of data and annotations are:
 3. Stage-specific spliced leader and poly(A) site CSV files)
    - Separate files for each stage, and for each site type (SL/Poly(A).
    - One entry for each detected site, including read coverage information.
-4. Summary 5'UTR, 3'UTR, trans-splicing and polyadenylation statistics.
+4. Summary 5'UTR, 3'UTR, trans-splicing, polyadenylation, inter-CDS,
+    and polypyrimidine tract statistics.
    - 5' and 3'UTRs as defined by the primary acceptor and poly-adenylation
      sites detected when aggregating data across all parasite developmental
      stages.
@@ -34,6 +35,10 @@ RNA-Seq samples, the following two analysis pipelines may be applied sequently:
           for the inter-CDS regions where primary UTR boundaries could be
           assigned, with each site assigned as being 'primary' or
           'alternative'.
+        - CSV file containing information about all detected polypyrimidine
+          tracts
+        - CSV file containing information about inter-CDS and intergenic
+          regions.
 
 ## Load sequence and annotations
 
@@ -73,6 +78,11 @@ if (CONFIG$parasite == 'L. major') {
     # Fix names (L. major chromosome identifiers)
     names(fasta) <- substring(names(fasta), 0, 7)
 }
+```
+
+```{r}
+# create a gene/chromosome mapping
+chr_mapping <- data_frame(gene=genes$ID, chr=as.character(genes@seqnames))
 ```
 
 ## Remove noncoding RNAs
@@ -131,6 +141,18 @@ for (stage in CONFIG$stages) {
 }
 ```
 
+## Load inter-CDS and intergenic region information
+
+```{r load_intercds_regions, warning=FALSE}
+intercds_regions <- cbind(read_csv(CONFIG$intercds_regions[['combined']]),
+                                   stage='combined')
+
+for (stage in CONFIG$stages) {
+    dat <- read_csv(CONFIG$intercds_regions[[stage]])
+    intercds_regions <- rbind(intercds_regions, cbind(dat, stage=stage))
+}
+```
+
 ### Load 5' and 3'UTR summary statistics
 
 Summary statistics describing the _primary_ 5' and 3'UTR boundaries.
@@ -138,6 +160,7 @@ Summary statistics describing the _primary_ 5' and 3'UTR boundaries.
 ```{r}
 # Create data.frames containing the 5' and 3' length stats
 utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[['combined']]), stage='combined')
+
 for (stage in CONFIG$stages) {
     utr5_stats <- rbind(utr5_stats, 
                         cbind(read_csv(CONFIG$utr5_stats[[stage]]), stage=stage))
@@ -177,7 +200,7 @@ for (stg in stages) {
     utr5_missing <- all_utr5[!all_utr5 %in% stage_specific_utr5$gene]
 
     if (length(utr5_missing) > 0) {
-        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, NA, stg)
+        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, NA, NA, stg)
         colnames(placeholders) <- colnames(utr5_stats)
         utr5_stats <- rbind(utr5_stats, placeholders)
     }
@@ -185,7 +208,7 @@ for (stg in stages) {
     utr3_missing <- all_utr3[!all_utr3 %in% stage_specific_utr3$gene]
 
     if (length(utr3_missing) > 0) {
-        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, NA, stg)
+        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, NA, NA, stg)
         colnames(placeholders) <- colnames(utr3_stats)
 
         # add to main dataframe
@@ -229,7 +252,11 @@ utr5_stats_combined <- utr5_stats %>% filter(stage == 'combined')
 utr3_stats_combined <- utr3_stats %>% filter(stage == 'combined')
 ```
 
-### Load RNA-Seq read counts
+### Load RNA-Seq read counts and mapping statistics
+
+```{r load_raw_rnaseq_counts}
+count_table <- read.csv(CONFIG$count_table, row.names=1)
+```
 
 Total number of RNA-Seq reads used in analysis and total number of reads which
 mapped to the host and parasite genomes.
@@ -270,3 +297,16 @@ mapping_stats$num_parasite_reads <- mapping_stats$num_reads_parasite +
                                     mapping_stats$num_reads_polya
 
 ```
+
+### Load polycistronic transcriptional unit (PTU) mapping
+
+Next we will load a mapping of gene PTU's created in a separate analysis. The
+`med_5` column name in the original file refers to the level of smoothing that
+was used during PTU detection.
+
+The mapping was
+
+```{r}
+ptu_mapping <- read_csv(CONFIG$ptu_mapping)
+```
+

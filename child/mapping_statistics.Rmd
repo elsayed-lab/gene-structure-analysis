@@ -7,7 +7,7 @@
 #           pct_reads_parasite=(num_reads_parasite/num_reads_total) * 100,
 #           pct_reads_mapped_total=((num_reads_host + num_reads_parasite) / num_reads_total) * 100)
 
-dat <- mapping_stats %>% 
+table_S02 <- mapping_stats %>% 
     group_by(Stage=condition) %>% 
     summarize(
         'Parasite reads'=sum(num_reads_parasite),
@@ -16,7 +16,7 @@ dat <- mapping_stats %>%
     )
 
 # reorder by development stage
-dat <- dat[match(CONFIG$condition_order, dat$Stage),]
+table_S02 <- table_S02[match(CONFIG$condition_order, table_S02$Stage),]
 
-xkable(dat, caption='**Table S2 (A)** SL-containing reads')
+xkable(table_S02, caption='**Table S2 (A)** SL-containing reads')
 ```
