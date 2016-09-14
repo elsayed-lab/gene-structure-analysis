@@ -2,7 +2,7 @@
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
                                   '06-gene-structure/01-gene-structure-determination')
-utr_analysis_suffix <- 'lmajor_friedlin/sl-min4_polya-min4_mindiff-2'
+utr_analysis_suffix <- 'lmajor_hsapiens/sl-min4_polya-min4_mindiff-2'
 utr_analysis_indir  <- file.path(utr_analysis_basedir, 'input', utr_analysis_suffix)
 utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output', utr_analysis_suffix)
 
@@ -28,14 +28,15 @@ polypyr_tracts <- as.list(file.path(utr_analysis_outdir, stages, 'polypyrimidine
 names(polypyr_tracts) <- stages
 
 # Directory containing input files generated specifically for this analysis
-input_dir <- file.path('..', 'input', 'lmajor_friedlin')
+input_dir <- file.path('..', '..', 'input', 'lmajor_hsapiens')
 
 # Sample metadata
 CONFIG <- list(
     # species information
-    'parasite' = 'L. major Friedlin',
-    'host'     = 'H. sapiens',
-    'stages'  = c('procyclic', 'metacyclic', 'amastigote'),
+    'parasite'   = 'L. major Friedlin',
+    'host'       = 'H. sapiens',
+    'stages'     = c('procyclic', 'metacyclic', 'amastigote'),
+    'short_name' = 'lmajor',
 
     # Discrete color palette and stroke color to use for plots
 
@@ -47,23 +48,33 @@ CONFIG <- list(
     'verbose' = FALSE,
 
     # Sample metadata
-    'samples' = read.csv('lmajor_friedlin_samples.csv'),
+    'samples' = read.csv('lmajor_hsapiens_samples.csv'),
 
     # Order to use when displaying conditions
-    'condition_order' = c('trypo', 'epi', '4', '6', '12', '24', '48', '72'),
+    'condition_order' = c('proc', 'meta', '4', '4', '24', '48', '72'),
+
+    # human-readable condition names
+    condition_mapping = data.frame(from=c('4', '24', '48', '72', 'proc', 'meta'),
+                                   to=c('Amastigote 4 hpi', 'Amastigote 24 hpi', 
+                                        'Amastigote 48 hpi', 'Amastigote 72 hpi', 
+                                        'Procyclic Promastigote',
+                                        'Metacyclic Promastigote')),
 
     # output directory
-    'output_dir' = 'output/lmajor_friedlin/1.0',
+    'cache_dir'  = 'README_cache/lmajor',
+    'output_dir' = 'output/lmajor_hsapiens/1.0',
 
     # TriTrypDB FASTA genome sequence
-    'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like/genome/'),
+    'input_fasta' = file.path(Sys.getenv("REF"), 'lmajor_friedlin/genome/',
+                              'TriTrypDB-28_LmajorFriedlin_Genome.fasta'),
 
     # Stage-specific GFFs containing genes and annotated UTRs
-    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
+    'input_gff' = file.path(utr_analysis_outdir, 'combined',
+                            'TriTrypDB-27_LmajorFriedlin_plus_unannotated_upstream_downstream_orfs-with-utrs.gff'),
 
     # RNA-Seq count table
-    'count_table' = file.path(Sys.getenv("SCRATCH"), 'tcruzi-hsapiens',
-                              'counts', 'tcruzi-all-samples.csv'),
+    'count_table' = file.path(Sys.getenv("SCRATCH"), 'lmajor-hsapiens',
+                              'counts', 'lmajor-all-samples.csv'),
 
     # Stage-specific primary site / UTR statistics
     'utr5_stats' = utr5_stats,
@@ -73,10 +84,10 @@ CONFIG <- list(
     # Polycistronic transcriptional unit (PTU) mapping
     'ptu_mapping' = file.path(Sys.getenv('RESEARCH'), '2013', '09-polycistron_detection',
                               'mappings',
-                              'TriTrypDB-28_TcruziCLBrenerEsmeraldo-like_PTUs.csv'),
+                              'TriTrypDB-28_LmajorFriedlin_PTUs.csv'),
 
     # Chromosome order to use for plotting
-    'chr_order' = sprintf("TcChr%d-S", 1:41),
+   'chr_order' = sprintf("LmjF.%02d", 1:36),
 
     # SL / Poly(A) detection data
     'sl_sites' = sl_sites,
@@ -107,7 +118,8 @@ CONFIG <- list(
 )
 
 # add intra/extracellular field to samples
-CONFIG$samples$stage <- ifelse(CONFIG$samples$condition %in% c('epi', 'trypo'),
+CONFIG$samples$stage <- ifelse(CONFIG$samples$condition %in% c('procyclicLM',
+                                                               'metacyclicLM'),
                                'Extracellular', 'Intracellular')
 
 # create output directory if it doesn't already exist

@@ -25,7 +25,7 @@ xkable(table_02, caption='**Table 2**: Stage-specific UTR lengths.')
 
 ### Average lengths
 
-```{r figure_x_average_lengths, fig.cap='**Figure x** Characterization of _T. cruzi_ gene structure', warning=FALSE}
+```{r figure_x_average_lengths, fig.cap=sprintf('**Figure x** Characterization of %s gene structure', CONFIG$parasite), warning=FALSE}
 # Average 5'UTR length
 p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
         geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +

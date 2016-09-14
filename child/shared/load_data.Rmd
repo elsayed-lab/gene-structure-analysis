@@ -58,43 +58,49 @@ genes       <- gff[gff$type == 'gene']
 # e.g. "LmjF.24 | organism=Leishmania_major_strain_Friedlin |..." -> "LmjF.24"
 names(fasta) <- sapply(strsplit(names(fasta), ' | '), function(x) {x[1]})
 
-# L. major: load unannotated ORFs detected from ribosome profiling data
-if (CONFIG$parasite == 'L. major') {
-    orfs      <- gff[gff$type == 'ORF']
-    orfs$Name <- orfs$ID
-    orfs$description <- 'Unannotated ORF'
-
-    # 2015/06/30 A few of the unannotated ORFs appear to have multiple conflicting
-    # entries -- removing these for now...
-    orfs <- orfs[!duplicated(orfs$Name)]
-
-    # Drop GFF columns not shared between TriTrypDB GFF and uORF GFF
-    keep_cols <- intersect(colnames(mcols(genes)), colnames(mcols(orfs)))
-    genes <- genes[,keep_cols]
-    orfs <- orfs[,keep_cols]
-
-    genes <- append(genes, orfs)
-
-    # Fix names (L. major chromosome identifiers)
-    names(fasta) <- substring(names(fasta), 0, 7)
+# For L. major GFF including unannotated ORFs, compute size
+if (sum(is.na(genes$size)) > 0) {
+    missing_size <- is.na(genes$size)
+    genes$size[missing_size] <- end(genes[missing_size]) - start(genes[missing_size])
 }
+
+# L. major: load unannotated ORFs detected from ribosome profiling data
+#if (CONFIG$parasite == 'L. major Friedlin') {
+#    orfs      <- gff[gff$type == 'ORF']
+#    orfs$Name <- orfs$Name
+#    orfs$description <- 'Unannotated ORF'
+
+#    # 2015/06/30 A few of the unannotated ORFs appear to have multiple conflicting
+#    # entries -- removing these for now...
+#    orfs <- orfs[!duplicated(orfs$Name)]
+
+#    # Drop GFF columns not shared between TriTrypDB GFF and uORF GFF
+#    keep_cols <- intersect(colnames(mcols(genes)), colnames(mcols(orfs)))
+#    genes <- genes[,keep_cols]
+#    orfs <- orfs[,keep_cols]
+
+#    genes <- append(genes, orfs)
+
+#    # Fix names (L. major chromosome identifiers)
+#    names(fasta) <- substring(names(fasta), 0, 7)
+#}
 ```
 
 ```{r}
 # create a gene/chromosome mapping
-chr_mapping <- data_frame(gene=genes$ID, chr=as.character(genes@seqnames))
+chr_mapping <- data_frame(gene=genes$Name, chr=as.character(genes@seqnames))
 ```
 
 ## Remove noncoding RNAs
 
 ```{r filter_ncrnas}
 # filter noncoding RNAs
-noncoding_ids <- genes$ID[grepl(CONFIG$id_filter_string, genes$ID)]
+noncoding_ids <- genes$Name[grepl(CONFIG$id_filter_string, genes$Name)]
 
 ncrna_mask <- rep(FALSE, length(genes))
 
 if (!is.null(CONFIG$id_filter_string)) {
-    ncrna_mask <- ncrna_mask | grepl(CONFIG$id_filter_string, genes$ID)
+    ncrna_mask <- ncrna_mask | grepl(CONFIG$id_filter_string, genes$Name)
 }
 
 if (!is.null(CONFIG$type_filter_string)) {

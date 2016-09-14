@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi v0.5)
+title: Trypanosome Gene Structure Analysis (L. major 1.0)
 author: Keith Hughitt
 output:
   html_document:
@@ -15,11 +15,11 @@ output:
 Introduction
 ============
 
-In previous work, *L. major* and *T. cruzi* RNA-Seq data was used to determine
-UTR boundaries and splice leader and polyadenylation acceptor 
+In previous work, *L. major* Friedlin and *T. cruzi* Y strain RNA-Seq data was
+used to determine UTR boundaries and splice leader and polyadenylation acceptor
 sites ([1](https://github.com/elsayed-lab/utr_analysis)), and to look for
 evidence of alternative trans-splicing and poly-adenylation, and compute basic
-statistics relating to SL and Poly(A) site usage 
+statistics relating to SL and Poly(A) site usage
 ([2](http://www.umiacs.umd.edu/~keith/research/2015/110-utr-lengths/)) across
 on a genome-wide scale.
 
@@ -36,7 +36,7 @@ scripts are provided in the `scripts/` folder.
 
 ```{r include=FALSE}
 library(knitr)
-knit('settings/tcruzi_ystrain.Rmd', quiet=TRUE, output=tempfile())
+knit('settings/lmajor_hsapiens.Rmd', quiet=TRUE, output=tempfile())
 ```
 
 ```{r knitr_settings, include=FALSE}
@@ -44,6 +44,7 @@ opts_knit$set(progress=FALSE, verbose=TRUE)
 opts_chunk$set(fig.width=1080/96,
                fig.height=1080/96,
                dpi=96,
+               cache.path=CONFIG$cache_dir,
 			   echo=CONFIG$verbose)
 options(digits=4)
 options(stringsAsFactors=FALSE)
@@ -73,7 +74,7 @@ library('msa')
 library('seqLogo')
 library('tibble')
 source('../../../2015/00-shared/R/util.R')
-source('child/helper.R')
+source('child/shared/helper.R')
 
 # fix namespace for dplyr functions
 assign('select', dplyr::select, envir=.GlobalEnv)
@@ -83,7 +84,7 @@ set.seed(1)
 ```
 
 ```{r include=FALSE}
-knit('child/load_data.Rmd', quiet=TRUE, output=tempfile())
+knit('child/shared/load_data.Rmd', quiet=TRUE, output=tempfile())
 ```
 
 Results
@@ -92,58 +93,58 @@ Results
 Overview
 --------
 
-```{r child='child/gene_structure_overview.Rmd'}
+```{r child='child/shared/gene_structure_overview.Rmd'}
 ```
 
 Coverage Statistics
 -------------------
 
-```{r child='child/coverage_summary_statistics.Rmd'}
+```{r child='child/shared/coverage_summary_statistics.Rmd'}
 ```
 
-```{r child='child/coverage_utrs.Rmd'}
+```{r child='child/shared/coverage_utrs.Rmd'}
 ```
 
 UTR lengths
 -----------
 
-```{r child='child/length_summary.Rmd'}
+```{r child='child/shared/length_summary.Rmd'}
 ```
 
-```{r child='child/length_correlations.Rmd'}
+```{r child='child/shared/length_correlations.Rmd'}
 ```
 
 Intergenic Regions
 ------------------
 
-```{r child='child/intergenic_regions.Rmd'}
+```{r child='child/shared/intergenic_regions.Rmd'}
 ```
 
 Alternative trans-splicing and polyadenylation
 ----------------------------------------------
 
-```{r child='child/alternative_site_usage.Rmd'}
+```{r child='child/shared/alternative_site_usage.Rmd'}
 ```
 
-```{r child='child/stage_specific_site_usage.Rmd'}
+```{r child='child/shared/stage_specific_site_usage.Rmd'}
 ```
 
 Polypyrimidine tracts
 ---------------------
 
-```{r child='child/polypyrimidine_tract.Rmd'}
+```{r child='child/shared/polypyrimidine_tract.Rmd'}
 ```
 
 Expression across developmental stages
 --------------------------------------
 
-```{r child='child/expression_summary.Rmd'}
+```{r child='child/shared/expression_summary.Rmd'}
 ```
 
 Mapping statistics
 ------------------
 
-```{r child='child/mapping_statistics.Rmd'}
+```{r child='child/shared/mapping_statistics.Rmd'}
 ```
 
 System Info

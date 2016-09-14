@@ -28,7 +28,7 @@ polypyr_tracts <- as.list(file.path(utr_analysis_outdir, stages, 'polypyrimidine
 names(polypyr_tracts) <- stages
 
 # Directory containing input files generated specifically for this analysis
-input_dir <- file.path('..', 'input', 'tcruzi_ystrain')
+input_dir <- file.path('..', '..', 'input', 'tcruzi_ystrain')
 
 # Sample metadata
 CONFIG <- list(
@@ -52,14 +52,26 @@ CONFIG <- list(
     # Order to use when displaying conditions
     'condition_order' = c('trypo', 'epi', '4', '6', '12', '24', '48', '72'),
 
+    # human-readable condition names
+    condition_mapping = data.frame(from=c('4', '6', '12', '20', '24', '48', '72',
+                                          'epi', 'trypo'),
+                                   to=c('Amastigote 4 hpi', 'Amastigote 6 hpi', 
+                                        'Amastigote 12 hpi', 'Amastigote 20 hpi',
+                                        'Amastigote 24 hpi', 'Amastigote 48 hpi',
+                                        'Amastigote 72 hpi', 'Epimastigote',
+                                        'Trypomastigote')),
+
     # output directory
+    'cache_dir'  = 'README_cache/tcruzi',
     'output_dir' = 'output/tcruzi_ystrain/1.0',
 
     # TriTrypDB FASTA genome sequence
-    'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like/genome/'),
+    'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 
+                              '/genome/TriTrypDB-28_TcruziCLBrenerEsmeraldo-like_Genome.fasta'),
 
     # Stage-specific GFFs containing genes and annotated UTRs
-    'input_gff' = file.path(utr_analysis_outdir, 'combined', 'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
+    'input_gff' = file.path(utr_analysis_outdir, 'combined',
+                            'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
 
     # RNA-Seq count table
     'count_table' = file.path(Sys.getenv("SCRATCH"), 'tcruzi-hsapiens',

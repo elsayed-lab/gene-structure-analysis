@@ -14,7 +14,7 @@ num_seqs <- length(seqs)
 sim_mat <- matrix(0, nrow=num_seqs, ncol=num_seqs)
 
 # Scoring matrix
-submat <- nucleotideSubstitutionMatrix(match=0, mismatch=-1, baseOnly=TRUE)
+submat <- nucleotideSubstitutionMatrix(match=1, mismatch=-1, baseOnly=TRUE)
 
 for (i in 1:num_seqs) {
     sim_mat[i,] <- pairwiseAlignment(pattern=seqs, subject=seqs[i],

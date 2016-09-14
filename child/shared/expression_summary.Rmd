@@ -2,8 +2,16 @@
 
 ```{r data_prep}
 # Create RPKM-normalized version of counts
-gene_lengths <- data.frame(gene=genes$ID, length=as.numeric(genes$size))
+gene_lengths <- data.frame(gene=genes$Name, length=as.numeric(genes$size))
+
+# remove duplicates and entries missing from main count table
+gene_lengths <- gene_lengths[gene_lengths$gene %in% rownames(count_table),]
+gene_lengths <- gene_lengths[!duplicated(gene_lengths$gene),]
+
 length_vector <- gene_lengths[match(row.names(count_table), gene_lengths$gene), 'length']
+
+# Exclude counts for SLRNAs, etc. not included in gene_lengths
+count_table <- count_table[rownames(count_table) %in% gene_lengths$gene,]
 
 rpkm_counts <- rpkm(count_table, gene.length=length_vector)
 ```
@@ -65,6 +73,14 @@ ptu_expr_averages <- rpkm_totals %>%
 ptu_expr_averages <- merge(ptu_expr_averages, 
                            rpkm_totals %>% select(chr, ptu) %>% unique, by='ptu')
 
+# Compute the combined length of CDS's for each PTU
+ptu_cds_total_lengths <- merge(gene_lengths, ptu_mapping, by.x='gene', by.y='gene_id') %>%
+    group_by(ptu) %>%
+    summarise(total_length=sum(length))
+
+ptu_stats <- merge(ptu_cds_total_lengths, ptu_expr_averages, by='ptu') %>%
+    mutate(expr_per_nt=average_expr/total_length)
+
 # ptu display order
 ptu_order <- sort(unique(ptu_stats$ptu))
 
@@ -76,14 +92,6 @@ ggplot(ptu_expr_averages, aes(x=ptu, y=average_expr)) +
     xlab("PTU") +
     ylab("Median Gene Expression (RPKM)") +
     ggtitle("Average RPKM expression by PTU")
-
-# Compute the combined length of CDS's for each PTU
-ptu_cds_total_lengths <- merge(gene_lengths, ptu_mapping, by.x='gene', by.y='gene_id') %>%
-    group_by(ptu) %>%
-    summarise(total_length=sum(length))
-
-ptu_stats <- merge(ptu_cds_total_lengths, ptu_expr_averages, by='ptu') %>%
-    mutate(expr_per_nt=median_expr/total_length)
 
 #ptu_stats <- merge(ptu_stats, rpkm_totals %>% select(chr, ptu) %>% unique, by='ptu')
 
