@@ -1,8 +1,9 @@
 #!/usr/bin/zsh
 
 #
-# Counts the total number of SL-containing or Poly(A)-containing reads 
-#
+# Counts the total number of SL-containing or Poly(A)-containing reads, per
+# RNA-Seq sample
+# 
 sl_outfile="../../input/tcruzi_ystrain/S01_num_reads_sl.csv"
 polya_outfile="../../input/tcruzi_ystrain/S01_num_reads_polya.csv"
 echo "sample_id,num_reads_sl" > $sl_outfile 

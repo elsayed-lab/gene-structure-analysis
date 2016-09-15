@@ -8,10 +8,11 @@ gene_lengths <- data.frame(gene=genes$Name, length=as.numeric(genes$size))
 gene_lengths <- gene_lengths[gene_lengths$gene %in% rownames(count_table),]
 gene_lengths <- gene_lengths[!duplicated(gene_lengths$gene),]
 
-length_vector <- gene_lengths[match(row.names(count_table), gene_lengths$gene), 'length']
-
 # Exclude counts for SLRNAs, etc. not included in gene_lengths
 count_table <- count_table[rownames(count_table) %in% gene_lengths$gene,]
+
+# Create a vector of gene lengths
+length_vector <- gene_lengths[match(row.names(count_table), gene_lengths$gene), 'length']
 
 rpkm_counts <- rpkm(count_table, gene.length=length_vector)
 ```
@@ -27,7 +28,8 @@ rpkm_totals <- merge(rpkm_totals, chr_mapping, by='gene')
 # Compute average total RPKM for each chromosome
 chr_expr_averages <- rpkm_totals %>% 
     group_by(chr) %>%
-    summarize(average_expr=median(expr))
+    summarize(average_expr=median(expr),
+              total_expr=sum(expr))
 
 ggplot(chr_expr_averages, aes(x=chr, y=average_expr)) + 
     geom_bar(stat='identity', fill=CONFIG$colors[1]) +
@@ -38,7 +40,7 @@ ggplot(chr_expr_averages, aes(x=chr, y=average_expr)) +
     ggtitle("Average RPKM expression by chromosome")
 ```
 
-### Average RPKM expression by chromosome, scaled by chromosome length
+### Average RPKM expression for at the nucleotide level
 
 ```{r figure_x_chr_rpkm_expr_by_nt, expression_by_chr_rpkm_len}
 chr_cds_total_lengths <- merge(gene_lengths, chr_mapping, by='gene') %>%
@@ -46,7 +48,7 @@ chr_cds_total_lengths <- merge(gene_lengths, chr_mapping, by='gene') %>%
     summarise(total_length=sum(length))
 
 chr_stats <- merge(chr_cds_total_lengths, chr_expr_averages, by='chr') %>%
-    mutate(expr_per_nt=average_expr/total_length)
+    mutate(expr_per_nt=total_expr/total_length)
 
 ggplot(chr_stats, aes(x=chr, y=expr_per_nt)) +
     geom_bar(stat='identity', color=CONFIG$stroke, fill=CONFIG$colors[1]) +
@@ -54,11 +56,10 @@ ggplot(chr_stats, aes(x=chr, y=expr_per_nt)) +
     theme(axis.text.x=element_text(angle=90)) +
     xlab("Chromosome") +
     ylab("Median RPKM expression per nucleotide") +
-    ggtitle("Average RPKM expression by chromosome, scaled by chromosome length")
-
+    ggtitle("Average RPKM expression per nt for each chromosome")
 ```
 
-### Average RPKM expression by PRU, scaled by PTU length
+### Average RPKM expression per nucleotide by PTU
 
 ```{r figure_x_expression_by_ptu_rpkm_len}
 # Add PTU mapping to RPKM gene counts
@@ -67,7 +68,8 @@ rpkm_totals <- merge(rpkm_totals, ptu_mapping, by.x='gene', by.y='gene_id')
 # Determine the average expression by PTU
 ptu_expr_averages <- rpkm_totals %>% 
     group_by(ptu) %>%
-    summarise(average_expr=median(expr))
+    summarise(average_expr=median(expr),
+              total_expr=sum(expr))
 
 # Add chromosome information
 ptu_expr_averages <- merge(ptu_expr_averages, 
@@ -79,7 +81,7 @@ ptu_cds_total_lengths <- merge(gene_lengths, ptu_mapping, by.x='gene', by.y='gen
     summarise(total_length=sum(length))
 
 ptu_stats <- merge(ptu_cds_total_lengths, ptu_expr_averages, by='ptu') %>%
-    mutate(expr_per_nt=average_expr/total_length)
+    mutate(expr_per_nt=total_expr/total_length)
 
 # ptu display order
 ptu_order <- sort(unique(ptu_stats$ptu))

@@ -76,9 +76,8 @@ CONFIG <- list(
     'count_table' = file.path(Sys.getenv("SCRATCH"), 'lmajor-hsapiens',
                               'counts', 'lmajor-all-samples.csv'),
 
-    # Stage-specific primary site / UTR statistics
+    # Stage-specific _primary_ SL/Poly(A) site and UTR statistics
     'utr5_stats' = utr5_stats,
-
     'utr3_stats' = utr3_stats,
 
     # Polycistronic transcriptional unit (PTU) mapping

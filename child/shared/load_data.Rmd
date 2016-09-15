@@ -30,8 +30,9 @@ RNA-Seq samples, the following two analysis pipelines may be applied sequently:
    - Outputs include:
         - An extended version of a TriTrypDB GFF file containing the annotated
           UTR bounaries
-        - CSV summary statistics for primary UTR boundaries
-        - CSV files containing all trans-splicing and polyadenylation sites
+        - CSV summary statistics for _primary_ 5' and 3'UTR boundaries
+          (`5utr_stats.csv` and `3utr_stats.csv`)
+        - CSV files containing _all_ trans-splicing and polyadenylation sites
           for the inter-CDS regions where primary UTR boundaries could be
           assigned, with each site assigned as being 'primary' or
           'alternative'.
@@ -164,7 +165,7 @@ for (stage in CONFIG$stages) {
 Summary statistics describing the _primary_ 5' and 3'UTR boundaries.
 
 ```{r}
-# Create data.frames containing the 5' and 3' length stats
+# Create data.frames containing the primary 5' and 3' length stats
 utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[['combined']]), stage='combined')
 
 for (stage in CONFIG$stages) {

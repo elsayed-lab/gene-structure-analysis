@@ -3,8 +3,8 @@
 #
 # Counts the total number of SL-containing or Poly(A)-containing reads 
 #
-sl_outfile="../../input/lmajor_friedlin/S01_num_reads_sl.csv"
-polya_outfile="../../input/lmajor_friedlin/S01_num_reads_polya.csv"
+sl_outfile="../../input/lmajor_hsapiens/S01_num_reads_sl.csv"
+polya_outfile="../../input/lmajor_hsapiens/S01_num_reads_polya.csv"
 echo "sample_id,num_reads_sl" > $sl_outfile 
 echo "sample_id,num_reads_polya" > $polya_outfile 
 

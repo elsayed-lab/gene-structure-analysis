@@ -2,10 +2,11 @@
 
 ```{r table_04, results='asis'}
 table_04 <- cbind(c("5'UTR", "3'UTR"), 
-            c(sum(utr5_stats$num_reads, na.rm=TRUE), sum(utr3_stats$num_reads, na.rm=TRUE)))
-colnames(table_04) <- c("Feature", "Number of reads")
+            c(sum(utr5_stats_combined$num_reads, na.rm=TRUE),
+              sum(utr3_stats_combined$num_reads, na.rm=TRUE)) / 1E6)
+colnames(table_04) <- c("Feature", "Number of reads (millions)")
 
-xkable(table_04, caption='**Table 4**: Number of reads supporting the primary UTR boundaries')
+xkable(table_04, caption='**Table 4**: Number of reads supporting the primary UTR boundaries (millions)')
 ```
 
 ```{r figure_03, fig.show='hold', out.width='450px', fig.cap="**Figure 3**: Distribution of number of SL- and Poly(A)-containing reads."}
