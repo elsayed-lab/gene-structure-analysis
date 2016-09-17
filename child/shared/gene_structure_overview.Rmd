@@ -1,10 +1,10 @@
 ```{r figure_01, fig.height=250/96, fig.cap="**Figure 1**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
 # Summary of gene structure
-utr5_summary <- utr5_stats %>% 
+utr5_summary <- utr5_stats_filtered %>% 
 	group_by(stage) %>% 
 	summarise(median=median(length, na.rm=TRUE))
 
-utr3_summary <- utr3_stats %>% 
+utr3_summary <- utr3_stats_filtered %>% 
 	group_by(stage) %>% 
 	summarise(median=median(length, na.rm=TRUE))
 

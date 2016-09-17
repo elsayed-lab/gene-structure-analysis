@@ -2,7 +2,7 @@
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
                                   '06-gene-structure/01-gene-structure-determination')
-utr_analysis_suffix <- 'tcruzi_ystrain/sl-min4_polya-min4_mindiff-3'
+utr_analysis_suffix <- 'tcruzi_ystrain/sl-min4_polya-min4_mindiff-2'
 utr_analysis_indir  <- file.path(utr_analysis_basedir, 'input', utr_analysis_suffix)
 utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output', utr_analysis_suffix)
 
@@ -63,7 +63,7 @@ CONFIG <- list(
 
     # output directory
     'cache_dir'  = 'README_cache/tcruzi',
-    'output_dir' = 'output/tcruzi_ystrain/1.0',
+    'output_dir' = 'output/tcruzi_ystrain/1.1',
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 

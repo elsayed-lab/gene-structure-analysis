@@ -1,6 +1,8 @@
 ### RNA-Seq coverage support for UTR boundaries
 
 ```{r table_01, results='asis'}
+# coverage statistics collected from original input RNA-Seq fastq files,
+# and UTR pipeline intermediate files.
 # see also: scripts/*/S01_*   
 table_01 <- num_reads %>% 
     mutate(pct_reads_sl=(num_reads_sl/num_reads_parasite) * 100,
@@ -8,8 +10,8 @@ table_01 <- num_reads %>%
     group_by(stage) %>%
     summarize("Human (millions)"=sum(num_reads_host, na.rm=TRUE) / 1E6,
               "Parasite (millions)"=sum(num_reads_parasite) / 1E6,
-              "SL-containing reads"=mean(pct_reads_sl),
-              "Poly(A)-containing reads"=mean(pct_reads_polya)) %>%
+              "SL-containing parasite reads (%)"=mean(pct_reads_sl),
+              "Poly(A)-containing parasite reads (%)"=mean(pct_reads_polya)) %>%
     rename("Parasite Stage"=stage)
 
 xkable(table_01, caption='**Table 1**: Summary of mapping statistics.')

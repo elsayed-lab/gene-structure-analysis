@@ -2,9 +2,9 @@
 for (stage in c('combined', stages)) {
 	cat(sprintf('\n### %s\n\n', stage))
 	# Summary of gene structure
-	median_5utr <- median(utr5_stats[[stage]]$length, na.rm=TRUE)
+	median_5utr <- median(utr5_stats_filtered[[stage]]$length, na.rm=TRUE)
 	median_cds  <- median(as.numeric(genes$size))
-	median_3utr <- median(utr3_stats[[stage]]$length, na.rm=TRUE)
+	median_3utr <- median(utr3_stats_filtered[[stage]]$length, na.rm=TRUE)
 
 	# Figure 1: Summary of gene structure
 	if (stage == 'combined') {
@@ -17,9 +17,9 @@ for (stage in c('combined', stages)) {
 	}
 
 	# Table 1: Gene Structure Summary
-	summary_dat <- gene_structure_summary(utr5_stats[[stage]]$length,
+	summary_dat <- gene_structure_summary(utr5_stats_filtered[[stage]]$length,
 										as.numeric(genes$size),
-										utr3_stats[[stage]]$length)
+										utr3_stats_filtered[[stage]]$length)
 	print(xkable(summary_dat, caption='**Table 1** Gene structure summary table.'))
 	cat('\n\n')
 }

@@ -2,9 +2,9 @@
 
 ```{r table_01b, results='asis'}
 # Table 1: Gene Structure Summary
-table_01b <- gene_structure_summary(utr5_stats_combined$length,
+table_01b <- gene_structure_summary(utr5_stats_combined_filtered$length,
                                       as.numeric(genes$size),
-                                      utr3_stats_combined$length)
+                                      utr3_stats_combined_filtered$length)
 xkable(table_01b, caption='**Table 1b** Gene structure summary table.')
 ```
 
@@ -27,13 +27,13 @@ xkable(table_02, caption='**Table 2**: Stage-specific UTR lengths.')
 
 ```{r figure_x_average_lengths, fig.cap=sprintf('**Figure x** Characterization of %s gene structure', CONFIG$parasite), warning=FALSE}
 # Average 5'UTR length
-p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
+p1 <- ggplot(utr5_stats_combined_filtered, aes(x=length)) + 
         geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="5'UTR length (nt)", y="Transcript density")
 
 # Average 3'UTR length
-p2 <- ggplot(utr3_stats_combined, aes(x=length)) + 
+p2 <- ggplot(utr3_stats_combined_filtered, aes(x=length)) + 
         geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="3'UTR length (nt)", y="Transcript density")
@@ -87,7 +87,7 @@ grid.arrange(p4 + ylim(0, plt_ylim),
 
 ```{r figure_x_5utr_lengths, warning=FALSE}
 # Stage-specific distributions
-ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
+ggplot(utr5_stats_filtered %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +
        scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
        xlim(0, 1500) +
@@ -99,7 +99,7 @@ ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fil
 
 ```{r figure_x_3utr_lengths, warning=FALSE}
 # Stage-specific distributions
-ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
+ggplot(utr3_stats_filtered %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +
        scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
        xlim(0, 1500) +
