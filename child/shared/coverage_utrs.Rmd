@@ -1,4 +1,4 @@
-#### Primary UTR boundaries
+### RNA-Seq coverage support for primary UTR boundaries
 
 ```{r table_04, results='asis'}
 table_04 <- cbind(c("5'UTR", "3'UTR"), 
@@ -9,7 +9,7 @@ colnames(table_04) <- c("Feature", "Number of reads (millions)")
 xkable(table_04, caption='**Table 4**: Number of reads supporting the primary UTR boundaries (millions)')
 ```
 
-```{r figure_03, fig.show='hold', out.width='450px', fig.cap="**Figure 3**: Distribution of number of SL- and Poly(A)-containing reads."}
+```{r figure_03, fig.show='hold', out.width='450px', fig.cap="**Figure 3**: Distribution of number of SL- and Poly(A)-containing reads.", eval=FALSE}
 # number of reads containing SL- or Poly(A) sequence
 ggplot(data.frame(x=log(utr5_stats_combined$num_reads + 1)), aes(x)) + 
        geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
@@ -22,8 +22,9 @@ ggplot(data.frame(x=log(utr3_stats_combined$num_reads + 1)), aes(x)) +
        ggtitle('# Poly(A)-containing reads')
 ```
 
+### Percentage of genes for which UTRs could be assigned
+
 ```{r coverage_summary_table, results='asis'}
-total_genes <- nrow(utr5_stats_combined)
 nvals <- c(1, 2, 3, 4, 5, 10, 100, 1000) 
 
 # % genes with N or more reads mapped to feature
@@ -31,11 +32,11 @@ sl_pcts <- c()
 polya_pcts <- c()
 
 for (nval in nvals) {
-	sl_pcts <- append(sl_pcts, sum(utr5_stats_combined$num_reads >= nval) / total_genes)
+	sl_pcts <- append(sl_pcts, sum(utr5_stats_combined$num_reads >= nval) / length(genes))
 }
 
 for (nval in nvals) {
-	polya_pcts <- append(polya_pcts, sum(utr3_stats_combined$num_reads >= nval) / total_genes)
+	polya_pcts <- append(polya_pcts, sum(utr3_stats_combined$num_reads >= nval) / length(genes))
 }
 
 sl_pcts    <- round(sl_pcts, 4) * 100
@@ -45,4 +46,13 @@ polya_pcts <- round(polya_pcts, 4) * 100
 table_05 <- cbind(N=nvals, SL=sl_pcts, PolyA=polya_pcts)
 
 xkable(table_05, caption='**Table 5**: Percent genes containing N or more reads mapping to the specified feature.')
+```
+
+```{r, results='asis'}
+cat(sprintf("- Total number of genes for which 5'UTR could be determined: %d (%d with 3+ reads)\n",
+            nrow(utr5_stats_combined),
+            nrow(utr5_stats_combined %>% filter(num_reads >= 3))))
+cat(sprintf("- Total number of genes for which 3'UTR could be determined: %d (%d with 3+ reads)\n\n",
+            nrow(utr3_stats_combined),
+            nrow(utr3_stats_combined %>% filter(num_reads >= 3))))
 ```

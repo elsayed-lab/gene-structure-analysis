@@ -24,9 +24,15 @@ plot_gene_structure(median_5utr, median_cds, median_3utr,
 ```
 
 ```{r cross_species_comparison}
-# T. brucei gene structure stats (Kolev et al., 2010)
-# Median CDS size computed using all `gene` entries from TriTrypDB-27_TbruceiTREU927.gff
-tb_median_cds <- 1470
+# Compute median CDS lengths for T. brucei protein-coding genes
+library('org.Tb927.tritryp.db')
+tb_gene_ids <- keys(org.Tb927.tritryp.db, keytype='GID')
+tb_genes <- AnnotationDbi::select(org.Tb927.tritryp.db, keys=tb_gene_ids,
+                                  keytype='GID', columns=c('TYPE', 'GENESIZE'))
+tb_median_cds <- median(tb_genes$GENESIZE[tb_genes$TYPE == 'proteincoding'])
+
+
+# T. brucei gene structure UTR stats (Kolev et al., 2010)
 
 # L. major Friedlin structure stats
 # Median CDS size computed using all `gene` entries from 

@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi 1.0)
+title: Trypanosome Gene Structure Analysis (T. cruzi 1.3)
 author: Keith Hughitt
 output:
   html_document:
@@ -46,7 +46,7 @@ opts_chunk$set(fig.width=1080/96,
                dpi=96,
                cache.path=CONFIG$cache_dir,
 			   echo=CONFIG$verbose)
-options(digits=4)
+options(digits=2)
 options(stringsAsFactors=FALSE)
 options(knitr.duplicate.label='allow')
 
@@ -63,6 +63,8 @@ library('dynamicTreeCut')
 library('rtracklayer')
 library('edgeR')
 library('ggplot2')
+library('GO.db')
+library('goseq')
 library('gplots')
 library('gridExtra')
 library('reshape2')
@@ -73,6 +75,8 @@ library('viridis')
 library('msa')
 library('seqLogo')
 library('tibble')
+source('../../../2015/00-shared/R/annotations.R')
+source('../../../2015/00-shared/R/enrichment_analysis.R')
 source('../../../2015/00-shared/R/util.R')
 source('child/shared/helper.R')
 
@@ -164,7 +168,18 @@ for (table_name in ls()[grepl('^table', ls())]) {
         next
     }
     filename <- sprintf("%s.csv", table_name)
-    write.csv(get(table_name), file=file.path(table_dir, filename))
+
+    # write table to file with 2 sig figs
+    write.csv(format(get(table_name), digits=1), 
+              file=file.path(table_dir, filename))
+}
+
+# copy SL and Poly(A) gff files
+data_dir <- file.path(CONFIG$output_dir, 'data')
+dir.create(data_dir, recursive=TRUE)
+
+for (gff in CONFIG$site_gffs) {
+    file.copy(gff, file.path(data_dir, basename(gff)))
 }
 
 # copy HTML and figures

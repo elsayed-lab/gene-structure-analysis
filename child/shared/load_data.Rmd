@@ -55,6 +55,16 @@ gff <- sort(gff, ignore.strand=TRUE)
 chromosomes <- gff[gff$type %in% c('contig', 'chromosome')]
 genes       <- gff[gff$type == 'gene']
 
+# Remove noncoding RNAs from annotations
+gene_types <- AnnotationDbi::select(orgdb, keys=keys(orgdb, 'GID'), 
+                                    keytype='GID', columns='TYPE')
+protein_coding <- gene_types$GID[gene_types$TYPE == 'proteincoding']
+
+genes <- genes[genes$ID %in% protein_coding]
+
+# remaining gene ids
+gene_ids <- genes$Name
+
 # Fix TriTrypDB FASTA names
 # e.g. "LmjF.24 | organism=Leishmania_major_strain_Friedlin |..." -> "LmjF.24"
 names(fasta) <- sapply(strsplit(names(fasta), ' | '), function(x) {x[1]})
@@ -92,29 +102,6 @@ if (sum(is.na(genes$size)) > 0) {
 chr_mapping <- data_frame(gene=genes$Name, chr=as.character(genes@seqnames))
 ```
 
-## Remove noncoding RNAs
-
-```{r filter_ncrnas}
-# filter noncoding RNAs
-noncoding_ids <- genes$Name[grepl(CONFIG$id_filter_string, genes$Name)]
-
-ncrna_mask <- rep(FALSE, length(genes))
-
-if (!is.null(CONFIG$id_filter_string)) {
-    ncrna_mask <- ncrna_mask | grepl(CONFIG$id_filter_string, genes$Name)
-}
-
-if (!is.null(CONFIG$type_filter_string)) {
-    ncrna_mask <- ncrna_mask | grepl(CONFIG$type_filter_string, as.character(genes$type))
-}
-
-# remove noncoding RNAs
-genes <- genes[!ncrna_mask,]
-
-# remaining gene ids
-gene_ids <- genes$Name
-```
-
 ## Create a dataframe containing strand information for each gene
 
 ```{r}
@@ -131,8 +118,13 @@ polya_sites <- list()
 stages <- c(CONFIG$stages, 'combined')
 
 for (stage in stages) {
+    # load site information
     sl_sites[[stage]]    <- read_csv(CONFIG$sl_sites[[stage]])
     polya_sites[[stage]] <- read_csv(CONFIG$polya_sites[[stage]])
+
+    # remove sites associated with noncoding RNAs (occurs quite rarely)
+    sl_sites[[stage]] <- sl_sites[[stage]][sl_sites[[stage]]$gene %in% protein_coding,]
+    polya_sites[[stage]] <- polya_sites[[stage]][polya_sites[[stage]]$gene %in% protein_coding,]
 }
 ```
 
@@ -142,10 +134,16 @@ for (stage in stages) {
 polypyrimidine_tracts <- cbind(read_csv(CONFIG$polypyrimidine_tracts[['combined']]),
                                stage='combined')
 
+polypyrimidine_tracts <- polypyrimidine_tracts[polypyrimidine_tracts$primary_sl %in% sl_sites[['combined']]$site,]
+
 for (stage in CONFIG$stages) {
     dat <- read_csv(CONFIG$polypyrimidine_tracts[[stage]])
+
+    # remove polypyr tracts associated with SL sites that have been filtered out
+    dat <- dat[dat$primary_sl %in% sl_sites[[stage]]$site,]
     polypyrimidine_tracts <- rbind(polypyrimidine_tracts, cbind(dat, stage=stage))
 }
+
 ```
 
 ## Load inter-CDS and intergenic region information
@@ -154,8 +152,15 @@ for (stage in CONFIG$stages) {
 intercds_regions <- cbind(read_csv(CONFIG$intercds_regions[['combined']]),
                                    stage='combined')
 
+# filter out regions associated with at least one noncoding gene
+intercds_regions <- intercds_regions[intercds_regions$left_gene %in% protein_coding & 
+                                     intercds_regions$right_gene %in% protein_coding,]
+
 for (stage in CONFIG$stages) {
     dat <- read_csv(CONFIG$intercds_regions[[stage]])
+
+    # filter out regions associated with at least one noncoding gene
+    dat <- dat[dat$left_gene %in% protein_coding & dat$right_gene %in% protein_coding,]
     intercds_regions <- rbind(intercds_regions, cbind(dat, stage=stage))
 }
 ```
@@ -178,6 +183,10 @@ for (stage in CONFIG$stages) {
     utr3_stats <- rbind(utr3_stats,
                         cbind(read_csv(CONFIG$utr3_stats[[stage]]), stage=stage))
 }
+
+# Filter out UTR stats for noncoding genes (around 50 genes for T. cruzi)
+utr5_stats <- utr5_stats[utr5_stats$gene %in% protein_coding,]
+utr3_stats <- utr3_stats[utr3_stats$gene %in% protein_coding,]
 
 # Remove any genes for which UTR boundaries were assigned within one or more
 # of the developmental stages, but could not be assigned when data from all

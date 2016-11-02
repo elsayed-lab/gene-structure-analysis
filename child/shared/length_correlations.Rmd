@@ -1,6 +1,6 @@
 ### UTR / CDS length correlations
 
-```{r figure_02, fig.show='hold', out.width='290px', warning=FALSE, fig.cap="**Figure 2**: UTR and CDS length correlations"}
+```{r figure_S3, fig.show='hold', out.width='290px', warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
 
 df <- as.data.frame(cbind(utr5_length=utr5_stats_combined_filtered$length,
                           cds_length=as.numeric(genes$size),

@@ -17,6 +17,15 @@ table_01 <- num_reads %>%
 xkable(table_01, caption='**Table 1**: Summary of mapping statistics.')
 ```
 
+```{r results='asis'}
+cat(sprintf('- Total number of SL-containing reads: %d (%0.3f%%)\n', 
+            sum(num_reads$num_reads_sl),
+            sum(num_reads$num_reads_sl) / sum(num_reads$num_reads_parasite) * 100))
+cat(sprintf('- Total number of Poly(A)-containing reads: %d (%0.3f%%)\n\n', 
+            sum(num_reads$num_reads_polya),
+            sum(num_reads$num_reads_polya) / sum(num_reads$num_reads_parasite) * 100))
+```
+
 ```{r, results='asis'}
 # human-readable condition names
 num_reads$condition_long <- CONFIG$condition_mapping$to[match(num_reads$condition, 

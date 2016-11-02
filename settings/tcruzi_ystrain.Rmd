@@ -1,4 +1,16 @@
 ```{r settings}
+#
+# v1.3
+# ----
+# - Modified UTR boundary detection logic (gene-structure-determination) to
+#   exclude SL and Poly(A) sites which would lead to UTRs containing >= 100
+#   N's. This is one issue leading to unexpectedly long UTRs.
+#
+
+# Load orgdb (used to determine gene type)
+library('org.TcCLB.esmer.tritryp.db')
+orgdb <- get('org.TcCLB.esmer.tritryp.db')
+
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
                                   '06-gene-structure/01-gene-structure-determination')
@@ -63,7 +75,7 @@ CONFIG <- list(
 
     # output directory
     'cache_dir'  = 'README_cache/tcruzi',
-    'output_dir' = 'output/tcruzi_ystrain/1.1',
+    'output_dir' = 'output/tcruzi_ystrain/1.3',
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 
@@ -71,7 +83,11 @@ CONFIG <- list(
 
     # Stage-specific GFFs containing genes and annotated UTRs
     'input_gff' = file.path(utr_analysis_outdir, 'combined',
-                            'TriTrypDB-27_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
+                            'TriTrypDB-28_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
+
+    # Stage-specific GFFs containing SL and Poly(A) site annotations
+    # only included here to be copied to the output dir for easier submission
+    'site_gffs' = Sys.glob(file.path(utr_analysis_indir, '*.gff.gz')),
 
     # RNA-Seq count table
     'count_table' = file.path(Sys.getenv("SCRATCH"), 'tcruzi-hsapiens',
