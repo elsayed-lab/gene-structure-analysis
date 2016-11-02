@@ -1,13 +1,5 @@
-```{r figure_01, fig.height=250/96, fig.cap="**Figure 1**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
+```{r figure_02, fig.height=250/96, fig.cap="**Figure 2**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
 # Summary of gene structure
-utr5_summary <- utr5_stats_filtered %>% 
-	group_by(stage) %>% 
-	summarise(median=median(length, na.rm=TRUE))
-
-utr3_summary <- utr3_stats_filtered %>% 
-	group_by(stage) %>% 
-	summarise(median=median(length, na.rm=TRUE))
-
 polypyrimidine_tracts <- polypyrimidine_tracts %>%
     mutate(length=end - start)
 pp_tract_summary <- polypyrimidine_tracts %>%
@@ -21,6 +13,11 @@ median_ppt  <- (pp_tract_summary %>% filter(stage == 'combined'))$median
 
 plot_gene_structure(median_5utr, median_cds, median_3utr,
                     utr_color=CONFIG$colors[2], cds_color=CONFIG$colors[1])
+```
+
+```{r, results='asis'}
+# median mRNA length
+
 ```
 
 ```{r cross_species_comparison}

@@ -5,6 +5,8 @@
 # - Modified UTR boundary detection logic (gene-structure-determination) to
 #   exclude SL and Poly(A) sites which would lead to UTRs containing >= 100
 #   N's. This is one issue leading to unexpectedly long UTRs.
+# - Increasing window-size when scanning for polypyrimidine tracts from 250 to
+#   400 nt.
 #
 
 # Load orgdb (used to determine gene type)

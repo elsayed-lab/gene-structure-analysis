@@ -94,12 +94,6 @@ knit('child/shared/load_data.Rmd', quiet=TRUE, output=tempfile())
 Results
 =======
 
-Overview
---------
-
-```{r child='child/shared/gene_structure_overview.Rmd'}
-```
-
 Coverage Statistics
 -------------------
 
@@ -113,6 +107,9 @@ UTR lengths
 -----------
 
 ```{r child='child/shared/length_summary.Rmd'}
+```
+
+```{r child='child/shared/gene_structure_overview.Rmd'}
 ```
 
 ```{r child='child/shared/length_correlations.Rmd'}
