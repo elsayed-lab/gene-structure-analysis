@@ -1,0 +1,110 @@
+### Functional enrichment of genes with short/long UTR's
+
+To see if their are any specific functions enriched among the genes with the
+shortest and longest UTR's, we will perform functional enrichment for the upper
+and lower 25% of genes in each category.
+
+```{r functional_enrichment_prep, message=FALSE}
+# Load GO annotations
+go_terms <- load_go_terms(orgdb, keys(orgdb, keytype='GID'), keytype='GID')
+
+# Gene / GO term mapping
+gene_go_mapping <- as.data.frame(unique(
+    go_terms %>% select(GID, GO, ONTOLOGY)
+))
+colnames(gene_go_mapping) <- c('gene', 'category', 'ontology')
+```
+
+#### Long 5'UTRs
+
+```{r functional_enrichment_long_5utrs, results='asis', message=FALSE, warning=FALSE}
+# list of all genes with confident UTR'5 lengths
+all_genes_5utr <- utr5_stats_combined_filtered$gene
+
+# Gene (CDS) lengths; used for goseq bias correction
+genes_with_known_5utrs <- genes[genes$ID %in% all_genes_5utr]
+gene_lengths_5utr <- width(genes_with_known_5utrs)
+names(gene_lengths_5utr) <- genes_with_known_5utrs$ID
+
+# number of genes in upper/lower quartiles
+quartile_num_genes <- round(nrow(utr5_stats_combined_filtered) / 4)
+
+# gene ids for genes in the upper quartile of 5'UTR lengths
+utr5_upper_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>% 
+                        select(gene) %>% head(quartile_num_genes))$gene
+
+# measure enrichment
+enriched <- test_gene_enrichment(utr5_upper_quartile, all_genes_5utr,
+                                 gene_go_mapping, gene_lengths_5utr)
+
+cat('\n**over-represented functions:**\n\n')
+xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
+
+cat('\n**under-represented functions:**\n\n')
+xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
+```
+
+#### Short 5'UTRs
+
+```{r functional_enrichment_short_5utrs, results='asis', message=FALSE, warning=FALSE}
+# gene ids for genes in the lower quartile of 5'UTR lengths
+utr5_lower_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>% 
+                        select(gene) %>% tail(quartile_num_genes))$gene
+
+# measure enrichment
+enriched <- test_gene_enrichment(utr5_lower_quartile, all_genes_5utr,
+                                 gene_go_mapping, gene_lengths_5utr)
+
+cat('\n**over-represented functions:**\n\n')
+xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
+
+cat('\n**under-represented functions:**\n\n')
+xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
+```
+
+#### Long 3'UTRs
+
+```{r functional_enrichment_long_3utrs, results='asis', message=FALSE, warning=FALSE}
+# list of all genes with confident 3'UTR lengths
+all_genes_3utr <- utr3_stats_combined_filtered$gene
+
+# Gene (CDS) lengths; used for goseq bias correction
+genes_with_known_3utrs <- genes[genes$ID %in% all_genes_3utr]
+gene_lengths_3utr <- width(genes_with_known_3utrs)
+names(gene_lengths_3utr) <- genes_with_known_3utrs$ID
+
+# number of genes in upper/lower quartiles
+quartile_num_genes <- round(nrow(utr3_stats_combined_filtered) / 4)
+
+# gene ids for genes in the upper quartile of 3'UTR lengths
+utr3_upper_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>% 
+                        select(gene) %>% head(quartile_num_genes))$gene
+
+# measure enrichment
+enriched <- test_gene_enrichment(utr3_upper_quartile, all_genes_3utr,
+                                 gene_go_mapping, gene_lengths_3utr)
+
+cat('\n**over-represented functions:**\n\n')
+xkable(enriched %>% filter(over_represented_pvalue_adj < 0.03))
+
+cat('\n**under-represented functions:**\n\n')
+xkable(enriched %>% filter(under_represented_pvalue_adj < 0.03))
+```
+
+#### Short 3'UTRs
+
+```{r functional_enrichment_short_3utrs, results='asis', message=FALSE, warning=FALSE}
+# gene ids for genes in the lower quartile of 3'UTR lengths
+utr3_lower_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>% 
+                        select(gene) %>% tail(quartile_num_genes))$gene
+
+# measure enrichment
+enriched <- test_gene_enrichment(utr3_lower_quartile, all_genes_3utr,
+                                 gene_go_mapping, gene_lengths_3utr)
+
+cat('\n**over-represented functions:**\n\n')
+xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
+
+cat('\n**under-represented functions:**\n\n')
+xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
+```
