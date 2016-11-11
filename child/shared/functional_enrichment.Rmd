@@ -37,11 +37,21 @@ utr5_upper_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>%
 enriched <- test_gene_enrichment(utr5_upper_quartile, all_genes_5utr,
                                  gene_go_mapping, gene_lengths_5utr)
 
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
+# over-represented functions
+sig_enriched <- enriched %>% filter(over_represented_pvalue_adj < 0.05)
 
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
+if (nrow(sig_enriched) > 0) {
+    cat('\n**over-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
+
+# under-represented functions
+sig_enriched <- enriched %>% filter(under_represented_pvalue_adj < 0.05)
+
+if (nrow(sig_enriched) > 0) {
+    cat('\n**under-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
 ```
 
 #### Short 5'UTRs
@@ -55,11 +65,21 @@ utr5_lower_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>%
 enriched <- test_gene_enrichment(utr5_lower_quartile, all_genes_5utr,
                                  gene_go_mapping, gene_lengths_5utr)
 
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
+# over-represented functions
+sig_enriched <- enriched %>% filter(over_represented_pvalue_adj < 0.05)
 
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
+if (nrow(sig_enriched) > 0) {
+    cat('\n**over-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
+
+# under-represented functions
+sig_enriched <- enriched %>% filter(under_represented_pvalue_adj < 0.05)
+
+if (nrow(sig_enriched) > 0) {
+    cat('\n**under-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
 ```
 
 #### Long 3'UTRs
@@ -84,11 +104,21 @@ utr3_upper_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>%
 enriched <- test_gene_enrichment(utr3_upper_quartile, all_genes_3utr,
                                  gene_go_mapping, gene_lengths_3utr)
 
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.03))
+# over-represented functions
+sig_enriched <- enriched %>% filter(over_represented_pvalue_adj < 0.05)
 
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.03))
+if (nrow(sig_enriched) > 0) {
+    cat('\n**over-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
+
+# under-represented functions
+sig_enriched <- enriched %>% filter(under_represented_pvalue_adj < 0.05)
+
+if (nrow(sig_enriched) > 0) {
+    cat('\n**under-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
 ```
 
 #### Short 3'UTRs
@@ -102,9 +132,19 @@ utr3_lower_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>%
 enriched <- test_gene_enrichment(utr3_lower_quartile, all_genes_3utr,
                                  gene_go_mapping, gene_lengths_3utr)
 
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
+# over-represented functions
+sig_enriched <- enriched %>% filter(over_represented_pvalue_adj < 0.05)
 
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
+if (nrow(sig_enriched) > 0) {
+    cat('\n**over-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
+
+# under-represented functions
+sig_enriched <- enriched %>% filter(under_represented_pvalue_adj < 0.05)
+
+if (nrow(sig_enriched) > 0) {
+    cat('\n**under-represented functions:**\n\n')
+    xkable(sig_enriched)
+}
 ```
