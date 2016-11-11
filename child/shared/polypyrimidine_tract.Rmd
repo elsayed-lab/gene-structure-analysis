@@ -70,7 +70,7 @@ df <- data_frame(cluster=sort(unique(clusters)),
 df <- df %>% arrange(desc(avg_similarity))
 ```
 
-```{r, results='asis', cache=TRUE, autodep=TRUE}
+```{r, results='asis', cache=TRUE, autodep=TRUE, fig.width=10, fig.height=5.625, dpi=192}
 # Iterate over top N clusters and generate a sequence logo for each
 n <- 10
 

@@ -15,7 +15,7 @@ xkable(table_01b, caption='**Table 1b** Gene structure summary table.')
 
 Median UTR length for each development stage.
 
-```{r lengths_by_developmental_stage, results='asis'}
+```{r lengths_by_developmental_stage, results='asis', warning=FALSE}
 # median 5' and 3'UTR lengths, by developmental stage
 utr5_summary <- utr5_stats_filtered %>% 
 	group_by(stage) %>% 
@@ -51,8 +51,11 @@ p2 <- ggplot(utr3_stats_combined_filtered, aes(x=length)) +
         labs(x="3'UTR length (nt)", y="Transcript density")
 
 # Average Polypyrimidine tract length
-p3 <- ggplot(polypyrimidine_tracts, aes(x=length)) + 
+polypyrimidine_tracts <- polypyrimidine_tracts %>% 
+    mutate(length = end - start)
+p3 <- ggplot(polypyrimidine_tracts %>% filter(stage=='combined'), aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        xlim(0, 300) +
         labs(x="Polypyrimidine tract length (nt)", y="Transcript density")
 
 # Average CDS length
@@ -67,7 +70,7 @@ p4 <- ggplot(cds_lengths, aes(x=length)) +
 # Average distance between primary SL site and polypyrimidine tract
 p5 <- ggplot(polypyrimidine_tracts, aes(x=sl_dist)) +
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 250) +
+        xlim(0, 300) +
         labs(x="Distance between primary trans-splicing site and polypyrimidine tract (nt)", y="Transcript density")
 
 # Average distance between primary poly(A) site and polypyrimidine tract

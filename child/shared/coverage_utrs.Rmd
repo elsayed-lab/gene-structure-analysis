@@ -52,7 +52,8 @@ xkable(table_05, caption='**Table 5**: Percent genes containing N or more reads 
 cat(sprintf("- Total number of genes for which 5'UTR could be determined: %d (%d with 3+ reads)\n",
             nrow(utr5_stats_combined),
             nrow(utr5_stats_combined %>% filter(num_reads >= 3))))
-cat(sprintf("- Total number of genes for which 3'UTR could be determined: %d (%d with 3+ reads)\n\n",
+cat(sprintf("- Total number of genes for which 3'UTR could be determined: %d (%d with 3+ reads)\n",
             nrow(utr3_stats_combined),
             nrow(utr3_stats_combined %>% filter(num_reads >= 3))))
+cat(sprintf("- Number of annotated protein-coding genes: %d\n\n", length(genes)))
 ```

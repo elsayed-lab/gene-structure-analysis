@@ -11,7 +11,7 @@ rownames(table_05) <- c('min', 'mean', 'median', 'max')
 xkable(t(table_05), caption='**Table 5** Intergenic length statistics.')
 ```
 
-```{r figure_04, fig.cap='**Figure 4**: Distribution of intergenic lengths (outliers removed)'}
+```{r figure_04, fig.cap='**Figure 4**: Distribution of intergenic lengths (outliers removed)', warning=FALSE}
 # Plot: Kernel density plot of intergenic length (trimmed upper quantile)
 clip_upper <- as.numeric(quantile(intergenic_lengths, 0.99)) 
 

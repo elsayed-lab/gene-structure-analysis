@@ -112,6 +112,9 @@ UTR lengths
 ```{r child='child/shared/gene_structure_overview.Rmd'}
 ```
 
+```{r child='child/shared/functional_enrichment.Rmd'}
+```
+
 ```{r child='child/shared/length_correlations.Rmd'}
 ```
 
