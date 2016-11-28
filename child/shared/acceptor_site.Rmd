@@ -1,0 +1,36 @@
+```{r}
+# add strand and chr information to SL site dataframe
+sl_sites_combined <- merge(merge(sl_sites[['combined']], 
+                                 gene_strands, by='gene'),
+                           chr_mapping, by='gene')
+```
+
+### Primary acceptor sites
+
+```{r, results='asis'}
+primary_sites <- sl_sites_combined %>% filter(type=='primary')
+
+# TESTING
+x <- data.frame()
+
+for (i in 1:nrow(primary_sites)) {
+    site <- primary_sites[i,]
+
+    # determine accept site dinucleotide sequence
+    if (site$strand == '+') {
+        start_ind <- site$chr_coordinate - 1
+        end_ind <- site$chr_coordinate
+        acceptor_site <- fasta[[site$chr]][start_ind:end_ind]
+    } else {
+        start_ind <- site$chr_coordinate 
+        end_ind <- site$chr_coordinate + 1
+        acceptor_site <- reverseComplement(fasta[[site$chr]][start_ind:end_ind])
+    }
+
+    # TESTING
+    x <- rbind(x, c(strand=site$strand,
+               acceptor_site=as.character(acceptor_site)))
+
+    if 
+}
+```
