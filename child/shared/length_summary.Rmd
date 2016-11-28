@@ -52,8 +52,13 @@ p2 <- ggplot(utr3_stats_combined_filtered, aes(x=length)) +
 
 # Average Polypyrimidine tract length
 polypyrimidine_tracts <- polypyrimidine_tracts %>% 
-    mutate(length = end - start)
-p3 <- ggplot(polypyrimidine_tracts %>% filter(stage=='combined'), aes(x=length)) + 
+    mutate(length=end - start)
+
+# combined statistics for polypyrimidine tracts
+polypyr_combined <- polypyrimidine_tracts %>% 
+    filter(stage == 'combined')
+
+p3 <- ggplot(polypyr_combined, aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 300) +
         labs(x="Polypyrimidine tract length (nt)", y="Transcript density")
@@ -68,13 +73,13 @@ p4 <- ggplot(cds_lengths, aes(x=length)) +
         labs(x="CDS length (nt)", y="Transcript density")
 
 # Average distance between primary SL site and polypyrimidine tract
-p5 <- ggplot(polypyrimidine_tracts, aes(x=sl_dist)) +
+p5 <- ggplot(polypyr_combined, aes(x=sl_dist)) +
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 300) +
         labs(x="Distance between primary trans-splicing site and polypyrimidine tract (nt)", y="Transcript density")
 
 # Average distance between primary poly(A) site and polypyrimidine tract
-p6 <- ggplot(polypyrimidine_tracts, aes(x=polya_dist)) +
+p6 <- ggplot(polypyr_combined, aes(x=polya_dist)) +
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="Distance between primary polyadenylation site and polypyrimidine tract (nt)", y="Transcript density")

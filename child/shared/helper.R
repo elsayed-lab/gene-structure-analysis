@@ -214,14 +214,14 @@ plot_alt_site_distance_hist <- function(sites, stage, upstream_color='red',
     # get primary and alternative sites
     primary_sites <- sites %>% 
         filter(type=='primary') %>%
-        select(gene, loc) %>%
-        rename(loc_primary=loc) %>%
+        select(gene, chr_coordinate) %>%
+        rename(loc_primary=chr_coordinate) %>%
         arrange(gene)
 
     secondary_sites <- sites %>% 
         filter(type=='alternative') %>%
-        select(gene, loc) %>%
-        rename(loc_secondary=loc) %>%
+        select(gene, chr_coordinate) %>%
+        rename(loc_secondary=chr_coordinate) %>%
         arrange(gene)
 
     # exclude genes with no detected alternative sites

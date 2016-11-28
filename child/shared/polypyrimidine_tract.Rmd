@@ -1,13 +1,43 @@
 ## Similarity of polypyrimidine tract sequences
 
+### Polypyrimidine length statistics
+
+```{r results='asis'}
+# Table X: Polypyrimidine tract lengths
+polypyrimidine_lengths <- polypyr_combined$length
+
+table_xx <- data.frame(length=c(min(polypyrimidine_lengths),
+                                mean(polypyrimidine_lengths),
+                                median(polypyrimidine_lengths),
+                                max(polypyrimidine_lengths)))
+rownames(table_xx) <- c('min', 'mean', 'median', 'max')
+xkable(t(table_xx), caption='**Table X** Polypyrimidine tract length statistics.')
+```
+
+### Median distance from SL/Poly(A) sites
+
+```{r results='asis'}
+cat(sprintf('- Median distance from SL acceptor site: %d\n', median(polypyr_combined$sl_dist)))
+cat(sprintf('- Median distance from Poly(A) site: %d\n', median(polypyr_combined$polya_dist)))
+```
+
+### Polypyrimidine tract composition
+
+```{r, results='asis'}
+# get polypyr sequences
+seqs <- polypyr_combined$seq
+
+# count # of C's, and T's
+num_cytosines <- sum(str_count(seqs, 'C'))
+num_thymines <- sum(str_count(seqs, 'T'))
+
+cat(sprintf('- %% Cytosine: %0.1f\n', 100 * (num_cytosines / (num_cytosines + num_thymines))))
+cat(sprintf('- %% Thymine: %0.1f\n\n', 100 * (num_thymines / (num_cytosines + num_thymines))))
+```
+
 ### Pairwise similarity between polypyrimidine sequences
 
 ```{r, cache=TRUE, autodep=TRUE}
-# get polypyrimidine tract sequences
-polypyr_combined <- polypyrimidine_tracts %>% filter(stage == 'combined')
-
-seqs <- polypyr_combined$seq
-
 num_seqs <- length(seqs)
 
 # Sequence similarity matrix

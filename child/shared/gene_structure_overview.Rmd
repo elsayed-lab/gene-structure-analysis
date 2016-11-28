@@ -1,3 +1,5 @@
+### Average gene structure
+
 ```{r figure_02, fig.height=250/96, fig.cap="**Figure 2**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
 # Summary of gene structure
 polypyrimidine_tracts <- polypyrimidine_tracts %>%
@@ -40,4 +42,26 @@ tb_median_cds <- median(tb_genes$GENESIZE[tb_genes$TYPE == 'proteincoding'])
 # median(as.numeric(genes$size))
 #
 lm_median_cds <- 1269
+```
+
+### Average GC- and CT-richness
+
+Median GC- and CT-richness for various gene features.
+
+```{r results='asis'}
+# compute intergenic region gc-richness
+intergenic_num_g <- str_count(intercds_regions$intergenic_seq, 'G')
+intergenic_num_c <- str_count(intercds_regions$intergenic_seq, 'C')
+intergenic_num_t <- str_count(intercds_regions$intergenic_seq, 'T')
+avg_intergenic_gc_richness <- median((intergenic_num_g + intergenic_num_c) / 
+                                     intercds_regions$intergenic_length)
+avg_intergenic_ct_richness <- median((intergenic_num_c + intergenic_num_t) / 
+                                     intercds_regions$intergenic_length)
+
+cat(sprintf("- 5'UTR GC-richness: %0.1f%%\n", median(utr5_stats_combined_filtered$gc) * 100))
+cat(sprintf("- 5'UTR CT-richness: %0.1f%%\n", median(utr5_stats_combined_filtered$ct) * 100))
+cat(sprintf("- 3'UTR GC-richness: %0.1f%%\n", median(utr3_stats_combined_filtered$gc) * 100))
+cat(sprintf("- 3'UTR CT-richness: %0.1f%%\n", median(utr3_stats_combined_filtered$ct) * 100))
+cat(sprintf("- Intergenic region GC-richness: %0.1f%%\n", median(avg_intergenic_gc_richness) * 100))
+cat(sprintf("- Intergenic region CT-richness: %0.1f%%\n\n", median(avg_intergenic_ct_richness) * 100))
 ```

@@ -16,6 +16,22 @@ for (developmental_stage in stages) {
 }
 ```
 
+```{r num_sl_sites_per_gene, results='asis'}
+sl_one_plus <- length(unique(sl_sites$combined$gene))
+sl_two_plus <- sum(table(sl_sites$combined$gene) >= 2)
+sl_two_to_four <- sum(table(sl_sites$combined$gene) >= 2 & 
+                      table(sl_sites$combined$gene) <= 4)
+sl_five_plus <- sum(table(sl_sites$combined$gene) >= 5)
+
+cat(sprintf('- Number of genes with 1+ SL sites detected: %d\n', sl_one_plus)) 
+cat(sprintf('- Number of genes with 2+ SL sites detected: %d (%0.1f)\n',
+            sl_two_plus, (sl_two_plus / sl_one_plus) * 100))
+cat(sprintf('- Number of genes with 2-4 SL sites detected: %d (%0.1f)\n',
+            sl_two_to_four, (sl_two_to_four / sl_one_plus) * 100))
+cat(sprintf('- Number of genes with 5+ SL sites detected: %d (%0.1f)\n\n',
+            sl_five_plus, (sl_five_plus / sl_one_plus) * 100))
+```
+
 ### Primary vs. secondary polyadenylation site usage
 
 ```{r figure_x_alt_polya}
@@ -33,3 +49,20 @@ for (developmental_stage in stages) {
                                       stroke_color=CONFIG$stroke))
 }
 ```
+
+```{r num_polya_sites_per_gene, results='asis'}
+polya_one_plus <- length(unique(polya_sites$combined$gene))
+polya_two_plus <- sum(table(polya_sites$combined$gene) >= 2)
+polya_two_to_four <- sum(table(polya_sites$combined$gene) >= 2 & 
+                      table(polya_sites$combined$gene) <= 4)
+polya_five_plus <- sum(table(polya_sites$combined$gene) >= 5)
+
+cat(sprintf('- Number of genes with 1+ polya sites detected: %d\n', polya_one_plus)) 
+cat(sprintf('- Number of genes with 2+ polya sites detected: %d (%0.1f)\n',
+            polya_two_plus, (polya_two_plus / polya_one_plus) * 100))
+cat(sprintf('- Number of genes with 2-4 polya sites detected: %d (%0.1f)\n',
+            polya_two_to_four, (polya_two_to_four / polya_one_plus) * 100))
+cat(sprintf('- Number of genes with 5+ polya sites detected: %d (%0.1f)\n\n',
+            polya_five_plus, (polya_five_plus / polya_one_plus) * 100))
+```
+
