@@ -26,10 +26,13 @@ cat(sprintf('- Total number of Poly(A)-containing reads: %d (%0.3f%%)\n\n',
             sum(num_reads$num_reads_polya) / sum(num_reads$num_reads_parasite) * 100))
 ```
 
-```{r, results='asis'}
+```{r, results='asis', eval=FALSE}
 # human-readable condition names
 num_reads$condition_long <- CONFIG$condition_mapping$to[match(num_reads$condition, 
                                                         CONFIG$condition_mapping$from)]
+
+# Old table S1; dropped from manuscript Nov 28, 2016 since most of these stats
+# have already been in a previous manuscript
 table_S01 <- num_reads %>%
     mutate("Infected"=ifelse(condition %in% c('proc', 'meta', 'epi', 'trypo'), 'N', 'Y'),
            num_reads_host=replace(num_reads_host, is.na(num_reads_host), 0),
