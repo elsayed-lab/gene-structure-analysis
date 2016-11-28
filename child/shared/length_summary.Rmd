@@ -5,9 +5,9 @@ or more reads.
 
 ```{r table_01b, results='asis'}
 # Table 1: Gene Structure Summary
-table_01b <- gene_structure_summary(utr5_stats_combined_filtered$length,
+table_01b <- gene_structure_summary(utr5_stats_combined$length,
                                     as.numeric(genes$size),
-                                    utr3_stats_combined_filtered$length)
+                                    utr3_stats_combined$length)
 xkable(table_01b, caption='**Table 1b** Gene structure summary table.')
 ```
 
@@ -17,11 +17,11 @@ Median UTR length for each development stage.
 
 ```{r lengths_by_developmental_stage, results='asis', warning=FALSE}
 # median 5' and 3'UTR lengths, by developmental stage
-utr5_summary <- utr5_stats_filtered %>% 
+utr5_summary <- utr5_stats %>% 
 	group_by(stage) %>% 
 	summarise(median=median(length, na.rm=TRUE))
 
-utr3_summary <- utr3_stats_filtered %>% 
+utr3_summary <- utr3_stats %>% 
 	group_by(stage) %>% 
 	summarise(median=median(length, na.rm=TRUE))
 
@@ -39,13 +39,13 @@ xkable(table_02, caption='**Table 2**: Stage-specific UTR lengths.')
 
 ```{r figure_1_average_lengths, fig.cap=sprintf('**Figure 1** Characterization of %s gene structure', CONFIG$parasite), warning=FALSE}
 # Average 5'UTR length
-p1 <- ggplot(utr5_stats_combined_filtered, aes(x=length)) + 
+p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="5'UTR length (nt)", y="Transcript density")
 
 # Average 3'UTR length
-p2 <- ggplot(utr3_stats_combined_filtered, aes(x=length)) + 
+p2 <- ggplot(utr3_stats_combined, aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
         labs(x="3'UTR length (nt)", y="Transcript density")
@@ -116,7 +116,7 @@ grid.arrange(p1, p5, p2, p6, p3, p7, p4, ncol=2)
 
 ```{r figure_x_5utr_lengths, warning=FALSE}
 # Stage-specific distributions
-ggplot(utr5_stats_filtered %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
+ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +
        scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
        xlim(0, 1500) +
@@ -128,7 +128,7 @@ ggplot(utr5_stats_filtered %>% filter(stage !='combined'), aes(x=length, group=s
 
 ```{r figure_x_3utr_lengths, warning=FALSE}
 # Stage-specific distributions
-ggplot(utr3_stats_filtered %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
+ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +
        scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
        xlim(0, 1500) +
@@ -157,7 +157,7 @@ colnames(gene_go_mapping) <- c('gene', 'category', 'ontology')
 
 ```{r functional_enrichment_long_5utrs, results='asis'}
 # list of all genes with confident UTR'5 lengths
-all_genes_5utr <- utr5_stats_combined_filtered$gene
+all_genes_5utr <- utr5_stats_combined$gene
 
 # Gene (CDS) lengths; used for goseq bias correction
 genes_with_known_5utrs <- genes[genes$ID %in% all_genes_5utr]
@@ -165,10 +165,10 @@ gene_lengths_5utr <- width(genes_with_known_5utrs)
 names(gene_lengths_5utr) <- genes_with_known_5utrs$ID
 
 # number of genes in upper/lower quartiles
-quartile_num_genes <- round(nrow(utr5_stats_combined_filtered) / 4)
+quartile_num_genes <- round(nrow(utr5_stats_combined) / 4)
 
 # gene ids for genes in the upper quartile of 5'UTR lengths
-utr5_upper_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>% 
+utr5_upper_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% head(quartile_num_genes))$gene
 
 # measure enrichment
@@ -186,7 +186,7 @@ xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
 
 ```{r functional_enrichment_short_5utrs, results='asis'}
 # gene ids for genes in the lower quartile of 5'UTR lengths
-utr5_lower_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>% 
+utr5_lower_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% tail(quartile_num_genes))$gene
 
 # measure enrichment
@@ -204,7 +204,7 @@ xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
 
 ```{r functional_enrichment_long_3utrs, results='asis'}
 # list of all genes with confident 3'UTR lengths
-all_genes_3utr <- utr3_stats_combined_filtered$gene
+all_genes_3utr <- utr3_stats_combined$gene
 
 # Gene (CDS) lengths; used for goseq bias correction
 genes_with_known_3utrs <- genes[genes$ID %in% all_genes_3utr]
@@ -212,10 +212,10 @@ gene_lengths_3utr <- width(genes_with_known_3utrs)
 names(gene_lengths_3utr) <- genes_with_known_3utrs$ID
 
 # number of genes in upper/lower quartiles
-quartile_num_genes <- round(nrow(utr3_stats_combined_filtered) / 4)
+quartile_num_genes <- round(nrow(utr3_stats_combined) / 4)
 
 # gene ids for genes in the upper quartile of 3'UTR lengths
-utr3_upper_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>% 
+utr3_upper_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% head(quartile_num_genes))$gene
 
 # measure enrichment
@@ -233,7 +233,7 @@ xkable(enriched %>% filter(under_represented_pvalue_adj < 0.03))
 
 ```{r functional_enrichment_short_3utrs, results='asis'}
 # gene ids for genes in the lower quartile of 3'UTR lengths
-utr3_lower_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>% 
+utr3_lower_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% tail(quartile_num_genes))$gene
 
 # measure enrichment

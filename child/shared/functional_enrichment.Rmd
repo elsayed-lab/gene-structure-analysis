@@ -19,7 +19,7 @@ colnames(gene_go_mapping) <- c('gene', 'category', 'ontology')
 
 ```{r functional_enrichment_long_5utrs, results='asis', message=FALSE, warning=FALSE}
 # list of all genes with confident UTR'5 lengths
-all_genes_5utr <- utr5_stats_combined_filtered$gene
+all_genes_5utr <- utr5_stats_combined$gene
 
 # Gene (CDS) lengths; used for goseq bias correction
 genes_with_known_5utrs <- genes[genes$ID %in% all_genes_5utr]
@@ -27,10 +27,10 @@ gene_lengths_5utr <- width(genes_with_known_5utrs)
 names(gene_lengths_5utr) <- genes_with_known_5utrs$ID
 
 # number of genes in upper/lower quartiles
-quartile_num_genes <- round(nrow(utr5_stats_combined_filtered) / 4)
+quartile_num_genes <- round(nrow(utr5_stats_combined) / 4)
 
 # gene ids for genes in the upper quartile of 5'UTR lengths
-utr5_upper_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>% 
+utr5_upper_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% head(quartile_num_genes))$gene
 
 # measure enrichment
@@ -58,7 +58,7 @@ if (nrow(sig_enriched) > 0) {
 
 ```{r functional_enrichment_short_5utrs, results='asis', message=FALSE, warning=FALSE}
 # gene ids for genes in the lower quartile of 5'UTR lengths
-utr5_lower_quartile <- (utr5_stats_combined_filtered %>% arrange(-length) %>% 
+utr5_lower_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% tail(quartile_num_genes))$gene
 
 # measure enrichment
@@ -86,7 +86,7 @@ if (nrow(sig_enriched) > 0) {
 
 ```{r functional_enrichment_long_3utrs, results='asis', message=FALSE, warning=FALSE}
 # list of all genes with confident 3'UTR lengths
-all_genes_3utr <- utr3_stats_combined_filtered$gene
+all_genes_3utr <- utr3_stats_combined$gene
 
 # Gene (CDS) lengths; used for goseq bias correction
 genes_with_known_3utrs <- genes[genes$ID %in% all_genes_3utr]
@@ -94,10 +94,10 @@ gene_lengths_3utr <- width(genes_with_known_3utrs)
 names(gene_lengths_3utr) <- genes_with_known_3utrs$ID
 
 # number of genes in upper/lower quartiles
-quartile_num_genes <- round(nrow(utr3_stats_combined_filtered) / 4)
+quartile_num_genes <- round(nrow(utr3_stats_combined) / 4)
 
 # gene ids for genes in the upper quartile of 3'UTR lengths
-utr3_upper_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>% 
+utr3_upper_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% head(quartile_num_genes))$gene
 
 # measure enrichment
@@ -125,7 +125,7 @@ if (nrow(sig_enriched) > 0) {
 
 ```{r functional_enrichment_short_3utrs, results='asis', message=FALSE, warning=FALSE}
 # gene ids for genes in the lower quartile of 3'UTR lengths
-utr3_lower_quartile <- (utr3_stats_combined_filtered %>% arrange(-length) %>% 
+utr3_lower_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% tail(quartile_num_genes))$gene
 
 # measure enrichment

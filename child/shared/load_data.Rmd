@@ -237,14 +237,24 @@ for (x in c('length', 'num_reads', 'gc', 'ct')) {
     utr5_stats[[x]] <- as.numeric(utr5_stats[[x]])
     utr3_stats[[x]] <- as.numeric(utr3_stats[[x]])
 }
+
+# For convenience, we will also create version of the above containing just the
+# combined stats
+utr5_stats_combined <- utr5_stats %>% filter(stage == 'combined')
+utr3_stats_combined <- utr3_stats %>% filter(stage == 'combined')
 ```
+
+```{r filter_sites, eval=FALSE}
+# Disabled Nov 28, 2016
+# Because there has already been a significant amount of vetting in the earlier
+# steps of this analysis, and in order to simplify the text and capture as much
+# site information as possible, this filtering is no longer used.
 
 ### Filter out low confidence UTR assignments
 
-Create alternate versions of the 5' and 3'UTR statistics data frames which only
-include sites with some minimum specified coverage level.
+#Create alternate versions of the 5' and 3'UTR statistics data frames which only
+#include sites with some minimum specified coverage level.
 
-```{r}
 # Create a version of thee stats with low-support sites filtered out; in
 # general we will use the unfiltered data frame when computing coverage
 # statistics, and the filtered version when assigning high-confidence UTR
@@ -258,13 +268,6 @@ utr3_low_count_genes <- (utr3_stats %>%
                             filter(stage=='combined' & 
                                    num_reads < CONFIG$min_read_support_3utr))$gene
 utr3_stats_filtered <- utr3_stats %>% filter(!gene %in% utr3_low_count_genes)
-```
-
-```{r}
-# For convenience, we will also create version of the above containing just the
-# combined stats
-utr5_stats_combined <- utr5_stats %>% filter(stage == 'combined')
-utr3_stats_combined <- utr3_stats %>% filter(stage == 'combined')
 
 utr5_stats_combined_filtered <- utr5_stats_filtered %>% filter(stage == 'combined')
 utr3_stats_combined_filtered <- utr3_stats_filtered %>% filter(stage == 'combined')

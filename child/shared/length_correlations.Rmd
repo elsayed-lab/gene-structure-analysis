@@ -2,9 +2,9 @@
 
 ```{r figure_S3, fig.show='hold', out.width='290px', warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
 
-df <- as.data.frame(cbind(utr5_length=utr5_stats_combined_filtered$length,
+df <- as.data.frame(cbind(utr5_length=utr5_stats_combined$length,
                           cds_length=as.numeric(genes$size),
-						  utr3_length=utr3_stats_combined_filtered$length))
+						  utr3_length=utr3_stats_combined$length))
 
 # 5'UTR vs. CDS
 ggplot(df, aes(x=utr5_length, y=cds_length)) + 

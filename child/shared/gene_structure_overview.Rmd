@@ -58,10 +58,10 @@ avg_intergenic_gc_richness <- median((intergenic_num_g + intergenic_num_c) /
 avg_intergenic_ct_richness <- median((intergenic_num_c + intergenic_num_t) / 
                                      intercds_regions$intergenic_length)
 
-cat(sprintf("- 5'UTR GC-richness: %0.1f%%\n", median(utr5_stats_combined_filtered$gc) * 100))
-cat(sprintf("- 5'UTR CT-richness: %0.1f%%\n", median(utr5_stats_combined_filtered$ct) * 100))
-cat(sprintf("- 3'UTR GC-richness: %0.1f%%\n", median(utr3_stats_combined_filtered$gc) * 100))
-cat(sprintf("- 3'UTR CT-richness: %0.1f%%\n", median(utr3_stats_combined_filtered$ct) * 100))
+cat(sprintf("- 5'UTR GC-richness: %0.1f%%\n", median(utr5_stats_combined$gc) * 100))
+cat(sprintf("- 5'UTR CT-richness: %0.1f%%\n", median(utr5_stats_combined$ct) * 100))
+cat(sprintf("- 3'UTR GC-richness: %0.1f%%\n", median(utr3_stats_combined$gc) * 100))
+cat(sprintf("- 3'UTR CT-richness: %0.1f%%\n", median(utr3_stats_combined$ct) * 100))
 cat(sprintf("- Intergenic region GC-richness: %0.1f%%\n", median(avg_intergenic_gc_richness) * 100))
 cat(sprintf("- Intergenic region CT-richness: %0.1f%%\n\n", median(avg_intergenic_ct_richness) * 100))
 ```
