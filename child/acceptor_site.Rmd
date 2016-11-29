@@ -30,7 +30,16 @@ for (i in 1:nrow(primary_sites)) {
     # TESTING
     x <- rbind(x, c(strand=site$strand,
                acceptor_site=as.character(acceptor_site)))
-
-    if 
 }
+
+# DEBUGGING: THERE SHOULD BE NO DIFFERENCES BETWEEN STRANDS!
+colnames(x) <- c('strand', 'seq')
+
+table(x$strand)
+
+x %>% 
+    group_by(strand, seq) %>% 
+    summarize(num=n()) %>%
+    arrange(desc(num)) %>%
+    kable
 ```

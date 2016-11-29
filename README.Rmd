@@ -49,6 +49,7 @@ opts_chunk$set(fig.width=1080/96,
 options(digits=3)
 options(stringsAsFactors=FALSE)
 options(knitr.duplicate.label='allow')
+options(java.parameters="-Xmx2g" )
 
 # If rmarkdown.pandoc.to not specified, have it default to 'latex' output
 if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
@@ -76,6 +77,7 @@ library('msa')
 library('seqLogo')
 library('tibble')
 library('stringr')
+library('xlsx')
 source('../../../2015/00-shared/R/annotations.R')
 source('../../../2015/00-shared/R/enrichment_analysis.R')
 source('../../../2015/00-shared/R/util.R')
@@ -152,12 +154,6 @@ Expression across developmental stages
 ```{r child='child/expression_summary.Rmd'}
 ```
 
-Mapping statistics
-------------------
-
-```{r child='child/mapping_statistics.Rmd'}
-```
-
 System Info
 ===========
 
@@ -179,6 +175,18 @@ for (table_name in ls()[grepl('^table', ls())]) {
     # write table to file
     write.csv(format(get(table_name), digits=3), 
               file=file.path(table_dir, filename))
+}
+
+# create excel spreadsheets
+sl_xlsx <- file.path(table_dir, 'table_S02.xlsx')
+polya_xlsx <- file.path(table_dir, 'table_S03.xlsx')
+
+write.xlsx(sl_sites$combined, file=sl_xlsx, sheetName="combined")
+write.xlsx(polya_sites$combined, file=polya_xlsx, sheetName="combined")
+
+for (stage in CONFIG$stages) {
+    write.xlsx(sl_sites[[stage]], file=sl_xlsx, sheetName=stage, append=TRUE)
+    write.xlsx(polya_sites[[stage]], file=polya_xlsx, sheetName=stage, append=TRUE)
 }
 
 # copy SL and Poly(A) gff files
