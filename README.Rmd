@@ -79,7 +79,7 @@ library('stringr')
 source('../../../2015/00-shared/R/annotations.R')
 source('../../../2015/00-shared/R/enrichment_analysis.R')
 source('../../../2015/00-shared/R/util.R')
-source('child/shared/helper.R')
+source('child/helper.R')
 
 # fix namespace for dplyr functions
 assign('select', dplyr::select, envir=.GlobalEnv)
@@ -89,7 +89,7 @@ set.seed(1)
 ```
 
 ```{r include=FALSE}
-knit('child/shared/load_data.Rmd', quiet=TRUE, output=tempfile())
+knit('child/load_data.Rmd', quiet=TRUE, output=tempfile())
 ```
 
 Results
@@ -98,64 +98,64 @@ Results
 Coverage Statistics
 -------------------
 
-```{r child='child/shared/coverage_summary_statistics.Rmd'}
+```{r child='child/coverage_summary_statistics.Rmd'}
 ```
 
-```{r child='child/shared/coverage_utrs.Rmd'}
+```{r child='child/coverage_utrs.Rmd'}
 ```
 
 UTR lengths
 -----------
 
-```{r child='child/shared/length_summary.Rmd'}
+```{r child='child/length_summary.Rmd'}
 ```
 
-```{r child='child/shared/gene_structure_overview.Rmd'}
+```{r child='child/gene_structure_overview.Rmd'}
 ```
 
-```{r child='child/shared/functional_enrichment.Rmd'}
+```{r child='child/functional_enrichment.Rmd'}
 ```
 
-```{r child='child/shared/length_correlations.Rmd'}
+```{r child='child/length_correlations.Rmd'}
 ```
 
 Intergenic Regions
 ------------------
 
-```{r child='child/shared/intergenic_regions.Rmd'}
+```{r child='child/intergenic_regions.Rmd'}
 ```
 
 Alternative trans-splicing and polyadenylation
 ----------------------------------------------
 
-```{r child='child/shared/alternative_site_usage.Rmd'}
+```{r child='child/alternative_site_usage.Rmd'}
 ```
 
-```{r child='child/shared/stage_specific_site_usage.Rmd'}
+```{r child='child/stage_specific_site_usage.Rmd'}
 ```
 
 Trans-spicing acceptor site
 ---------------------------
 
-```{r child='child/shared/acceptor_site.Rmd'}
+```{r child='child/acceptor_site.Rmd'}
 ```
 
 Polypyrimidine tracts
 ---------------------
 
-```{r child='child/shared/polypyrimidine_tract.Rmd'}
+```{r child='child/polypyrimidine_tract.Rmd'}
 ```
 
 Expression across developmental stages
 --------------------------------------
 
-```{r child='child/shared/expression_summary.Rmd'}
+```{r child='child/expression_summary.Rmd'}
 ```
 
 Mapping statistics
 ------------------
 
-```{r child='child/shared/mapping_statistics.Rmd'}
+```{r child='child/mapping_statistics.Rmd'}
 ```
 
 System Info

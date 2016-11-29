@@ -1,5 +1,12 @@
 ```{r settings}
 #
+# v1.5
+# ----
+# - Disabled filtering of SL/Poly(A) sites with less than three reads prior
+#   to computing statistics.
+# - Removed old table S1 (coverage statistics); already covered in earlier
+#   manuscript.
+#
 # v1.4
 # ----
 # - Fixed an issue with coordinates for 5'UTR acceptor site position.
@@ -16,6 +23,9 @@
 # Load orgdb (used to determine gene type)
 library('org.TcCLB.esmer.tritryp.db')
 orgdb <- get('org.TcCLB.esmer.tritryp.db')
+
+# Analysis version
+analysis_version <- '1.5'
 
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
@@ -46,7 +56,7 @@ polypyr_tracts <- as.list(file.path(utr_analysis_outdir, stages, 'polypyrimidine
 names(polypyr_tracts) <- stages
 
 # Directory containing input files generated specifically for this analysis
-input_dir <- file.path('..', '..', 'input', 'tcruzi_ystrain')
+input_dir <- file.path('..', 'input', 'tcruzi_ystrain')
 
 # Sample metadata
 CONFIG <- list(
@@ -73,7 +83,7 @@ CONFIG <- list(
     # human-readable condition names
     condition_mapping = data.frame(from=c('4', '6', '12', '20', '24', '48', '72',
                                           'epi', 'trypo'),
-                                   to=c('Amastigote 4 hpi', 'Amastigote 6 hpi', 
+                                   to=c('Amastigote 04 hpi', 'Amastigote 06 hpi', 
                                         'Amastigote 12 hpi', 'Amastigote 20 hpi',
                                         'Amastigote 24 hpi', 'Amastigote 48 hpi',
                                         'Amastigote 72 hpi', 'Epimastigote',
@@ -81,7 +91,7 @@ CONFIG <- list(
 
     # output directory
     'cache_dir'  = 'README_cache/tcruzi',
-    'output_dir' = 'output/tcruzi_ystrain/1.4',
+    'output_dir' = file.path('output/tcruzi_ystrain', analysis_version),
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 
@@ -149,7 +159,8 @@ if (!dir.exists(CONFIG$output_dir)) {
 }
 
 # clean-up
-rm(utr_analysis_basedir, utr_analysis_indir, utr_analysis_outdir, 
-   utr5_stats, utr3_stats, sl_sites, polya_sites, polypyr_tracts)
+rm(analysis_version, utr_analysis_basedir, utr_analysis_indir,
+   utr_analysis_outdir, utr5_stats, utr3_stats, sl_sites, polya_sites,
+   polypyr_tracts)
 ```
 
