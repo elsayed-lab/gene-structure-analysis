@@ -49,11 +49,25 @@ opts_chunk$set(fig.width=1080/96,
 options(digits=3)
 options(stringsAsFactors=FALSE)
 options(knitr.duplicate.label='allow')
-options(java.parameters="-Xmx2g" )
+options(java.parameters="-Xmx8g" )
+#options(java.parameters="-Xmx4000m")
 
 # If rmarkdown.pandoc.to not specified, have it default to 'latex' output
 if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
     opts_knit$set(rmarkdown.pandoc.to='latex')
+}
+
+# Format-specific options
+if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {
+    # PDF output
+    opts_chunk$set(dev=c('cairo_pdf', 'tiff'), 
+  				   dev.args=list(cairo_pdf=list(family="DejaVu Sans")),
+                   fig.width=1920/192,
+                   fig.height=1920/192,
+                   dpi=192)
+} else {
+    # HTML output
+    opts_chunk$set(dev='png', fig.retina=1)
 }
 ```
 
@@ -181,12 +195,19 @@ for (table_name in ls()[grepl('^table', ls())]) {
 sl_xlsx <- file.path(table_dir, 'table_S02.xlsx')
 polya_xlsx <- file.path(table_dir, 'table_S03.xlsx')
 
-write.xlsx(sl_sites$combined, file=sl_xlsx, sheetName="combined")
-write.xlsx(polya_sites$combined, file=polya_xlsx, sheetName="combined")
+write.xlsx(sl_sites$combined %>% arrange(gene), 
+           file=sl_xlsx, sheetName="combined")
+write.xlsx(polya_sites$combined %>% arrange(gene), 
+           file=polya_xlsx, sheetName="combined")
 
 for (stage in CONFIG$stages) {
-    write.xlsx(sl_sites[[stage]], file=sl_xlsx, sheetName=stage, append=TRUE)
-    write.xlsx(polya_sites[[stage]], file=polya_xlsx, sheetName=stage, append=TRUE)
+    # free up Java memory on each loop iteration
+    # http://stackoverflow.com/questions/21937640/handling-java-lang-outofmemoryerror-when-writing-to-excel-from-r
+    .jcall("java/lang/System", method
+    write.xlsx(sl_sites[[stage]] %>% arrange(gene), 
+               file=sl_xlsx, sheetName=stage, append=TRUE)
+    write.xlsx(polya_sites[[stage]] %>% arrange(gene), 
+               file=polya_xlsx, sheetName=stage, append=TRUE)
 }
 
 # copy SL and Poly(A) gff files
