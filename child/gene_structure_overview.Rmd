@@ -18,8 +18,36 @@ plot_gene_structure(median_5utr, median_cds, median_3utr,
 ```
 
 ```{r, results='asis'}
-# median mRNA length
+# create a data frame to store gene-matched lengths
+matched_lengths <- data.frame()
 
+# compute median mRNA length for all genes for which we have sufficient
+# information
+for (gene_id in utr3_stats_combined$gene) {
+    # skip genes for which we don't know both UTR lengths
+    if (!gene_id %in% utr5_stats_combined$gene) {
+        next
+    }
+
+    # get length of each component and add entry to dataframe
+    matched_lengths <- rbind(matched_lengths, c(
+        (utr5_stats_combined %>% filter(gene == gene_id))$length,
+        (utr3_stats_combined %>% filter(gene == gene_id))$length,
+        width(genes[genes$ID == gene_id])
+    ))
+}
+
+cat(sprintf('-Median mRNA length: %d nt\n',
+            as.integer(median(rowSums(matched_lengths)))))
+
+# average proportion of mRNA contributed by each portion
+utr5_prop <- 100 * mean(matched_lengths[,1] / rowSums(matched_lengths))
+utr3_prop <- 100 * mean(matched_lengths[,2] / rowSums(matched_lengths))
+cds_prop  <- 100 * mean(matched_lengths[,3] / rowSums(matched_lengths))
+
+cat(sprintf('- 5\'UTR: %0.2f %%\n', utr5_prop))
+cat(sprintf('- 3\'UTR: %0.2f %%\n', utr3_prop))
+cat(sprintf('- CDS: %0.2f %%\n\n', cds_prop))
 ```
 
 ```{r cross_species_comparison}
