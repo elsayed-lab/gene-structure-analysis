@@ -1,34 +1,35 @@
 ### UTR / CDS length correlations
 
-```{r figure_S3, fig.show='hold', out.width='290px', warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
+```{r figure_S2, warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
+par(mfrow=c(2, 2))
+df <- data.frame(gene=genes$ID, cds_length=as.numeric(genes$size))
+df <- merge(merge(df, utr5_stats_combined %>% select(gene, utr5_length=length), by='gene'),
+                  utr3_stats_combined %>% select(gene, utr3_length=length),
+            by='gene')
 
-df <- as.data.frame(cbind(utr5_length=utr5_stats_combined$length,
-                          cds_length=as.numeric(genes$size),
-						  utr3_length=utr3_stats_combined$length))
-
-# 5'UTR vs. CDS
+# 5′ UTR vs. CDS
 ggplot(df, aes(x=utr5_length, y=cds_length)) + 
 	geom_point() + 
     geom_smooth(method="rlm") +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("5'UTR vs. CDS length")
+    ggtitle("5′ UTR vs. CDS length")
 
-# 3'UTR vs. CDS
+# 3′ UTR vs. CDS
 ggplot(df, aes(x=utr3_length, y=cds_length)) + 
 	geom_point() + 
     geom_smooth(method="rlm") +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("3'UTR vs. CDS length")
+    ggtitle("3′ UTR vs. CDS length")
 
-# 5'UTR vs. 3'UTR
+# 5′ UTR vs. 3′ UTR
 ggplot(df, aes(x=utr5_length, y=utr3_length)) + 
 	geom_point() + 
     geom_smooth(method="rlm") +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("5'UTR vs. 5'UTR length")
+    ggtitle("5′ UTR vs. 5′ UTR length")
 ```
 
 ```{r length_correlations_table, results='asis'}
@@ -37,7 +38,7 @@ table_04b <- as.data.frame(c(
     cor(df$utr3_length, df$cds_length, method='spearman', use='pairwise.complete.obs'),
     cor(df$utr5_length, df$utr3_length, method='spearman', use='pairwise.complete.obs')
 ))
-rownames(table_04b) <- c("5'UTR vs. CDS", "3'UTR vs. CDS", "5'UTR vs. 3'UTR")
+rownames(table_04b) <- c("5′ UTR vs. CDS", "3′ UTR vs. CDS", "5′ UTR vs. 3′ UTR")
 colnames(table_04b) <- c("Spearman's rho")
 
 xkable(table_04b, caption='**Table 4b**: Percent genes containing N or more reads mapping to the specified feature.')
