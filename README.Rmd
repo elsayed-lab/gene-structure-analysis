@@ -40,17 +40,17 @@ knit('settings/tcruzi_ystrain.Rmd', quiet=TRUE, output=tempfile())
 ```
 
 ```{r knitr_settings, include=FALSE}
-opts_knit$set(progress=FALSE, verbose=TRUE)
-opts_chunk$set(fig.width=1080/96,
-               fig.height=1080/96,
-               dpi=96,
+opts_knit$set(progress=FALSE, verbose=TRUE,
+              base.dir=file.path(getwd(), CONFIG$output_dir, 'figure'))
+opts_chunk$set(fig.width=1920/192,
+               fig.height=1920/192,
+               dpi=192,
                cache.path=CONFIG$cache_dir,
 			   echo=CONFIG$verbose)
 options(digits=3)
 options(stringsAsFactors=FALSE)
 options(knitr.duplicate.label='allow')
 options(java.parameters="-Xmx8g" )
-#options(java.parameters="-Xmx4000m")
 
 # If rmarkdown.pandoc.to not specified, have it default to 'latex' output
 if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
@@ -61,13 +61,11 @@ if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
 if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {
     # PDF output
     opts_chunk$set(dev=c('cairo_pdf', 'tiff'), 
-  				   dev.args=list(cairo_pdf=list(family="DejaVu Sans")),
-                   fig.width=1920/192,
-                   fig.height=1920/192,
-                   dpi=192)
+  				   dev.args=list(cairo_pdf=list(family="DejaVu Sans"),
+                                 tiff=list(compression="lzw")))
 } else {
     # HTML output
-    opts_chunk$set(dev='png', fig.retina=1)
+    opts_chunk$set(dev=c('png', 'tiff'), fig.retina=1)
 }
 ```
 
@@ -175,7 +173,7 @@ System Info
 sessionInfo()
 ```
 
-```{r include=FALSE}
+```{r include=FALSE, cache=TRUE, autodep=TRUE}
 # write tables to file
 table_dir <- file.path(CONFIG$output_dir, 'table')
 dir.create(table_dir, recursive=TRUE)
@@ -191,6 +189,18 @@ for (table_name in ls()[grepl('^table', ls())]) {
               file=file.path(table_dir, filename))
 }
 
+# add chromosome information to site data and drop site identifiers for all
+# tables, except for the 'combined' one
+for (stage in c('combined', CONFIG$stages)) {
+    sl_sites[[stage]] <- merge(sl_sites[[stage]], chr_mapping, by='gene')
+    polya_sites[[stage]] <- merge(polya_sites[[stage]], chr_mapping, by='gene')
+
+    if (stage != 'combined') {
+        sl_sites[[stage]] <- sl_sites[[stage]] %>% select(-site)
+        polya_sites[[stage]] <- polya_sites[[stage]] %>% select(-site)
+    }
+}
+
 # create excel spreadsheets
 sl_xlsx <- file.path(table_dir, 'table_S02.xlsx')
 polya_xlsx <- file.path(table_dir, 'table_S03.xlsx')
@@ -203,7 +213,7 @@ write.xlsx(polya_sites$combined %>% arrange(gene),
 for (stage in CONFIG$stages) {
     # free up Java memory on each loop iteration
     # http://stackoverflow.com/questions/21937640/handling-java-lang-outofmemoryerror-when-writing-to-excel-from-r
-    .jcall("java/lang/System", method
+    .jcall("java/lang/System", method = "gc")
     write.xlsx(sl_sites[[stage]] %>% arrange(gene), 
                file=sl_xlsx, sheetName=stage, append=TRUE)
     write.xlsx(polya_sites[[stage]] %>% arrange(gene), 
@@ -218,8 +228,11 @@ for (gff in CONFIG$site_gffs) {
     file.copy(gff, file.path(data_dir, basename(gff)))
 }
 
-# copy HTML and figures
-system(sprintf('(sleep 30 && cp -r README.html %s) &', CONFIG$output_dir))
-system(sprintf('cp -r README_files/figure-html %s/figure', CONFIG$output_dir))
+# save rendered output
+if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {
+    system(sprintf('(sleep 30 && cp -r README.pdf %s) &', CONFIG$output_dir))
+} else {
+    system(sprintf('(sleep 30 && cp -r README.html %s) &', CONFIG$output_dir))
+}
 ```
 
