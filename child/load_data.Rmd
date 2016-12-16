@@ -10,9 +10,9 @@ The sources of data and annotations are:
 3. Stage-specific spliced leader and poly(A) site CSV files)
    - Separate files for each stage, and for each site type (SL/Poly(A).
    - One entry for each detected site, including read coverage information.
-4. Summary 5'UTR, 3'UTR, trans-splicing, polyadenylation, inter-CDS,
+4. Summary 5'UTR, 3′ UTR, trans-splicing, polyadenylation, inter-CDS,
     and polypyrimidine tract statistics.
-   - 5' and 3'UTRs as defined by the primary acceptor and poly-adenylation
+   - 5' and 3′ UTRs as defined by the primary acceptor and poly-adenylation
      sites detected when aggregating data across all parasite developmental
      stages.
 
@@ -30,7 +30,7 @@ RNA-Seq samples, the following two analysis pipelines may be applied sequently:
    - Outputs include:
         - An extended version of a TriTrypDB GFF file containing the annotated
           UTR bounaries
-        - CSV summary statistics for _primary_ 5' and 3'UTR boundaries
+        - CSV summary statistics for _primary_ 5' and 3′ UTR boundaries
           (`5utr_stats.csv` and `3utr_stats.csv`)
         - CSV files containing _all_ trans-splicing and polyadenylation sites
           for the inter-CDS regions where primary UTR boundaries could be
@@ -47,6 +47,13 @@ RNA-Seq samples, the following two analysis pipelines may be applied sequently:
 # Load genome sequence and annotations
 gff <- import.gff3(CONFIG$input_gff)
 fasta <- readDNAStringSet(CONFIG$input_fasta)
+
+# individual CDS sequences
+cds_fasta <- readDNAStringSet(CONFIG$input_cds_fasta)
+
+# fix cds identifiers so they match gene ids
+names(cds_fasta) <- str_replace(names(cds_fasta), '\\.1 ', ' ')
+names(cds_fasta) <- str_replace(names(cds_fasta), '[: ].*', '')
 
 # Sort GFF GenomicRanges
 gff <- sortSeqlevels(gff)
@@ -144,6 +151,12 @@ for (stage in CONFIG$stages) {
     polypyrimidine_tracts <- rbind(polypyrimidine_tracts, cbind(dat, stage=stage))
 }
 
+# combined statistics for polypyrimidine tracts
+polypyrimidine_tracts <- polypyrimidine_tracts %>% 
+    mutate(length=end - start)
+
+polypyr_combined <- polypyrimidine_tracts %>% 
+    filter(stage == 'combined')
 ```
 
 ## Load inter-CDS and intergenic region information
@@ -165,12 +178,12 @@ for (stage in CONFIG$stages) {
 }
 ```
 
-### Load 5' and 3'UTR summary statistics
+### Load 5' and 3′ UTR summary statistics
 
-Summary statistics describing the _primary_ 5' and 3'UTR boundaries.
+Summary statistics describing the _primary_ 5' and 3′ UTR boundaries.
 
 ```{r}
-# Create data.frames containing the primary 5' and 3' length stats
+# Create data.frames containing the primary 5' and 3′  length stats
 utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[['combined']]), stage='combined')
 
 for (stage in CONFIG$stages) {
@@ -252,7 +265,7 @@ utr3_stats_combined <- utr3_stats %>% filter(stage == 'combined')
 
 ### Filter out low confidence UTR assignments
 
-#Create alternate versions of the 5' and 3'UTR statistics data frames which only
+#Create alternate versions of the 5' and 3′ UTR statistics data frames which only
 #include sites with some minimum specified coverage level.
 
 # Create a version of thee stats with low-support sites filtered out; in
@@ -329,5 +342,11 @@ The mapping was
 
 ```{r}
 ptu_mapping <- read_csv(CONFIG$ptu_mapping)
+```
+
+### Load TriTryp ortholog gene list
+
+```{r}
+tritryp_orthologs <- readLines(CONFIG$tritryp_orthologs)
 ```
 

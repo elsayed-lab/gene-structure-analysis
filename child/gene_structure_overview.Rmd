@@ -1,6 +1,6 @@
 ### Average gene structure
 
-```{r figure_02, fig.height=250/96, fig.cap="**Figure 2**: Average 5'UTR, CDS, and 3'UTR lengths across all development stages."}
+```{r figure_02, fig.height=250/96, fig.cap="**Figure 2**: Average 5'UTR, CDS, and 3′ UTR lengths across all development stages."}
 # Summary of gene structure
 polypyrimidine_tracts <- polypyrimidine_tracts %>%
     mutate(length=end - start)
@@ -77,19 +77,49 @@ lm_median_cds <- 1269
 Median GC- and CT-richness for various gene features.
 
 ```{r results='asis'}
-# compute intergenic region gc-richness
-intergenic_num_g <- str_count(intercds_regions$intergenic_seq, 'G')
-intergenic_num_c <- str_count(intercds_regions$intergenic_seq, 'C')
-intergenic_num_t <- str_count(intercds_regions$intergenic_seq, 'T')
-avg_intergenic_gc_richness <- median((intergenic_num_g + intergenic_num_c) / 
-                                     intercds_regions$intergenic_length)
-avg_intergenic_ct_richness <- median((intergenic_num_c + intergenic_num_t) / 
-                                     intercds_regions$intergenic_length)
+# function to compute proportion of a nucleotide for a collection of sequences
+nt_proportion <- function (seqs) { 
+    # Exclude any N's
+    seqs <- gsub('N', '', seqs)
 
-cat(sprintf("- 5'UTR GC-richness: %0.1f%%\n", median(utr5_stats_combined$gc) * 100))
-cat(sprintf("- 5'UTR CT-richness: %0.1f%%\n", median(utr5_stats_combined$ct) * 100))
-cat(sprintf("- 3'UTR GC-richness: %0.1f%%\n", median(utr3_stats_combined$gc) * 100))
-cat(sprintf("- 3'UTR CT-richness: %0.1f%%\n", median(utr3_stats_combined$ct) * 100))
-cat(sprintf("- Intergenic region GC-richness: %0.1f%%\n", median(avg_intergenic_gc_richness) * 100))
-cat(sprintf("- Intergenic region CT-richness: %0.1f%%\n\n", median(avg_intergenic_ct_richness) * 100))
+    # feature lengths
+    seq_lengths <- unlist(lapply(seqs, nchar))
+
+    # measure proportion of each nucleotide, for each feature
+    sapply(c('A', 'C', 'G', 'T'), function (nt) { 
+        str_count(seqs, nt) / seq_lengths 
+    })
+}
+
+# intergenic region composition
+intergenic_seqs <- (intercds_regions %>% filter(stage == 'combined'))$intergenic_seq
+intergenic_comp <- nt_proportion(intergenic_seqs)
+
+# 5' and 3'UTR composition
+utr5_comp <- nt_proportion(utr5_stats_combined$seq)
+utr3_comp <- nt_proportion(utr3_stats_combined$seq)
+
+# Drop any features for which there were only N's (rare)
+utr5_comp <- utr5_comp[complete.cases(utr5_comp),]
+utr3_comp <- utr3_comp[complete.cases(utr3_comp),]
+
+# CDS composition
+cds_comp <- nt_proportion(as.character(cds_fasta))
+
+# Genome composition
+genome_comp <- nt_proportion(as.character(fasta))
+
+# data frame of sequence compositions, by feature
+table_s06 <- data.frame(
+    utr5=apply(utr5_comp, 2, median),
+    cds=apply(cds_comp, 2, median),
+    utr3=apply(utr3_comp, 2, median),
+    intergenic=apply(intergenic_comp, 2, median),
+    genome=apply(genome_comp, 2, median)
+)
+
+# GC richness
+table_s06 <- rbind(table_s06, GC=table_s06[2,] + table_s06[3,])
+
+kable(table_s06)
 ```
