@@ -18,7 +18,7 @@ for (s1_name in stages) {
 
 ### Differences in polyadenylation site usage across developmental stage
 
-```{r figure_x_stage-specific_3utr_lengths, fig.cap="**Figure SX** 3'UTR length across developmental stage.", warning=FALSE}
+```{r figure_x_stage-specific_3utr_lengths, fig.cap="**Figure SX** 3′ UTR length across developmental stage.", warning=FALSE}
 for (s1_name in stages) {
     for (s2_name in stages) {
         # skip combined site dataframes and self comparisons

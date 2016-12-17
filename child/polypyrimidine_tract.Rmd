@@ -1,6 +1,4 @@
-## Similarity of polypyrimidine tract sequences
-
-### Polypyrimidine length statistics
+## Polypyrimidine length statistics
 
 ```{r results='asis'}
 # Table X: Polypyrimidine tract lengths
@@ -14,40 +12,66 @@ rownames(table_xx) <- c('min', 'mean', 'median', 'max')
 xkable(t(table_xx), caption='**Table X** Polypyrimidine tract length statistics.')
 ```
 
-### Median distance from SL/Poly(A) sites
+## Median distance from SL/Poly(A) sites
 
 ```{r results='asis'}
 cat(sprintf('- Median distance from SL acceptor site: %d\n', median(polypyr_combined$sl_dist)))
 cat(sprintf('- Median distance from Poly(A) site: %d\n', median(polypyr_combined$polya_dist)))
 ```
 
-### Polypyrimidine tract composition
+## Polypyrimidine tract composition
 
 ```{r, results='asis'}
 # get polypyr sequences
-seqs <- polypyr_combined$seq
+polypyrimidine_seqs <- polypyr_combined$seq
 
 # count # of C's, and T's
-num_cytosines <- sum(str_count(seqs, 'C'))
-num_thymines <- sum(str_count(seqs, 'T'))
+num_cytosines <- sum(str_count(polypyrimidine_seqs, 'C'))
+num_thymines <- sum(str_count(polypyrimidine_seqs, 'T'))
 
 cat(sprintf('- %% Cytosine: %0.1f\n', 100 * (num_cytosines / (num_cytosines + num_thymines))))
 cat(sprintf('- %% Thymine: %0.1f\n\n', 100 * (num_thymines / (num_cytosines + num_thymines))))
 ```
 
+## Polypyrimidine tract motifs
+
+### Global Polypyrimidine tract sequence logo
+
+```{r polpyrimidine_tract_logo_global, fig.width=7680/192}
+# perform an MSA
+seqs <- DNAStringSet(polypyrimidine_seqs)
+alignment <- msa(seqs, method='ClustalOmega')
+
+#alignment <- msa(seqs, method='Muscle')
+
+# convert to a PFM, and then to a PWM
+pfm <- consensusMatrix(alignment@unmasked)[DNA_BASES,]
+
+# same as apply(pfm, 2, function(x) { x / sum(x) })
+pwm <- prop.table(pfm, 2)
+
+# find boundaries of main alignment (here, positions where at least 75% of
+# the sequence aligned)
+indices <- which(colSums(pfm) >= 0.75 * ncol(pwm))
+from <- indices[1]
+to <- last(indices)
+
+seqLogo(pwm[,from:to])
+```
+
 ### Pairwise similarity between polypyrimidine sequences
 
 ```{r, cache=TRUE, autodep=TRUE}
-num_seqs <- length(seqs)
-
 # Sequence similarity matrix
+num_seqs <- length(seqs)
 sim_mat <- matrix(0, nrow=num_seqs, ncol=num_seqs)
 
 # Scoring matrix
 submat <- nucleotideSubstitutionMatrix(match=1, mismatch=-1, baseOnly=TRUE)
 
 for (i in 1:num_seqs) {
-    sim_mat[i,] <- pairwiseAlignment(pattern=seqs, subject=seqs[i],
+    sim_mat[i,] <- pairwiseAlignment(pattern=polypyrimidine_seqs,
+                                     subject=polypyrimidine_seqs[i],
                                      substitutionMatrix=submat, gapOpening=0,
                                      gapExtension=0)@score
 }
@@ -106,7 +130,7 @@ n <- 10
 
 for (i in 1:n) {
     cluster_choice <- (df %>% arrange(desc(avg_similarity)))$cluster[i]
-    cluster_seqs <- DNAStringSet(seqs[clusters == cluster_choice])
+    cluster_seqs <- DNAStringSet(polypyrimidine_seqs[clusters == cluster_choice])
 
     # perform an MSA
     alignment <- msa(cluster_seqs)

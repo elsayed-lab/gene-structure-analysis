@@ -11,17 +11,6 @@ rownames(table_05) <- c('min', 'mean', 'median', 'max')
 xkable(t(table_05), caption='**Table 5** Intergenic length statistics.')
 ```
 
-```{r figure_04, fig.cap='**Figure 4**: Distribution of intergenic lengths (outliers removed)', warning=FALSE}
-# Plot: Kernel density plot of intergenic length (trimmed upper quantile)
-clip_upper <- as.numeric(quantile(intergenic_lengths, 0.99)) 
-
-ggplot(data.frame(x=intergenic_lengths), aes(x)) + 
-       geom_histogram(binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-       xlim(0, clip_upper) +
-       labs(x="Intergenic region length (nt)", y="Number of regions") +
-       ggtitle('Distribution of intergenic lengths')
-```
-
 ```{r, results='asis'}
 cat(sprintf('\n- %% intergenic lengths between 100-200nt: %0.2f\n\n',
             sum(intergenic_lengths >= 100 & intergenic_lengths <= 200) / 

@@ -11,7 +11,7 @@ sl_sites_combined <- merge(merge(sl_sites[['combined']],
 primary_sites <- sl_sites_combined %>% filter(type=='primary')
 
 # TESTING
-x <- data.frame()
+acceptor_sites <- c()
 
 for (i in 1:nrow(primary_sites)) {
     site <- primary_sites[i,]
@@ -28,18 +28,22 @@ for (i in 1:nrow(primary_sites)) {
     }
 
     # TESTING
-    x <- rbind(x, c(strand=site$strand,
-               acceptor_site=as.character(acceptor_site)))
+    #x <- rbind(x, c(strand=site$strand,
+    #           acceptor_site=as.character(acceptor_site)))
+    acceptor_sites <- c(acceptor_sites, as.character(acceptor_site))
 }
 
 # DEBUGGING: THERE SHOULD BE NO DIFFERENCES BETWEEN STRANDS!
-colnames(x) <- c('strand', 'seq')
+#colnames(x) <- c('strand', 'seq')
+primary_sites <- cbind(primary_sites, acceptor_site=acceptor_sites)
 
-table(x$strand)
+table(primary_sites$strand)
 
-x %>% 
-    group_by(strand, seq) %>% 
+primary_sites %>% 
+    select(strand, acceptor_site) %>%
+    group_by(strand, acceptor_site) %>% 
     summarize(num=n()) %>%
     arrange(desc(num)) %>%
+    head %>%
     kable
 ```

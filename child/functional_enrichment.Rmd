@@ -4,7 +4,7 @@ To see if their are any specific functions enriched among the genes with the
 shortest and longest UTR's, we will perform functional enrichment for the upper
 and lower 25% of genes in each category.
 
-```{r functional_enrichment_prep, message=FALSE}
+```{r functional_enrichment_prep, message=FALSE, warning=FALSE}
 # Load GO annotations
 go_terms <- load_go_terms(orgdb, keys(orgdb, keytype='GID'), keytype='GID')
 
@@ -82,10 +82,10 @@ if (nrow(sig_enriched) > 0) {
 }
 ```
 
-#### Long 3'UTRs
+#### Long 3′ UTRs
 
 ```{r functional_enrichment_long_3utrs, results='asis', message=FALSE, warning=FALSE}
-# list of all genes with confident 3'UTR lengths
+# list of all genes with confident 3′ UTR lengths
 all_genes_3utr <- utr3_stats_combined$gene
 
 # Gene (CDS) lengths; used for goseq bias correction
@@ -96,7 +96,7 @@ names(gene_lengths_3utr) <- genes_with_known_3utrs$ID
 # number of genes in upper/lower quartiles
 quartile_num_genes <- round(nrow(utr3_stats_combined) / 4)
 
-# gene ids for genes in the upper quartile of 3'UTR lengths
+# gene ids for genes in the upper quartile of 3′ UTR lengths
 utr3_upper_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% head(quartile_num_genes))$gene
 
@@ -121,10 +121,10 @@ if (nrow(sig_enriched) > 0) {
 }
 ```
 
-#### Short 3'UTRs
+#### Short 3′ UTRs
 
 ```{r functional_enrichment_short_3utrs, results='asis', message=FALSE, warning=FALSE}
-# gene ids for genes in the lower quartile of 3'UTR lengths
+# gene ids for genes in the lower quartile of 3′ UTR lengths
 utr3_lower_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% tail(quartile_num_genes))$gene
 

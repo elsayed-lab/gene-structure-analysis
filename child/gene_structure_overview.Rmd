@@ -17,7 +17,7 @@ plot_gene_structure(median_5utr, median_cds, median_3utr,
                     utr_color=CONFIG$colors[2], cds_color=CONFIG$colors[1])
 ```
 
-```{r, results='asis'}
+```{r, results='asis', message=FALSE}
 # create a data frame to store gene-matched lengths
 matched_lengths <- data.frame()
 
@@ -37,7 +37,7 @@ for (gene_id in utr3_stats_combined$gene) {
     ))
 }
 
-cat(sprintf('-Median mRNA length: %d nt\n',
+cat(sprintf('- Median mRNA length: %d nt\n',
             as.integer(median(rowSums(matched_lengths)))))
 
 # average proportion of mRNA contributed by each portion

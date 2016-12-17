@@ -24,24 +24,13 @@ plot_gene_structure <- function(utr5, cds, utr3, utr_color='#6a839c', cds_color=
 #
 # gene_structure_summary
 #
-gene_structure_summary <- function(utr5_lengths, cds_lengths, utr3_lengths) {
-    # equalize lengths
-    max_length <- max(length(utr5_lengths), length(cds_lengths), length(utr3_lengths))
-    utr5_lengths <- c(utr5_lengths, rep(NA, max_length - length(utr5_lengths)))
-    cds_lengths  <- c(cds_lengths,  rep(NA, max_length - length(cds_lengths)))
-    utr3_lengths <- c(utr3_lengths, rep(NA, max_length - length(utr3_lengths)))
-
-    mat <- cbind(utr5_lengths, cds_lengths, utr3_lengths)
-
-    summary_dat <- data.frame(
-        min=apply(mat, 2, function (x) { min(x, na.rm=TRUE) }),
-        median=apply(mat, 2, function (x) { median(x, na.rm=TRUE) }),
-        mean=apply(mat, 2, function (x) { mean(x, na.rm=TRUE) }),
-        max=apply(mat, 2, function (x) { max(x, na.rm=TRUE) })
+gene_structure_summary <- function(lengths) {
+    data.frame(
+        min=apply(lengths, 2, function (x) { min(x, na.rm=TRUE) }),
+        median=apply(lengths, 2, function (x) { median(x, na.rm=TRUE) }),
+        mean=apply(lengths, 2, function (x) { mean(x, na.rm=TRUE) }),
+        max=apply(lengths, 2, function (x) { max(x, na.rm=TRUE) })
     )
-    rownames(summary_dat) <- c("5'UTR", "CDS", "3'UTR")
-    
-    return(summary_dat)
 }
 
 #
@@ -208,9 +197,10 @@ plot_diff_utrs <- function(dat, feature_name) {
 #'
 #' plot_alt_site_distance_hist
 #'
-plot_alt_site_distance_hist <- function(sites, stage, upstream_color='red',
+plot_alt_site_distance_hist <- function(sites, upstream_color='red',
                                         downstream_color='blue', 
-                                        stroke_color='#333333') {
+                                        stroke_color='#333333', 
+                                        xlabel='', main='') {
     # get primary and alternative sites
     primary_sites <- sites %>% 
         filter(type=='primary') %>%
@@ -243,12 +233,10 @@ plot_alt_site_distance_hist <- function(sites, stage, upstream_color='red',
     # limit to sites in range [-2500, 2500]
     dat <- dat %>% filter(abs(dist) <= 2500)
 
-    # plot distribution, coloring upstream and downstream sites differentially
-    main <- sprintf("Alternative site distance from primary site (%s)", stage)
-
     ggplot(dat, aes(dist, fill=direction)) +
         geom_histogram(breaks=seq(-2500, 2500, by=50), color=stroke_color) +
         scale_fill_manual(values=c(upstream_color, downstream_color)) +
-        ggtitle(main)
+        ggtitle(main) + theme(plot.title=element_text(hjust=0)) + 
+        labs(x=xlabel)
 }
 

@@ -1,5 +1,11 @@
 ```{r settings}
 #
+# v1.6
+# ----
+# - Generating high-quality (tiff) versions of all figures.
+# - Modified site coordinate tables (S2/S3) to include chromosome information
+#   and to exclude stage-specific site identifiers.
+#
 # v1.5
 # ----
 # - Disabled filtering of SL/Poly(A) sites with less than three reads prior
@@ -25,7 +31,7 @@ library('org.TcCLB.esmer.tritryp.db')
 orgdb <- get('org.TcCLB.esmer.tritryp.db')
 
 # Analysis version
-analysis_version <- '1.5'
+analysis_version <- '1.6'
 
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
@@ -95,11 +101,13 @@ CONFIG <- list(
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 
-                              '/genome/TriTrypDB-28_TcruziCLBrenerEsmeraldo-like_Genome.fasta'),
+                              '/genome/TriTrypDB-29_TcruziCLBrenerEsmeraldo-like_Genome.fasta'),
+    'input_cds_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 
+                                  '/genome/TriTrypDB-29_TcruziCLBrenerEsmeraldo-like_AnnotatedCDSs.fasta'),
 
     # Stage-specific GFFs containing genes and annotated UTRs
     'input_gff' = file.path(utr_analysis_outdir, 'combined',
-                            'TriTrypDB-28_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
+                            'TriTrypDB-29_TcruziCLBrenerEsmeraldo-like-with-utrs.gff'),
 
     # Stage-specific GFFs containing SL and Poly(A) site annotations
     # only included here to be copied to the output dir for easier submission
@@ -116,7 +124,7 @@ CONFIG <- list(
     # Polycistronic transcriptional unit (PTU) mapping
     'ptu_mapping' = file.path(Sys.getenv('RESEARCH'), '2013', '09-polycistron_detection',
                               'mappings',
-                              'TriTrypDB-28_TcruziCLBrenerEsmeraldo-like_PTUs.csv'),
+                              'TriTrypDB-29_TcruziCLBrenerEsmeraldo-like_PTUs.csv'),
 
     # Chromosome order to use for plotting
     'chr_order' = sprintf("TcChr%d-S", 1:41),
@@ -138,6 +146,9 @@ CONFIG <- list(
     # Minimum number of reads for UTR to be used for analysis
     'min_read_support_5utr'   = 3,
     'min_read_support_3utr'   = 3,
+
+    # TriTryp ortholog list
+    'tritryp_orthologs' = file.path(input_dir, 'tritryp_orthologs.txt'),
 
     # Number of reads mapped
     'reads_mapped_total'    = file.path(input_dir, 'S01_num_reads_total.csv'),

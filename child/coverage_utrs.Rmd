@@ -1,7 +1,7 @@
 ### RNA-Seq coverage support for primary UTR boundaries
 
 ```{r table_04, results='asis'}
-table_04 <- cbind(c("5'UTR", "3'UTR"), 
+table_04 <- cbind(c("5'UTR", "3′ UTR"), 
             c(sum(utr5_stats_combined$num_reads, na.rm=TRUE),
               sum(utr3_stats_combined$num_reads, na.rm=TRUE)) / 1E6)
 colnames(table_04) <- c("Feature", "Number of reads (millions)")
@@ -52,7 +52,7 @@ xkable(table_05, caption='**Table 5**: Percent genes containing N or more reads 
 cat(sprintf("- Total number of genes for which 5'UTR could be determined: %d (%d with 3+ reads)\n",
             nrow(utr5_stats_combined),
             nrow(utr5_stats_combined %>% filter(num_reads >= 3))))
-cat(sprintf("- Total number of genes for which 3'UTR could be determined: %d (%d with 3+ reads)\n",
+cat(sprintf("- Total number of genes for which 3′ UTR could be determined: %d (%d with 3+ reads)\n",
             nrow(utr3_stats_combined),
             nrow(utr3_stats_combined %>% filter(num_reads >= 3))))
 cat(sprintf("- Number of annotated protein-coding genes: %d\n\n", length(genes)))

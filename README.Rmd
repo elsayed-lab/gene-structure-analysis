@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi 1.4)
+title: Trypanosome Gene Structure Analysis (T. cruzi 1.6)
 author: Keith Hughitt
 output:
   html_document:
@@ -40,10 +40,10 @@ knit('settings/tcruzi_ystrain.Rmd', quiet=TRUE, output=tempfile())
 ```
 
 ```{r knitr_settings, include=FALSE}
-opts_knit$set(progress=FALSE, verbose=TRUE,
-              base.dir=file.path(getwd(), CONFIG$output_dir, 'figure'))
+opts_knit$set(progress=FALSE, verbose=TRUE)
 opts_chunk$set(fig.width=1920/192,
                fig.height=1920/192,
+               fig.path=file.path(CONFIG$output_dir, 'figure/'),
                dpi=192,
                cache.path=CONFIG$cache_dir,
 			   echo=CONFIG$verbose)
@@ -118,8 +118,8 @@ Coverage Statistics
 ```{r child='child/coverage_utrs.Rmd'}
 ```
 
-UTR lengths
------------
+UTRs
+----
 
 ```{r child='child/length_summary.Rmd'}
 ```

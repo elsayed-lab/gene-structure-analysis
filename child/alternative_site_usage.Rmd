@@ -2,18 +2,25 @@
 
 ```{r figure_x_alt_ts}
 # iterate over genes for which primary trans-splicing site was detected
-for (developmental_stage in stages) {
-    sites <- sl_sites[[developmental_stage]]
+plts <- list()
+
+for (i in 1:length(stages)) {
+    stage <- stages[i]
+    sites <- sl_sites[[stage]]
 
     # filter sites with low read coverage
     sites <- sites %>% filter(num_reads >= CONFIG$min_read_support_5utr)
 
     # get primary and secondary sites
-    print(plot_alt_site_distance_hist(sites, developmental_stage,
-                                      upstream_color=CONFIG$colors[2],
-                                      downstream_color=CONFIG$colors[1],
-                                      stroke_color=CONFIG$stroke))
+    xlabel <- sprintf("Alternative site distance from primary site (%s)", stage)
+
+    plts[stage] <- plot_alt_site_distance_hist(sites,
+                                               upstream_color=CONFIG$colors[2],
+                                               downstream_color=CONFIG$colors[1],
+                                               stroke_color=CONFIG$stroke,
+                                               main=letters[i], xlabel=xlabel)
 }
+grid.arrange(grobs=plts, ncol=2)
 ```
 
 ```{r num_sl_sites_per_gene, results='asis'}
@@ -36,18 +43,25 @@ cat(sprintf('- Number of genes with 5+ SL sites detected: %d (%0.1f)\n\n',
 
 ```{r figure_x_alt_polya}
 # iterate over genes for which primary trans-splicing site was detected
-for (developmental_stage in stages) {
-    sites <- polya_sites[[developmental_stage]]
+plts <- list()
+
+for (i in 1:length(stages)) {
+    stage <- stages[i]
+    sites <- polya_sites[[stage]]
 
     # filter sites with low read coverage
     sites <- sites %>% filter(num_reads >= CONFIG$min_read_support_3utr)
 
     # get primary and secondary sites
-    print(plot_alt_site_distance_hist(sites, developmental_stage,
-                                      upstream_color=CONFIG$colors[2],
-                                      downstream_color=CONFIG$colors[1],
-                                      stroke_color=CONFIG$stroke))
+    xlabel <- sprintf("Alternative site distance from primary site (%s)", stage)
+
+    plts[stage] <- plot_alt_site_distance_hist(sites, 
+                                               upstream_color=CONFIG$colors[2],
+                                               downstream_color=CONFIG$colors[1],
+                                               stroke_color=CONFIG$stroke,
+                                               main=letters[i], xlabel=xlabel)
 }
+grid.arrange(grobs=plts, ncol=2)
 ```
 
 ```{r num_polya_sites_per_gene, results='asis'}
