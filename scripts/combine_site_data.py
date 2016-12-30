@@ -16,8 +16,6 @@ Example Usage:
 
 Note that the script currently assumes each of the input GFFs shares a common
 filename prefix which is adapted for the output filename determination.
-
-Source: https://github.com/elsayed-lab/utr_length_composition_and_site_usage_analysis
 """
 import os
 import sys
@@ -51,7 +49,9 @@ def main():
     # Reset read counter
     fp.seek(0)
 
-    # Get entries for the first input file
+    # Get chromosome entries for the first input file; as of TriTrypDB 29, the
+    # GFF file no longer includes chromosome entries so we will use dicts
+    # instead.
     chromosomes = {}
 
     for entry in GFF.parse(fp):
@@ -60,9 +60,9 @@ def main():
 
     fp.close()
 
-    # Add sites from other input GFFs
-    for gff in gffs[1:]:
-        # Open first input GFF
+    # Add sites from all GFFs
+    for gff in gffs:
+        # Open input GFF
         if gff.endswith('.gz'):
             fp = gzip.open(gff)
         else:
@@ -70,6 +70,10 @@ def main():
 
         for entry in GFF.parse(fp):
             for feature in entry.features:
+                # Add chromosome key if it doesn't already exist (needed for
+                # TriTrypDB 29+)
+                if entry.id not in chromosomes:
+                    chromosomes[entry.id] = Chromosome() 
                 chromosomes[entry.id].features.append(feature)
 
     # combined sites
@@ -155,6 +159,10 @@ def main():
         output.writelines(combined)
 
     print("Done!")
+
+class Chromosome(object):
+    def __init__(self):
+        self.features = []
 
 def commonsuffix(strs):
     """Takes a list of strings and returns their common suffix"""

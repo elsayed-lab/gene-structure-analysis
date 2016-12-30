@@ -2,7 +2,7 @@
 
 ```{r data_prep}
 # Create RPKM-normalized version of counts
-gene_lengths <- data.frame(gene=genes$Name, length=as.numeric(genes$size))
+gene_lengths <- data.frame(gene=genes$ID, length=as.numeric(genes$size))
 
 # remove duplicates and entries missing from main count table
 gene_lengths <- gene_lengths[gene_lengths$gene %in% rownames(count_table),]

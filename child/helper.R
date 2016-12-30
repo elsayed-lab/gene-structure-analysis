@@ -197,10 +197,11 @@ plot_diff_utrs <- function(dat, feature_name) {
 #'
 #' plot_alt_site_distance_hist
 #'
-plot_alt_site_distance_hist <- function(sites, upstream_color='red',
-                                        downstream_color='blue', 
-                                        stroke_color='#333333', 
-                                        xlabel='', main='') {
+plot_alt_site_distance_hist <- function(sites, gene_strands,
+                                        upstream_color='red',
+                                        downstream_color='blue',
+                                        stroke_color='#333333', xlabel='',
+                                        main='') {
     # get primary and alternative sites
     primary_sites <- sites %>% 
         filter(type=='primary') %>%
@@ -236,7 +237,8 @@ plot_alt_site_distance_hist <- function(sites, upstream_color='red',
     ggplot(dat, aes(dist, fill=direction)) +
         geom_histogram(breaks=seq(-2500, 2500, by=50), color=stroke_color) +
         scale_fill_manual(values=c(upstream_color, downstream_color)) +
-        ggtitle(main) + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle(main) + 
+        theme(plot.title=element_text(hjust=0)) + 
         labs(x=xlabel)
 }
 

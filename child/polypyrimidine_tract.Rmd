@@ -15,8 +15,8 @@ xkable(t(table_xx), caption='**Table X** Polypyrimidine tract length statistics.
 ## Median distance from SL/Poly(A) sites
 
 ```{r results='asis'}
-cat(sprintf('- Median distance from SL acceptor site: %d\n', median(polypyr_combined$sl_dist)))
-cat(sprintf('- Median distance from Poly(A) site: %d\n', median(polypyr_combined$polya_dist)))
+cat(sprintf('- Median distance from SL acceptor site: %0.1f\n', median(polypyr_combined$sl_dist)))
+cat(sprintf('- Median distance from Poly(A) site: %0.1f\n', median(polypyr_combined$polya_dist)))
 ```
 
 ## Polypyrimidine tract composition
@@ -37,7 +37,7 @@ cat(sprintf('- %% Thymine: %0.1f\n\n', 100 * (num_thymines / (num_cytosines + nu
 
 ### Global Polypyrimidine tract sequence logo
 
-```{r polpyrimidine_tract_logo_global, fig.width=7680/192}
+```{r polpyrimidine_tract_logo_global, fig.width=15360/192}
 # perform an MSA
 seqs <- DNAStringSet(polypyrimidine_seqs)
 alignment <- msa(seqs, method='ClustalOmega')
@@ -124,7 +124,7 @@ df <- data_frame(cluster=sort(unique(clusters)),
 df <- df %>% arrange(desc(avg_similarity))
 ```
 
-```{r, results='asis', cache=TRUE, autodep=TRUE, fig.width=10, fig.height=5.625, dpi=192}
+```{r, results='asis', cache=TRUE, autodep=TRUE, fig.width=30, fig.height=5.625, dpi=192}
 # Iterate over top N clusters and generate a sequence logo for each
 n <- 10
 

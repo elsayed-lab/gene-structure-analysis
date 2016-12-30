@@ -70,7 +70,7 @@ protein_coding <- gene_types$GID[gene_types$TYPE == 'proteincoding']
 genes <- genes[genes$ID %in% protein_coding]
 
 # remaining gene ids
-gene_ids <- genes$Name
+gene_ids <- genes$ID
 
 # Fix TriTrypDB FASTA names
 # e.g. "LmjF.24 | organism=Leishmania_major_strain_Friedlin |..." -> "LmjF.24"
@@ -106,13 +106,13 @@ if (sum(is.na(genes$size)) > 0) {
 
 ```{r}
 # create a gene/chromosome mapping
-chr_mapping <- data_frame(gene=genes$Name, chr=as.character(genes@seqnames))
+chr_mapping <- data_frame(gene=genes$ID, chr=as.character(genes@seqnames))
 ```
 
 ## Create a dataframe containing strand information for each gene
 
 ```{r}
-gene_strands <- data_frame(gene=genes$Name, strand=as.vector(genes@strand))
+gene_strands <- data_frame(gene=genes$ID, strand=as.vector(genes@strand))
 ```
 
 ## Load spliced leader and poly(A) site coordinates
@@ -347,6 +347,6 @@ ptu_mapping <- read_csv(CONFIG$ptu_mapping)
 ### Load TriTryp ortholog gene list
 
 ```{r}
-tritryp_orthologs <- readLines(CONFIG$tritryp_orthologs)
+tritryp_orthologs <- readLines('../input/shared/tritryp_orthologs.txt')
 ```
 

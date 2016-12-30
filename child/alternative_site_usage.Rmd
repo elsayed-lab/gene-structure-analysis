@@ -7,6 +7,7 @@ plts <- list()
 for (i in 1:length(stages)) {
     stage <- stages[i]
     sites <- sl_sites[[stage]]
+    message(stage)
 
     # filter sites with low read coverage
     sites <- sites %>% filter(num_reads >= CONFIG$min_read_support_5utr)
@@ -14,7 +15,7 @@ for (i in 1:length(stages)) {
     # get primary and secondary sites
     xlabel <- sprintf("Alternative site distance from primary site (%s)", stage)
 
-    plts[stage] <- plot_alt_site_distance_hist(sites,
+    plts[[stage]] <- plot_alt_site_distance_hist(sites, gene_strands,
                                                upstream_color=CONFIG$colors[2],
                                                downstream_color=CONFIG$colors[1],
                                                stroke_color=CONFIG$stroke,
@@ -55,11 +56,11 @@ for (i in 1:length(stages)) {
     # get primary and secondary sites
     xlabel <- sprintf("Alternative site distance from primary site (%s)", stage)
 
-    plts[stage] <- plot_alt_site_distance_hist(sites, 
-                                               upstream_color=CONFIG$colors[2],
-                                               downstream_color=CONFIG$colors[1],
-                                               stroke_color=CONFIG$stroke,
-                                               main=letters[i], xlabel=xlabel)
+    plts[[stage]] <- plot_alt_site_distance_hist(sites, gene_strands, 
+                                                 upstream_color=CONFIG$colors[2],
+                                                 downstream_color=CONFIG$colors[1],
+                                                 stroke_color=CONFIG$stroke,
+                                                 main=letters[i], xlabel=xlabel)
 }
 grid.arrange(grobs=plts, ncol=2)
 ```

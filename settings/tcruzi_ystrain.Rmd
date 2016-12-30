@@ -1,5 +1,12 @@
 ```{r settings}
 #
+# v2.0
+# ----
+# - Fixed couple bugs in upstream analysis steps (utr_analysis.py) which
+# resulted in erronious and missed sites.
+# - Relaxed minimum detection length criteria from 4 -> 3 nt long.
+# - Switching to TriTrypDB version 29 annotations.
+#
 # v1.6
 # ----
 # - Generating high-quality (tiff) versions of all figures.
@@ -31,12 +38,12 @@ library('org.TcCLB.esmer.tritryp.db')
 orgdb <- get('org.TcCLB.esmer.tritryp.db')
 
 # Analysis version
-analysis_version <- '1.6'
+analysis_version <- '2.0'
 
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
                                   '06-gene-structure/01-gene-structure-determination')
-utr_analysis_suffix <- 'tcruzi_ystrain/sl-min4_polya-min4_mindiff-2'
+utr_analysis_suffix <- 'tcruzi_ystrain/sl-min3_polya-min3_mindiff-2'
 utr_analysis_indir  <- file.path(utr_analysis_basedir, 'input', utr_analysis_suffix)
 utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output', utr_analysis_suffix)
 
@@ -146,9 +153,6 @@ CONFIG <- list(
     # Minimum number of reads for UTR to be used for analysis
     'min_read_support_5utr'   = 3,
     'min_read_support_3utr'   = 3,
-
-    # TriTryp ortholog list
-    'tritryp_orthologs' = file.path(input_dir, 'tritryp_orthologs.txt'),
 
     # Number of reads mapped
     'reads_mapped_total'    = file.path(input_dir, 'S01_num_reads_total.csv'),

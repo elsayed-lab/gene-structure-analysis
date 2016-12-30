@@ -57,26 +57,26 @@ xkable(table_02, caption='**Table 2**: Stage-specific UTR lengths.')
 
 ### Average lengths
 
-```{r figure_1_average_lengths, fig.cap=sprintf('**Figure 1** Characterization of %s gene structure', CONFIG$parasite), warning=FALSE}
+```{r figure_01_average_lengths, fig.cap=sprintf('**Figure 1** Characterization of %s gene structure', CONFIG$parasite), warning=FALSE}
 # Average 5′ UTR length
 p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
-        ggtitle('a') + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle('A') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="5′ UTR length (nt)")
 
 # Average 3′ UTR length
 p2 <- ggplot(utr3_stats_combined, aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
-        ggtitle('b') + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle('B') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="3′ UTR length (nt)")
 
 # Average Polypyrimidine tract length
 p3 <- ggplot(polypyr_combined, aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 300) +
-        ggtitle('c') + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle('C') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="Polypyrimidine tract length (nt)")
 
 # Average CDS length
@@ -86,21 +86,21 @@ colnames(cds_lengths) <- 'length'
 p4 <- ggplot(cds_lengths, aes(x=length)) + 
         geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 5000) +
-        ggtitle('d') + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle('D') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="CDS length (nt)")
 
 # Average distance between primary SL site and polypyrimidine tract
 p5 <- ggplot(polypyr_combined, aes(x=sl_dist)) +
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 300) +
-        ggtitle('e') + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle('E') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="Distance between primary trans-splicing site and polypyrimidine tract (nt)")
 
 # Average distance between primary poly(A) site and polypyrimidine tract
 p6 <- ggplot(polypyr_combined, aes(x=polya_dist)) +
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
-        ggtitle('f') + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle('F') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="Distance between primary polyadenylation site and polypyrimidine tract (nt)")
 
 # Average intergenic length (distance between SL and Poly(A) sites)
@@ -108,7 +108,7 @@ p7 <- ggplot(intercds_regions %>% filter(stage == 'combined'),
              aes(x=intergenic_length)) +
         geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
         xlim(0, 1500) +
-        ggtitle('g') + theme(plot.title=element_text(hjust=0)) + 
+        ggtitle('G') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="Intergenic length (nt)")
 
 grid.arrange(p1, p5, p2, p6, p3, p7, p4, ncol=2, left='Transcript density')
@@ -154,113 +154,3 @@ p2 <- ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stag
 grid.arrange(p1, p2, ncol=2)
 ```
 
-### Functional enrichment of genes with short/long UTR's
-
-To see if their are any specific functions enriched among the genes with the
-shortest and longest UTR's, we will perform functional enrichment for the upper
-and lower 25% of genes in each category.
-
-```{r functional_enrichment_prep}
-# Load GO annotations
-go_terms <- load_go_terms(orgdb, keys(orgdb, keytype='GID'), keytype='GID')
-
-# Gene / GO term mapping
-gene_go_mapping <- as.data.frame(unique(
-    go_terms %>% select(GID, GO, ONTOLOGY)
-))
-colnames(gene_go_mapping) <- c('gene', 'category', 'ontology')
-```
-
-#### Long 5′ UTRs
-
-```{r functional_enrichment_long_5utrs, results='asis'}
-# list of all genes with confident UTR'5 lengths
-all_genes_5utr <- utr5_stats_combined$gene
-
-# Gene (CDS) lengths; used for goseq bias correction
-genes_with_known_5utrs <- genes[genes$ID %in% all_genes_5utr]
-gene_lengths_5utr <- width(genes_with_known_5utrs)
-names(gene_lengths_5utr) <- genes_with_known_5utrs$ID
-
-# number of genes in upper/lower quartiles
-quartile_num_genes <- round(nrow(utr5_stats_combined) / 4)
-
-# gene ids for genes in the upper quartile of 5′ UTR lengths
-utr5_upper_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
-                        select(gene) %>% head(quartile_num_genes))$gene
-
-# measure enrichment
-enriched <- test_gene_enrichment(utr5_upper_quartile, all_genes_5utr,
-                                 gene_go_mapping, gene_lengths_5utr)
-
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
-
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
-```
-
-#### Short 5′ UTRs
-
-```{r functional_enrichment_short_5utrs, results='asis'}
-# gene ids for genes in the lower quartile of 5′ UTR lengths
-utr5_lower_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
-                        select(gene) %>% tail(quartile_num_genes))$gene
-
-# measure enrichment
-enriched <- test_gene_enrichment(utr5_lower_quartile, all_genes_5utr,
-                                 gene_go_mapping, gene_lengths_5utr)
-
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
-
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
-```
-
-#### Long 3′ UTRs
-
-```{r functional_enrichment_long_3utrs, results='asis'}
-# list of all genes with confident 3′ UTR lengths
-all_genes_3utr <- utr3_stats_combined$gene
-
-# Gene (CDS) lengths; used for goseq bias correction
-genes_with_known_3utrs <- genes[genes$ID %in% all_genes_3utr]
-gene_lengths_3utr <- width(genes_with_known_3utrs)
-names(gene_lengths_3utr) <- genes_with_known_3utrs$ID
-
-# number of genes in upper/lower quartiles
-quartile_num_genes <- round(nrow(utr3_stats_combined) / 4)
-
-# gene ids for genes in the upper quartile of 3′ UTR lengths
-utr3_upper_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
-                        select(gene) %>% head(quartile_num_genes))$gene
-
-# measure enrichment
-enriched <- test_gene_enrichment(utr3_upper_quartile, all_genes_3utr,
-                                 gene_go_mapping, gene_lengths_3utr)
-
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.03))
-
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.03))
-```
-
-#### Short 3′ UTRs
-
-```{r functional_enrichment_short_3utrs, results='asis'}
-# gene ids for genes in the lower quartile of 3′ UTR lengths
-utr3_lower_quartile <- (utr3_stats_combined %>% arrange(-length) %>% 
-                        select(gene) %>% tail(quartile_num_genes))$gene
-
-# measure enrichment
-enriched <- test_gene_enrichment(utr3_lower_quartile, all_genes_3utr,
-                                 gene_go_mapping, gene_lengths_3utr)
-
-cat('\n**over-represented functions:**\n\n')
-xkable(enriched %>% filter(over_represented_pvalue_adj < 0.05))
-
-cat('\n**under-represented functions:**\n\n')
-xkable(enriched %>% filter(under_represented_pvalue_adj < 0.05))
-```

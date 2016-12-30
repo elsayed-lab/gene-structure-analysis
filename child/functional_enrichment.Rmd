@@ -15,7 +15,7 @@ gene_go_mapping <- as.data.frame(unique(
 colnames(gene_go_mapping) <- c('gene', 'category', 'ontology')
 ```
 
-#### Long 5'UTRs
+#### Long 5′ UTRs
 
 ```{r functional_enrichment_long_5utrs, results='asis', message=FALSE, warning=FALSE}
 # list of all genes with confident UTR'5 lengths
@@ -29,7 +29,7 @@ names(gene_lengths_5utr) <- genes_with_known_5utrs$ID
 # number of genes in upper/lower quartiles
 quartile_num_genes <- round(nrow(utr5_stats_combined) / 4)
 
-# gene ids for genes in the upper quartile of 5'UTR lengths
+# gene ids for genes in the upper quartile of 5′ UTR lengths
 utr5_upper_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% head(quartile_num_genes))$gene
 
@@ -54,10 +54,10 @@ if (nrow(sig_enriched) > 0) {
 }
 ```
 
-#### Short 5'UTRs
+#### Short 5′ UTRs
 
 ```{r functional_enrichment_short_5utrs, results='asis', message=FALSE, warning=FALSE}
-# gene ids for genes in the lower quartile of 5'UTR lengths
+# gene ids for genes in the lower quartile of 5′ UTR lengths
 utr5_lower_quartile <- (utr5_stats_combined %>% arrange(-length) %>% 
                         select(gene) %>% tail(quartile_num_genes))$gene
 
