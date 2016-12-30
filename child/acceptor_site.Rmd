@@ -8,42 +8,98 @@ sl_sites_combined <- merge(merge(sl_sites[['combined']],
 ### Primary acceptor sites
 
 ```{r, results='asis'}
-primary_sites <- sl_sites_combined %>% filter(type=='primary')
+# create a string version of chromosome sequences
+chr_seqs <- lapply(fasta, as.character)
 
-# TESTING
-acceptor_sites <- c()
+sl_sites_combined <- sl_sites_combined %>% 
+    mutate(acc_start=ifelse(strand == '+', chr_coordinate - 1, chr_coordinate),
+           acc_end=ifelse(strand=='+', chr_coordinate, chr_coordinate + 1)) %>%
+    mutate(acceptor_site=substr(chr_seqs[chr], acc_start, acc_end))
 
-for (i in 1:nrow(primary_sites)) {
-    site <- primary_sites[i,]
+# reverse negative strand sequences
+sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site <- as.character(reverseComplement(
+    DNAStringSet(sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site)
+))
 
-    # determine accept site dinucleotide sequence
-    if (site$strand == '+') {
-        start_ind <- site$chr_coordinate - 1
-        end_ind <- site$chr_coordinate
-        acceptor_site <- fasta[[site$chr]][start_ind:end_ind]
-    } else {
-        start_ind <- site$chr_coordinate 
-        end_ind <- site$chr_coordinate + 1
-        acceptor_site <- reverseComplement(fasta[[site$chr]][start_ind:end_ind])
-    }
+# exclude any sites containing N's (not very common)
+sl_sites_combined <- sl_sites_combined %>% 
+    filter(str_detect(acceptor_site, '[AGCT]{2}'))
 
-    # TESTING
-    #x <- rbind(x, c(strand=site$strand,
-    #           acceptor_site=as.character(acceptor_site)))
-    acceptor_sites <- c(acceptor_sites, as.character(acceptor_site))
-}
+# in cases where primary site was excluded, remove gene from consideration
+primary_site_genes <- (sl_sites_combined %>% filter(type == 'primary'))$gene
 
-# DEBUGGING: THERE SHOULD BE NO DIFFERENCES BETWEEN STRANDS!
-#colnames(x) <- c('strand', 'seq')
-primary_sites <- cbind(primary_sites, acceptor_site=acceptor_sites)
+sl_sites_combined <- sl_sites_combined[sl_sites_combined$gene %in%
+                                       primary_site_genes,]
 
-table(primary_sites$strand)
+# total number of sites and number of primary sites
+num_total <- nrow(sl_sites_combined)
+num_primary <- nrow(sl_sites_combined %>% filter(type == 'primary'))
 
-primary_sites %>% 
-    select(strand, acceptor_site) %>%
-    group_by(strand, acceptor_site) %>% 
-    summarize(num=n()) %>%
+sl_sites_combined %>% 
+    filter(type == 'primary') %>%
+    select(acceptor_site) %>%
+    group_by(acceptor_site) %>% 
+    summarize(num=round((n() / num_primary) * 100, 2)) %>%
     arrange(desc(num)) %>%
     head %>%
+    kable
+```
+
+### Alternative acceptor sites
+
+```{r, results='asis'}
+# total number of sites and number of primary sites
+num_alternative <- nrow(sl_sites_combined %>% filter(type == 'alternative'))
+
+sl_sites_combined %>% 
+    filter(type == 'alternative') %>%
+    select(acceptor_site) %>%
+    group_by(acceptor_site) %>% 
+    summarize(num=round((n() / num_alternative) * 100, 2)) %>%
+    arrange(desc(num)) %>%
+    head %>%
+    kable
+```
+
+### Primary vs. alternative acceptor sites
+
+```{r, figure03a}
+sl_summary <- sl_sites_combined %>% 
+    select(acceptor_site, type) %>%
+    group_by(type, acceptor_site) %>% 
+    summarise (num=n()) %>%
+    mutate(prop=num / sum(num)) %>%
+    arrange(desc(prop))
+
+ggplot(sl_summary, aes(acceptor_site, y=prop, fill=type)) +
+    geom_bar(position="dodge", stat='identity')
+```
+
+### Distance between primary and alternative trans-splicing sites
+
+```{r acceptor_site_dist, results='asis'}
+sl_sites_combined <- sl_sites_combined %>% 
+    group_by(gene) %>% 
+    mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
+                                                 chr_coordinate[type == 'primary'] - chr_coordinate))
+
+# primary - minor acceptor site distances
+ag_dists <- (sl_sites_combined %>% 
+             filter(type == 'alternative' & acceptor_site == 'AG'))$primary_site_dist
+
+# ignore primary vs. primary comparisons
+ag_dists <- ag_dists[ag_dists != 0]
+
+# convert to data frame and add color based on orientation
+ag_dists <- data.frame(dist=ag_dists) %>%
+    mutate(orientation=ifelse(dist < 0, 'upstream', 'downstream'))
+
+ggplot(ag_dists, aes(x=dist, fill=orientation)) + 
+    geom_histogram(binwidth=20, center=10, color='white') +
+    xlim(-1000, 1000)
+
+ag_dists %>% 
+    group_by(orientation) %>%
+    summarize(number=n()) %>%
     kable
 ```
