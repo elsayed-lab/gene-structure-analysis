@@ -11,15 +11,28 @@ sl_sites_combined <- merge(merge(sl_sites[['combined']],
 # create a string version of chromosome sequences
 chr_seqs <- lapply(fasta, as.character)
 
+# grab a window (90nt upstream, 10nt downstream) surrounding the acceptor site
+win_size_upstream = 90
+win_size_downstream = 10
+
 sl_sites_combined <- sl_sites_combined %>% 
-    mutate(acc_start=ifelse(strand == '+', chr_coordinate - 1, chr_coordinate),
-           acc_end=ifelse(strand=='+', chr_coordinate, chr_coordinate + 1)) %>%
-    mutate(acceptor_site=substr(chr_seqs[chr], acc_start, acc_end))
+    mutate(acc_start=ifelse(strand == '+', 
+                            chr_coordinate - win_size_upstream - 1, 
+                            chr_coordinate - win_size_downstream),
+           acc_end=ifelse(strand=='+', 
+                          chr_coordinate + win_size_downstream, 
+                          chr_coordinate + win_size_upstream + 1)) %>%
+    mutate(acceptor_site_win=substr(chr_seqs[chr], acc_start, acc_end))
 
 # reverse negative strand sequences
-sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site <- as.character(reverseComplement(
+sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site_win <- as.character(reverseComplement(
     DNAStringSet(sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site)
 ))
+
+# actual splice acceptor site is 2nt wide
+sl_sites_combined <- sl_sites_combined %>% 
+    mutate(acceptor_site=substr(acceptor_site_win, win_size_upstream + 1, win_size_upstream + 2),
+           acceptor_site_3nt=substr(acceptor_site_win, win_size_upstream, win_size_upstream + 2))
 
 # exclude any sites containing N's (not very common)
 sl_sites_combined <- sl_sites_combined %>% 
@@ -63,7 +76,7 @@ sl_sites_combined %>%
 
 ### Primary vs. alternative acceptor sites
 
-```{r, figure03a}
+```{r, figure_03a}
 sl_summary <- sl_sites_combined %>% 
     select(acceptor_site, type) %>%
     group_by(type, acceptor_site) %>% 
@@ -73,6 +86,48 @@ sl_summary <- sl_sites_combined %>%
 
 ggplot(sl_summary, aes(acceptor_site, y=prop, fill=type)) +
     geom_bar(position="dodge", stat='identity')
+```
+
+### Preceeding nucleotide
+
+```{r}
+sl_sites_combined %>%
+    group_by(type, acceptor_site_3nt) %>%
+    summarise (num=n()) %>%
+    mutate(prop=num / sum(num)) %>%
+    arrange(desc(prop))
+```
+
+### Acceptor site sequence logos
+
+#### Primary acceptor site logo
+
+```{r figure_03e, fig.width=3840/192}
+primary_seqs <- (sl_sites_combined %>% filter(type=='primary'))$acceptor_site_win
+
+# for logo purposes, exclude sequences with N's (~1%)
+primary_seqs <- primary_seqs[str_count(primary_seqs, 'N') == 0]
+
+# convert to a PFM, and then to a PWM
+pwm <- consensusMatrix(primary_seqs, as.prob=TRUE)[DNA_BASES,]
+
+# draw sequence logo
+seqLogo(pwm, ic.scale=FALSE)
+```
+
+#### Alternative acceptor site logo
+
+```{r figure_s05, fig.width=3840/192}
+alt_seqs <- (sl_sites_combined %>% filter(type=='alternative'))$acceptor_site_win
+
+# for logo purposes, exclude sequences with N's (~1%)
+alt_seqs <- alt_seqs[str_count(alt_seqs, 'N') == 0]
+
+# convert to a PFM, and then to a PWM
+pwm <- consensusMatrix(alt_seqs, as.prob=TRUE)[DNA_BASES,]
+
+# draw sequence logo
+seqLogo(pwm, ic.scale=FALSE)
 ```
 
 ### Distance between primary and alternative trans-splicing sites
@@ -100,6 +155,6 @@ ggplot(ag_dists, aes(x=dist, fill=orientation)) +
 
 ag_dists %>% 
     group_by(orientation) %>%
-    summarize(number=n()) %>%
+    summarize(number=n(), proportion=n() / nrow(ag_dists)) %>%
     kable
 ```
