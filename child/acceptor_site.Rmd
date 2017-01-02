@@ -79,16 +79,6 @@ ggplot(sl_summary, aes(acceptor_site, y=prop, fill=type)) +
     geom_bar(position="dodge", stat='identity')
 ```
 
-### Preceeding nucleotide
-
-```{r}
-sl_sites_combined %>%
-    group_by(type, acceptor_site_3nt) %>%
-    summarise (num=n()) %>%
-    mutate(prop=num / sum(num)) %>%
-    arrange(desc(prop))
-```
-
 ### Acceptor site sequence logos
 
 #### Primary acceptor site logo
@@ -127,7 +117,8 @@ seqLogo(pwm, ic.scale=FALSE)
 sl_sites_combined <- sl_sites_combined %>% 
     group_by(gene) %>% 
     mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
-                                                 chr_coordinate[type == 'primary'] - chr_coordinate))
+                                                 chr_coordinate[type == 'primary'] - chr_coordinate)) %>%
+    mutate(orientation=ifelse(primary_site_dist < 0, 'upstream', 'downstream'))
 
 # primary - minor acceptor site distances
 ag_dists <- (sl_sites_combined %>% 
@@ -149,3 +140,38 @@ ag_dists %>%
     summarize(number=n(), proportion=n() / nrow(ag_dists)) %>%
     kable
 ```
+
+### Preceeding nucleotide
+
+```{r}
+# primary site proportions (including upstream nucleotide)
+primary_site_props <- sl_sites_combined %>%
+    filter(type == 'primary') %>%
+    group_by(acceptor_site_3nt) %>%
+    summarise (num=n()) %>%
+    mutate(prop=num / sum(num)) %>%
+    filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
+    select(-num) %>%
+    arrange(desc(prop))
+
+# alt site proportions, divided by up- and down-stream orientation, relative
+# to the primary site
+alt_site_props <- sl_sites_combined %>%
+    filter(type=='alternative') %>%
+    group_by(orientation, acceptor_site_3nt) %>%
+    summarise (num=n()) %>%
+    mutate(primary=num / sum(num)) %>%
+    filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
+    select(-num) %>% 
+    arrange(desc(primary)) %>%
+    spread(orientation, primary)
+
+table_s12 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
+colnames(table_s12) <- c('site', 'Primary', 'Alternative downstream', 
+                         'Alternative upstream')
+table_s12 <- table_s12 %>% column_to_rownames('site')
+table_s12 <- round(table_s12 * 100)
+
+kable(table_s12)
+```
+
