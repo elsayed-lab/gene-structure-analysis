@@ -1,16 +1,11 @@
 ### Primary vs. alternative acceptor sites
 
 ```{r}
-# add strand and chr information to SL site dataframe
-sl_sites_combined <- merge(merge(sl_sites[['combined']], 
-                                 gene_strands, by='gene'),
-                           chr_mapping, by='gene')
+# create combined site data frame including strand information
+sl_sites_combined <- merge(sl_sites[['combined']], gene_strands, by='gene')
 ```
 
 ```{r, results='asis'}
-# create a string version of chromosome sequences
-chr_seqs <- lapply(fasta, as.character)
-
 # grab a window (90nt upstream, 10nt downstream) surrounding the acceptor site
 win_size_upstream = 90
 win_size_downstream = 10
@@ -26,7 +21,7 @@ sl_sites_combined <- sl_sites_combined %>%
 
 # reverse negative strand sequences
 sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site_win <- as.character(reverseComplement(
-    DNAStringSet(sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site)
+    DNAStringSet(sl_sites_combined[sl_sites_combined$strand == '-',]$acceptor_site_win)
 ))
 
 # actual splice acceptor site is 2nt wide
@@ -113,7 +108,9 @@ seqLogo(pwm, ic.scale=FALSE)
 
 ### Distance between primary and alternative trans-splicing sites
 
-```{r acceptor_site_dist, results='asis'}
+#### Canonical AG acceptor site
+
+```{r figure_03b, results='asis'}
 sl_sites_combined <- sl_sites_combined %>% 
     group_by(gene) %>% 
     mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
@@ -124,15 +121,32 @@ sl_sites_combined <- sl_sites_combined %>%
 ag_dists <- (sl_sites_combined %>% 
              filter(type == 'alternative' & acceptor_site == 'AG'))$primary_site_dist
 
-# ignore primary vs. primary comparisons
-ag_dists <- ag_dists[ag_dists != 0]
-
 # convert to data frame and add color based on orientation
 ag_dists <- data.frame(dist=ag_dists) %>%
     mutate(orientation=ifelse(dist < 0, 'upstream', 'downstream'))
 
 ggplot(ag_dists, aes(x=dist, fill=orientation)) + 
     geom_histogram(binwidth=20, center=10, color='white') +
+    xlim(-1000, 1000)
+
+ag_dists %>% 
+    group_by(orientation) %>%
+    summarize(number=n(), proportion=n() / nrow(ag_dists)) %>%
+    kable
+```
+
+#### Non-canonical acceptor sites
+
+```{r, figure_03c}
+ag_dists <- (sl_sites_combined %>% 
+             filter(type == 'alternative' & acceptor_site != 'AG'))$primary_site_dist
+
+# convert to data frame and add color based on orientation
+ag_dists <- data.frame(dist=ag_dists) %>%
+    mutate(orientation=ifelse(dist < 0, 'upstream', 'downstream'))
+
+ggplot(ag_dists, aes(x=dist, fill=orientation)) + 
+    geom_histogram(binwidth=10, center=5, color='white') +
     xlim(-1000, 1000)
 
 ag_dists %>% 

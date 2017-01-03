@@ -48,6 +48,13 @@ RNA-Seq samples, the following two analysis pipelines may be applied sequently:
 gff <- import.gff3(CONFIG$input_gff)
 fasta <- readDNAStringSet(CONFIG$input_fasta)
 
+# Fix TriTrypDB FASTA names
+# e.g. "LmjF.24 | organism=Leishmania_major_strain_Friedlin |..." -> "LmjF.24"
+names(fasta) <- sapply(strsplit(names(fasta), ' | '), function(x) {x[1]})
+
+# create a string version of chromosome sequences
+chr_seqs <- lapply(fasta, as.character)
+
 # individual CDS sequences
 cds_fasta <- readDNAStringSet(CONFIG$input_cds_fasta)
 
@@ -71,10 +78,6 @@ genes <- genes[genes$ID %in% protein_coding]
 
 # remaining gene ids
 gene_ids <- genes$ID
-
-# Fix TriTrypDB FASTA names
-# e.g. "LmjF.24 | organism=Leishmania_major_strain_Friedlin |..." -> "LmjF.24"
-names(fasta) <- sapply(strsplit(names(fasta), ' | '), function(x) {x[1]})
 
 # For L. major GFF including unannotated ORFs, compute size
 if (sum(is.na(genes$size)) > 0) {
@@ -132,6 +135,10 @@ for (stage in stages) {
     # remove sites associated with noncoding RNAs (occurs quite rarely)
     sl_sites[[stage]] <- sl_sites[[stage]][sl_sites[[stage]]$gene %in% protein_coding,]
     polya_sites[[stage]] <- polya_sites[[stage]][polya_sites[[stage]]$gene %in% protein_coding,]
+
+    # add chromosome information 
+    sl_sites[[stage]] <- merge(sl_sites[[stage]], chr_mapping, by='gene')
+    polya_sites[[stage]] <- merge(polya_sites[[stage]], chr_mapping, by='gene')
 }
 ```
 
