@@ -65,7 +65,8 @@ if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {
                                  tiff=list(compression="lzw")))
 } else {
     # HTML output
-    opts_chunk$set(dev=c('png', 'tiff'), fig.retina=1)
+    #opts_chunk$set(dev=c('png', 'tiff'), fig.retina=1)
+    opts_chunk$set(dev=c('png'), fig.retina=1)
 }
 ```
 
@@ -149,10 +150,16 @@ Alternative trans-splicing and polyadenylation
 ```{r child='child/stage_specific_site_usage.Rmd'}
 ```
 
-Trans-spicing acceptor site
----------------------------
+Trans-spicing acceptor sites
+----------------------------
 
 ```{r child='child/acceptor_site.Rmd'}
+```
+
+Polyadenylation sites
+---------------------
+
+```{r child='child/polyadenylation_sites.Rmd'}
 ```
 
 Polypyrimidine tracts
@@ -190,16 +197,10 @@ for (table_name in ls()[grepl('^table', ls())]) {
               file=file.path(table_dir, filename))
 }
 
-# add chromosome information to site data and drop site identifiers for all
-# tables, except for the 'combined' one
-for (stage in c('combined', CONFIG$stages)) {
-    sl_sites[[stage]] <- merge(sl_sites[[stage]], chr_mapping, by='gene')
-    polya_sites[[stage]] <- merge(polya_sites[[stage]], chr_mapping, by='gene')
-
-    if (stage != 'combined') {
-        sl_sites[[stage]] <- sl_sites[[stage]] %>% select(-site)
-        polya_sites[[stage]] <- polya_sites[[stage]] %>% select(-site)
-    }
+# drop site identifiers for all tables, except for the 'combined' one
+for (stage in CONFIG$stages) {
+    sl_sites[[stage]] <- sl_sites[[stage]] %>% select(-site)
+    polya_sites[[stage]] <- polya_sites[[stage]] %>% select(-site)
 }
 
 # create excel spreadsheets

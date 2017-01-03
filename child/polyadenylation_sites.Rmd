@@ -1,0 +1,133 @@
+### Primary vs. alternative polyadenylation sites
+
+```{r}
+# add strand and chr information to poly(A) site dataframe
+polya_sites_combined <- merge(polya_sites[['combined']], gene_strands, by='gene')
+```
+
+```{r, results='asis'}
+# grab a window (90nt upstream, 10nt downstream) surrounding the polyadenylation site
+win_size_upstream = 90
+win_size_downstream = 10
+
+polya_sites_combined <- polya_sites_combined %>% 
+    mutate(acc_start=ifelse(strand == '+', 
+                            chr_coordinate - win_size_upstream - 1, 
+                            chr_coordinate - win_size_downstream),
+           acc_end=ifelse(strand=='+', 
+                          chr_coordinate + win_size_downstream, 
+                          chr_coordinate + win_size_upstream + 1)) %>%
+    mutate(polya_site_win=substr(chr_seqs[chr], acc_start, acc_end))
+
+# reverse negative strand sequences
+polya_sites_combined[polya_sites_combined$strand == '-',]$polya_site_win <- as.character(reverseComplement(
+    DNAStringSet(polya_sites_combined[polya_sites_combined$strand == '-',]$polya_site_win)
+))
+
+# 2 and 3nt wide windows at polya site
+polya_sites_combined <- polya_sites_combined %>% 
+    mutate(polya_site=substr(polya_site_win, win_size_upstream + 1, win_size_upstream + 2),
+           polya_site_3nt=substr(polya_site_win, win_size_upstream, win_size_upstream + 2))
+
+# exclude any sites containing N's (not very common)
+polya_sites_combined <- polya_sites_combined %>% 
+    filter(str_detect(polya_site, '[AGCT]{2}'))
+
+# in cases where primary site was excluded, remove gene from consideration
+primary_site_genes <- (polya_sites_combined %>% filter(type == 'primary'))$gene
+
+polya_sites_combined <- polya_sites_combined[polya_sites_combined$gene %in% primary_site_genes,]
+```
+
+```{r table_s11, results='asis'}
+# total number of sites and number of primary sites
+num_total <- nrow(polya_sites_combined)
+num_primary <- nrow(polya_sites_combined %>% filter(type == 'primary'))
+num_alternative <- nrow(polya_sites_combined %>% filter(type == 'alternative'))
+
+primary_site_props <- polya_sites_combined %>% 
+    filter(type == 'primary') %>%
+    group_by(polya_site) %>% 
+    summarize(primary=round((n() / num_primary) * 100, 2))
+
+alt_site_props <- polya_sites_combined %>% 
+    filter(type == 'alternative') %>%
+    group_by(polya_site) %>% 
+    summarize(alternative=round((n() / num_alternative) * 100, 2))
+
+table_sXX <- merge(primary_site_props, alt_site_props, by='polya_site') %>%
+    arrange(desc(primary))
+colnames(table_sXX) <- c('Polyadenylation sequence', 'Primary site', 'Minor site')
+kable(table_sXX)
+```
+
+```{r, figure_XX}
+polya_summary <- polya_sites_combined %>% 
+    select(polya_site, type) %>%
+    group_by(type, polya_site) %>% 
+    summarise (num=n()) %>%
+    mutate(prop=num / sum(num)) %>%
+    arrange(desc(prop))
+
+ggplot(polya_summary, aes(polya_site, y=prop, fill=type)) +
+    geom_bar(position="dodge", stat='identity')
+```
+
+### polyadenylation site sequence logos
+
+#### Primary polyadenylation site logo
+
+```{r figure_03f, fig.width=3840/192}
+primary_seqs <- (polya_sites_combined %>% filter(type=='primary'))$polya_site_win
+
+# for logo purposes, exclude sequences with N's (~1%)
+primary_seqs <- primary_seqs[str_count(primary_seqs, 'N') == 0]
+
+# convert to a PFM, and then to a PWM
+pwm <- consensusMatrix(primary_seqs, as.prob=TRUE)[DNA_BASES,]
+
+# draw sequence logo
+seqLogo(pwm, ic.scale=FALSE)
+```
+
+#### Alternative polyadenylation site logo
+
+```{r figure_s06, fig.width=3840/192}
+alt_seqs <- (polya_sites_combined %>% filter(type=='alternative'))$polya_site_win
+
+# for logo purposes, exclude sequences with N's (~1%)
+alt_seqs <- alt_seqs[str_count(alt_seqs, 'N') == 0]
+
+# convert to a PFM, and then to a PWM
+pwm <- consensusMatrix(alt_seqs, as.prob=TRUE)[DNA_BASES,]
+
+# draw sequence logo
+seqLogo(pwm, ic.scale=FALSE)
+```
+
+### Distance between primary and alternative polyadenylation sites
+
+```{r figure_03d, results='asis'}
+polya_sites_combined <- polya_sites_combined %>% 
+    group_by(gene) %>% 
+    mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
+                                                 chr_coordinate[type == 'primary'] - chr_coordinate)) %>%
+    mutate(orientation=ifelse(primary_site_dist < 0, 'upstream', 'downstream'))
+
+# primary - minor polyadenylation site distances
+polya_dists <- (polya_sites_combined %>% filter(type == 'alternative'))$primary_site_dist
+
+# convert to data frame and add color based on orientation
+polya_dists <- data.frame(dist=polya_dists) %>%
+    mutate(orientation=ifelse(dist < 0, 'upstream', 'downstream'))
+
+ggplot(polya_dists, aes(x=dist, fill=orientation)) + 
+    geom_histogram(binwidth=20, center=10, color='white') +
+    xlim(-1000, 1000)
+
+polya_dists %>% 
+    group_by(orientation) %>%
+    summarize(number=n(), proportion=n() / nrow(polya_dists)) %>%
+    kable
+```
+
