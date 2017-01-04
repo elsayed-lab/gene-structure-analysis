@@ -1,4 +1,4 @@
-### Functional enrichment of genes with short/long UTR's
+## Functional enrichment of genes with short/long UTR's
 
 To see if their are any specific functions enriched among the genes with the
 shortest and longest UTR's, we will perform functional enrichment for the upper
@@ -15,7 +15,7 @@ gene_go_mapping <- as.data.frame(unique(
 colnames(gene_go_mapping) <- c('gene', 'category', 'ontology')
 ```
 
-#### Long 5′ UTRs
+### Long 5′ UTRs
 
 ```{r functional_enrichment_long_5utrs, results='asis', message=FALSE, warning=FALSE}
 # list of all genes with confident UTR'5 lengths
@@ -54,7 +54,7 @@ if (nrow(sig_enriched) > 0) {
 }
 ```
 
-#### Short 5′ UTRs
+### Short 5′ UTRs
 
 ```{r functional_enrichment_short_5utrs, results='asis', message=FALSE, warning=FALSE}
 # gene ids for genes in the lower quartile of 5′ UTR lengths
@@ -82,7 +82,7 @@ if (nrow(sig_enriched) > 0) {
 }
 ```
 
-#### Long 3′ UTRs
+### Long 3′ UTRs
 
 ```{r functional_enrichment_long_3utrs, results='asis', message=FALSE, warning=FALSE}
 # list of all genes with confident 3′ UTR lengths
@@ -121,7 +121,7 @@ if (nrow(sig_enriched) > 0) {
 }
 ```
 
-#### Short 3′ UTRs
+### Short 3′ UTRs
 
 ```{r functional_enrichment_short_3utrs, results='asis', message=FALSE, warning=FALSE}
 # gene ids for genes in the lower quartile of 3′ UTR lengths

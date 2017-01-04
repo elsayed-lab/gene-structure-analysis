@@ -1,4 +1,4 @@
-### RNA-Seq coverage support for UTR boundaries
+## RNA-Seq coverage support for UTR boundaries
 
 ```{r table_S01, results='asis'}
 # coverage statistics collected from original input RNA-Seq fastq files,

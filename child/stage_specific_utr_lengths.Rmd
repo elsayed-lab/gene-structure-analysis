@@ -1,0 +1,47 @@
+## Comparison of UTR lengths across developmental stages
+
+Median UTR length for each development stage.
+
+```{r lengths_by_developmental_stage, results='asis', warning=FALSE}
+# median 5′ and 3′ UTR lengths, by developmental stage
+utr5_summary <- utr5_stats %>% 
+	group_by(stage) %>% 
+	summarise(median=median(length, na.rm=TRUE))
+
+utr3_summary <- utr3_stats %>% 
+	group_by(stage) %>% 
+	summarise(median=median(length, na.rm=TRUE))
+
+table_02 <- cbind(
+	stage=stages,
+	utr5=(utr5_summary %>% filter(stage != 'combined'))$median,
+	utr3=(utr3_summary %>% filter(stage != 'combined'))$median
+)
+colnames(table_02) <- c('stage', "5′ UTR", "3′ UTR")
+
+xkable(table_02, caption='**Table 2**: Stage-specific UTR lengths.')
+```
+
+
+```{r figure_s01, warning=FALSE, fig.cap="**Figure S1** Distribution of 5' and 3' UTR lengths across developmental stages"}
+# 5' UTR
+p1 <- ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
+       geom_histogram(binwidth=20, colour=CONFIG$stroke) +
+       scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
+       xlim(0, 1500) +
+       labs(x="5′ UTR length (nt)", y="Transcript density") +
+       facet_grid(stage ~.) + 
+       theme(strip.background = element_blank(), strip.text.y = element_blank())
+
+# 3' UTR 
+p2 <- ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
+       geom_histogram(binwidth=20, colour=CONFIG$stroke) +
+       scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
+       xlim(0, 1500) +
+       labs(x="3′ UTR length (nt)") +
+       facet_grid(stage ~.) +
+       theme(strip.background = element_blank(), strip.text.y = element_blank())
+
+grid.arrange(p1, p2, ncol=2)
+```
+

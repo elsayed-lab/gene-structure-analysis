@@ -1,4 +1,4 @@
-### UTR / CDS length correlations
+## UTR / CDS length correlations
 
 ```{r figure_S2, warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
 df <- data.frame(gene=genes$ID, cds_length=as.numeric(genes$size))

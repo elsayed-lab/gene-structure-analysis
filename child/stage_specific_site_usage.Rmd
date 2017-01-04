@@ -1,6 +1,17 @@
-### Differences in trans-splicing acceptor site usage across developmental stage
+## Differences in trans-splicing acceptor site usage across developmental stage
 
-```{r figure_x_stage-specific_5utr_lengths, fig.cap="**Figure SX** 5'UTR length across developmental stage.", warning=FALSE}
+For each pair of parasite developmental stages, a scatterplot showing the 
+locations of primary SL sites which differ across stage is shown.
+
+Further, genes which meet the following requirements and are thus are likely
+candidates for SL switching are listed below:
+
+1. Primary to secondary site coverage ratio > 2 for all stages
+2. Minimum of 20 reads for all stages
+3. Primary site location differs between at least two stages, and is located
+   at least 20nt apart.
+
+```{r figure_x_stage-specific_5utr_lengths, results='asis', fig.cap="**Figure SX** 5' UTR length across developmental stage.", warning=FALSE}
 for (s1_name in stages) {
     for (s2_name in stages) {
         # skip combined site dataframes and self comparisons
@@ -10,15 +21,26 @@ for (s1_name in stages) {
         
         # create cross-stage dataframe and plot UTRs with variables lengths
         # across developmental stage
-        dat <- create_utr_comparison_df(sl_sites, s1_name, s2_name)
+        dat <- create_utr_comparison_df(sl_sites, s1_name, s2_name, CONFIG$min_read_support_5utr)
+
+        cat('\n')
+
         print(plot_diff_utrs(dat, 'SL'))
+
+        cat('\n')
+
+        # genes with stage-specific site switching
+        dat %>% filter(s1_ptos > 2 & s2_ptos > 2 & len_diff >= 20 & min_num_reads > 20) %>%
+            arrange(desc(min_num_reads)) %>%
+            kable %>%
+            print
     }
 }
 ```
 
-### Differences in polyadenylation site usage across developmental stage
+## Differences in polyadenylation site usage across developmental stage
 
-```{r figure_x_stage-specific_3utr_lengths, fig.cap="**Figure SX** 3′ UTR length across developmental stage.", warning=FALSE}
+```{r figure_x_stage-specific_3utr_lengths, results='asis', fig.cap="**Figure SX** 3′ UTR length across developmental stage.", warning=FALSE}
 for (s1_name in stages) {
     for (s2_name in stages) {
         # skip combined site dataframes and self comparisons
@@ -28,8 +50,20 @@ for (s1_name in stages) {
         
         # create cross-stage dataframe and plot UTRs with variables lengths
         # across developmental stage
-        dat <- create_utr_comparison_df(polya_sites, s1_name, s2_name)
+        dat <- create_utr_comparison_df(polya_sites, s1_name, s2_name,
+                                        CONFIG$min_read_support_3utr)
+
+        cat('\n')
+
         print(plot_diff_utrs(dat, 'Poly(A)'))
+
+        cat('\n')
+
+        # genes with stage-specific site switching
+        dat %>% filter(s1_ptos > 2 & s2_ptos > 2 & len_diff >= 20 & min_num_reads > 20) %>%
+            arrange(desc(min_num_reads)) %>%
+            kable %>%
+            print
     }
 }
 ```

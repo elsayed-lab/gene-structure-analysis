@@ -1,4 +1,4 @@
-### Average gene structure
+## Average gene structure
 
 ```{r figure_02, fig.height=250/96, fig.cap="**Figure 2**: Average 5'UTR, CDS, and 3′ UTR lengths across all development stages."}
 # Summary of gene structure
@@ -50,7 +50,7 @@ cat(sprintf('- 3\'UTR: %0.2f %%\n', utr3_prop))
 cat(sprintf('- CDS: %0.2f %%\n\n', cds_prop))
 ```
 
-```{r cross_species_comparison}
+```{r cross_species_comparison, message=FALSE}
 # Compute median CDS lengths for T. brucei protein-coding genes
 library('org.Tb927.tritryp.db')
 tb_gene_ids <- keys(org.Tb927.tritryp.db, keytype='GID')
@@ -72,11 +72,9 @@ tb_median_cds <- median(tb_genes$GENESIZE[tb_genes$TYPE == 'proteincoding'])
 lm_median_cds <- 1269
 ```
 
-### Average GC- and CT-richness
+## Average GC- and CT-richness
 
-Median GC- and CT-richness for various gene features.
-
-```{r results='asis'}
+```{r table_s06, results='asis'}
 # function to compute proportion of a nucleotide for a collection of sequences
 nt_proportion <- function (seqs) { 
     # Exclude any N's
@@ -121,5 +119,5 @@ table_s06 <- data.frame(
 # GC richness
 table_s06 <- rbind(table_s06, GC=table_s06[2,] + table_s06[3,])
 
-kable(table_s06)
+kable(table_s06, caption="**Table S6** Median GC- and CT-richness for gene features.")
 ```

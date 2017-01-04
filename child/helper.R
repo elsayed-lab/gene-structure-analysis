@@ -133,7 +133,7 @@ detect_polypyrimidine_tracts <- function() {
 #' 
 #' create_utr_comparison_df
 #' 
-create_utr_comparison_df <- function(sites, s1_name, s2_name) {
+create_utr_comparison_df <- function(sites, s1_name, s2_name, min_read_support) {
     # Get sites for specified developmental stages
     s1 <- sites[[s1_name]] %>% 
         filter(type=='primary') %>%
@@ -148,6 +148,40 @@ create_utr_comparison_df <- function(sites, s1_name, s2_name) {
     s1 <- s1 %>% filter(gene %in% common_genes)
     s2 <- s2 %>% filter(gene %in% common_genes)
 
+    # for each gene, get maximum coverage for alternative sites; used to compute
+    # primary/secondary ratio
+    s1_alt_coverage <- sites[[s1_name]] %>% 
+        filter(type=='alternative') %>% 
+        group_by(gene) %>% 
+        top_n(1, num_reads) %>% 
+        slice(1) %>%
+        select(gene, alt_coverage=num_reads) %>%
+        ungroup()
+
+    # default to alt coverage of "1" (neccessary to compute ratios)
+    s1_no_alt_sites <- s1$gene[!s1$gene %in% s1_alt_coverage$gene]
+    s1_alt_coverage <- rbind(s1_alt_coverage,
+                             data.frame(gene=s1_no_alt_sites, alt_coverage=1))
+
+    s1 <- merge(s1, s1_alt_coverage, by='gene') %>%
+        mutate(ptos=num_reads / alt_coverage)
+
+    s2_alt_coverage <- sites[[s2_name]] %>% 
+        filter(type=='alternative') %>% 
+        group_by(gene) %>% 
+        top_n(1, num_reads) %>% 
+        slice(1) %>%
+        select(gene, alt_coverage=num_reads) %>%
+        ungroup()
+
+    # default to alt coverage of "1" (neccessary to compute ratios)
+    s2_no_alt_sites <- s2$gene[!s2$gene %in% s2_alt_coverage$gene]
+    s2_alt_coverage <- rbind(s2_alt_coverage,
+                             data.frame(gene=s2_no_alt_sites, alt_coverage=1))
+
+    s2 <- merge(s2, s2_alt_coverage, by='gene') %>%
+        mutate(ptos=num_reads / alt_coverage)
+
     # combine into a single dataframe (both data frames have been previously sorted
     # by gene id to ensure correct order)
     dat <- data_frame(
@@ -155,7 +189,9 @@ create_utr_comparison_df <- function(sites, s1_name, s2_name) {
         s1_len=s1$utr_length,
         s2_len=s2$utr_length,
         s1_num_reads=s1$num_reads,
-        s2_num_reads=s2$num_reads
+        s2_num_reads=s2$num_reads,
+        s1_ptos=s1$ptos,
+        s2_ptos=s2$ptos
     )
 
     # ignore UTRs of the same length (uninteresting) and add difference column
@@ -163,15 +199,13 @@ create_utr_comparison_df <- function(sites, s1_name, s2_name) {
         filter(s1_len != s2_len) %>% 
         mutate(len_diff=abs(s1_len - s2_len))
 
-    # use log of min read support as a measure of our confidence
+    # use min read support as a measure of our confidence
     dat <- dat %>% 
         mutate(min_num_reads=pmin(s1_num_reads, s2_num_reads))
     #    mutate(log_min_num_reads=log(min_num_reads))
 
-    # only show sites with > 10 reads in both stages
-    dat <- dat %>% filter(min_num_reads >= 10)
-
-    dat
+    # only show sites with > 3 reads in both stages
+    dat %>% filter(min_num_reads >= min_read_support)
 }
 
 plot_diff_utrs <- function(dat, feature_name) {

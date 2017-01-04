@@ -1,4 +1,4 @@
-### Average gene RPKM expression by chromosome
+## Average gene RPKM expression by chromosome
 
 ```{r data_prep}
 # Create RPKM-normalized version of counts
@@ -40,7 +40,7 @@ ggplot(chr_expr_averages, aes(x=chr, y=average_expr)) +
     ggtitle("Average RPKM expression by chromosome")
 ```
 
-### Average RPKM expression by chromosome at the nucleotide level
+## Average RPKM expression by chromosome at the nucleotide level
 
 ```{r figure_x_average_chr_rpkm_expr_by_nt}
 chr_cds_total_lengths <- merge(gene_lengths, chr_mapping, by='gene') %>%
@@ -59,7 +59,7 @@ ggplot(chr_stats, aes(x=chr, y=expr_per_nt)) +
     ggtitle("Average RPKM expression per nt for each chromosome")
 ```
 
-### Average RPKM expression by chromosome (extracellular vs. intracellular)
+## Average RPKM expression by chromosome (extracellular vs. intracellular)
 
 ```{r figure_x_average_chr_gene_rpkm_expr_stage_specific}
 # Create a long version of RPKM counts
@@ -88,7 +88,7 @@ ggplot(chr_expr_averages, aes(x=stage, y=average_expr, fill=stage)) +
     facet_wrap(~chr)
 ```
 
-### Total RPKM expression by chromosome (extracellular vs. intracellular)
+## Total RPKM expression by chromosome (extracellular vs. intracellular)
 
 ```{r figure_x_total_chr_rpkm_expr_stage_specific}
 ggplot(chr_expr_averages, aes(x=stage, y=total_expr, fill=stage)) + 
@@ -98,7 +98,7 @@ ggplot(chr_expr_averages, aes(x=stage, y=total_expr, fill=stage)) +
     facet_wrap(~chr)
 ```
 
-### Average RPKM expression by chromosome (developmental stage)
+## Average RPKM expression by chromosome (developmental stage)
 
 ```{r figure_x_average_chr_gene_rpkm_expr_condition_specific}
 # Compute average total RPKM for each chromosome (developmental stage)
@@ -113,7 +113,7 @@ ggplot(chr_expr_averages, aes(x=condition, y=total_expr, fill=condition)) +
     facet_wrap(~chr)
 ```
 
-### Total RPKM expression by chromosome (developmental stage)
+## Total RPKM expression by chromosome (developmental stage)
 
 ```{r figure_x_total_chr_rpkm_expr_condition_specific}
 ggplot(chr_expr_averages, aes(x=condition, y=total_expr, fill=condition)) + 
@@ -122,7 +122,7 @@ ggplot(chr_expr_averages, aes(x=condition, y=total_expr, fill=condition)) +
     facet_wrap(~chr)
 ```
 
-### Average RPKM expression per nucleotide by PTU
+## Average RPKM expression per nucleotide by PTU
 
 ```{r figure_x_average_rpkm_expr_per_nt_by_ptu}
 # Add PTU mapping to RPKM gene counts
@@ -159,7 +159,7 @@ ggplot(ptu_expr_averages, aes(x=ptu, y=average_expr)) +
     ggtitle("Average RPKM expression by PTU")
 ```
 
-### Total RPKM expression per nucleotide by PTU
+## Total RPKM expression per nucleotide by PTU
 
 ```{r figure_x_total_rpkm_expr_per_nt_by_ptu}
 #ptu_stats <- merge(ptu_stats, rpkm_totals %>% select(chr, ptu) %>% unique, by='ptu')

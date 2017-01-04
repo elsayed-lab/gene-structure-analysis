@@ -1,4 +1,4 @@
-### Intergenic length distribution
+## Intergenic length distribution
 
 ```{r intergenic_lengths_table, results='asis',  message=FALSE}
 # Table 5: Intergenic region lengths

@@ -88,6 +88,7 @@ library('readr')
 library('viridis')
 library('msa')
 library('seqLogo')
+library('stringdist')
 library('tibble')
 library('tidyr')
 library('stringr')
@@ -108,11 +109,8 @@ set.seed(1)
 knit('child/load_data.Rmd', quiet=TRUE, output=tempfile())
 ```
 
-Results
-=======
-
 Coverage Statistics
--------------------
+===================
 
 ```{r child='child/coverage_summary_statistics.Rmd'}
 ```
@@ -121,9 +119,12 @@ Coverage Statistics
 ```
 
 UTRs
-----
+====
 
 ```{r child='child/length_summary.Rmd'}
+```
+
+```{r child='child/stage_specific_utr_lengths.Rmd'}
 ```
 
 ```{r child='child/gene_structure_overview.Rmd'}
@@ -136,13 +137,13 @@ UTRs
 ```
 
 Intergenic Regions
-------------------
+==================
 
 ```{r child='child/intergenic_regions.Rmd'}
 ```
 
 Alternative trans-splicing and polyadenylation
-----------------------------------------------
+==============================================
 
 ```{r child='child/alternative_site_usage.Rmd'}
 ```
@@ -151,25 +152,25 @@ Alternative trans-splicing and polyadenylation
 ```
 
 Trans-spicing acceptor sites
-----------------------------
+============================
 
 ```{r child='child/acceptor_site.Rmd'}
 ```
 
 Polyadenylation sites
----------------------
+=====================
 
 ```{r child='child/polyadenylation_sites.Rmd'}
 ```
 
 Polypyrimidine tracts
----------------------
+=====================
 
 ```{r child='child/polypyrimidine_tract.Rmd'}
 ```
 
 Expression across developmental stages
---------------------------------------
+======================================
 
 ```{r child='child/expression_summary.Rmd'}
 ```

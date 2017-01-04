@@ -1,4 +1,4 @@
-### Primary vs. secondary trans-splicing site usage
+## Primary vs. secondary trans-splicing site usage
 
 ```{r figure_x_alt_ts}
 # iterate over genes for which primary trans-splicing site was detected
@@ -40,7 +40,7 @@ cat(sprintf('- Number of genes with 5+ SL sites detected: %d (%0.1f)\n\n',
             sl_five_plus, (sl_five_plus / sl_one_plus) * 100))
 ```
 
-### Primary vs. secondary polyadenylation site usage
+## Primary vs. secondary polyadenylation site usage
 
 ```{r figure_x_alt_polya}
 # iterate over genes for which primary trans-splicing site was detected
