@@ -107,7 +107,9 @@ seqLogo(pwm, ic.scale=FALSE)
 
 ## Distance between primary and alternative polyadenylation sites
 
-```{r figure_03d, results='asis'}
+### Global
+
+```{r figure_03d, results='asis', fig.cap='**Figure 03d** Distribution of distances between primary and alternative polyadenylation sites.'}
 polya_sites_combined <- polya_sites_combined %>% 
     group_by(gene) %>% 
     mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
@@ -131,3 +133,33 @@ polya_dists %>%
     kable
 ```
 
+### Stage-dependent
+
+```{r figure_S6, results='asis'}
+for (stage in stages) {
+    # skip combined 
+    if (stage == 'combined') {
+        next
+    }
+
+    polya_sites <- merge(polya_sites[[stage]], gene_strands, by='gene')
+
+    polya_sites <- polya_sites %>% 
+        group_by(gene) %>% 
+        mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
+                                                     chr_coordinate[type == 'primary'] - chr_coordinate)) %>%
+        mutate(orientation=ifelse(primary_site_dist < 0, 'upstream', 'downstream'))
+
+    # primary - minor polyadenylation site distances
+    polya_dists <- (polya_sites %>% filter(type == 'alternative'))$primary_site_dist
+
+    # convert to data frame and add color based on orientation
+    polya_dists <- data.frame(dist=polya_dists) %>%
+        mutate(orientation=ifelse(dist < 0, 'upstream', 'downstream'))
+
+    print(ggplot(polya_dists, aes(x=dist, fill=orientation)) + 
+        geom_histogram(binwidth=20, center=10, color='white') +
+        xlim(-1000, 1000) +
+        ggtitle(stage))
+}
+```

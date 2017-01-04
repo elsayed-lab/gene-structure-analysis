@@ -190,7 +190,7 @@ seqLogo(pwm, ic.scale=FALSE)
 
 ### Canonical AG acceptor site
 
-```{r figure_03b, results='asis', fig.cap="**Figure 03b** Distribution of distances between primary and alternative trans-splicing acceptor sites for canonical acceptor sites."}
+```{r figure_03b, results='asis', warning=FALSE, fig.cap="**Figure 03b** Distribution of distances between primary and alternative trans-splicing acceptor sites for canonical acceptor sites."}
 sl_sites_combined <- sl_sites_combined %>% 
     group_by(gene) %>% 
     mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
@@ -208,7 +208,9 @@ ag_dists <- data.frame(dist=ag_dists) %>%
 ggplot(ag_dists, aes(x=dist, fill=orientation)) + 
     geom_histogram(binwidth=20, center=10, color='white') +
     xlim(-1000, 1000)
+```
 
+```{r}
 ag_dists %>% 
     group_by(orientation) %>%
     summarize(number=n(), proportion=n() / nrow(ag_dists)) %>%
@@ -217,7 +219,7 @@ ag_dists %>%
 
 ### Non-canonical acceptor sites
 
-```{r, figure_03c, fig.cap="**Figure 03b** Distribution of distances between primary and alternative trans-splicing acceptor sites for non-canonical acceptor sites."}
+```{r, figure_03c, warning=FALSE, fig.cap="**Figure 03c** Distribution of distances between primary and alternative trans-splicing acceptor sites for non-canonical acceptor sites."}
 ag_dists <- (sl_sites_combined %>% 
              filter(type == 'alternative' & acceptor_site != 'AG'))$primary_site_dist
 
@@ -228,7 +230,9 @@ ag_dists <- data.frame(dist=ag_dists) %>%
 ggplot(ag_dists, aes(x=dist, fill=orientation)) + 
     geom_histogram(binwidth=10, center=5, color='white') +
     xlim(-1000, 1000)
+```
 
+```{r}
 ag_dists %>% 
     group_by(orientation) %>%
     summarize(number=n(), proportion=n() / nrow(ag_dists)) %>%
