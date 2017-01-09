@@ -62,7 +62,7 @@ colnames(table_s11) <- c('Acceptor sequence', 'Primary site', 'Minor site')
 kable(table_s11, caption='**Table S11** Primary and alternative acceptor site sequence composition')
 ```
 
-```{r, figure_03a, fig.cap="**Figure 03a** Sequence composition of primary and alternative SL acceptor sites"}
+```{r figure_03a, fig.cap="**Figure 03a** Sequence composition of primary and alternative SL acceptor sites"}
 sl_summary <- sl_sites_combined %>% 
     select(acceptor_site, type) %>%
     group_by(type, acceptor_site) %>% 
@@ -96,7 +96,7 @@ seqLogo(pwm, ic.scale=FALSE)
 
 #### Sub-groups with similar primary acceptor site sequences
 
-```{r}
+```{r figure_XX_sl_acceptor_site_sequence_heatmap}
 # measure pairwise hamming distances between all acceptor site sequences
 num_seqs <- length(primary_seqs)
 hamming_dist_mat <- as.matrix(stringdistmatrix(primary_seqs, method='hamming', useNames='names'))
@@ -118,7 +118,7 @@ heatmap.2(sim_mat[ind,ind], trace='none',
           main='Pairwise Trans-splicing Acceptor Site Region Sequence Alignments')
 ```
 
-```{r, acceptor_site_cluster_sequences, results='asis', cache=TRUE, autodep=TRUE}
+```{r acceptor_site_cluster_sequences, results='asis', cache=TRUE, autodep=TRUE}
 # convert to distance matrix and find clusters of similar acceptor site area
 # sequences 
 dist_mat <- 1 - ((sim_mat - min(sim_mat)) / max(sim_mat))
@@ -150,7 +150,7 @@ df <- data_frame(cluster=sort(unique(clusters)),
 df <- df %>% arrange(desc(avg_similarity))
 ```
 
-```{r, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192}
+```{r figure_XX_sl_acceptor_site_sequence_cluster, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192}
 # Iterate over top N clusters and generate a sequence logo for each
 n <- 10
 

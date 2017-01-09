@@ -50,9 +50,9 @@ pfm <- consensusMatrix(alignment@unmasked)[DNA_BASES,]
 # same as apply(pfm, 2, function(x) { x / sum(x) })
 pwm <- prop.table(pfm, 2)
 
-# find boundaries of main alignment (here, positions where at least ~1/3 of
+# find boundaries of main alignment (here, positions where at least 25% of
 # the sequences aligned)
-indices <- which(colSums(pfm) >= (0.32 * length(seqs)))
+indices <- which(colSums(pfm) >= (0.25 * length(seqs)))
 from <- indices[1]
 to <- last(indices)
 
@@ -61,7 +61,7 @@ seqLogo(pwm[,from:to])
 
 ### Pairwise similarity between polypyrimidine sequences
 
-```{r, cache=TRUE, autodep=TRUE}
+```{r figure_XX_polypyr_sequence_cluster_heatmap, cache=TRUE, autodep=TRUE}
 # Sequence similarity matrix
 num_seqs <- length(seqs)
 sim_mat <- matrix(0, nrow=num_seqs, ncol=num_seqs)
@@ -124,7 +124,7 @@ df <- data_frame(cluster=sort(unique(clusters)),
 df <- df %>% arrange(desc(avg_similarity))
 ```
 
-```{r, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192}
+```{r figure_XX_polypyr_tract_cluster, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192}
 # Iterate over top N clusters and generate a sequence logo for each
 n <- 10
 

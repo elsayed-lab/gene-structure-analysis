@@ -6,9 +6,9 @@ polya_sites_combined <- merge(polya_sites[['combined']], gene_strands, by='gene'
 ```
 
 ```{r, results='asis'}
-# grab a window (90nt upstream, 10nt downstream) surrounding the polyadenylation site
-win_size_upstream = 90
-win_size_downstream = 10
+# grab a window (50nt upstream, 50nt downstream) surrounding the polyadenylation site
+win_size_upstream = 50 
+win_size_downstream = 50
 
 polya_sites_combined <- polya_sites_combined %>% 
     mutate(acc_start=ifelse(strand == '+', 
@@ -61,7 +61,7 @@ colnames(table_sXX) <- c('Polyadenylation sequence', 'Primary site', 'Minor site
 kable(table_sXX)
 ```
 
-```{r, figure_XX}
+```{r, figure_XX_polya_site_sequence_composition}
 polya_summary <- polya_sites_combined %>% 
     select(polya_site, type) %>%
     group_by(type, polya_site) %>% 
@@ -142,16 +142,16 @@ for (stage in stages) {
         next
     }
 
-    polya_sites <- merge(polya_sites[[stage]], gene_strands, by='gene')
+    stage_polya_sites <- merge(polya_sites[[stage]], gene_strands, by='gene')
 
-    polya_sites <- polya_sites %>% 
+    stage_polya_sites <- stage_polya_sites %>% 
         group_by(gene) %>% 
         mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
                                                      chr_coordinate[type == 'primary'] - chr_coordinate)) %>%
         mutate(orientation=ifelse(primary_site_dist < 0, 'upstream', 'downstream'))
 
     # primary - minor polyadenylation site distances
-    polya_dists <- (polya_sites %>% filter(type == 'alternative'))$primary_site_dist
+    polya_dists <- (stage_polya_sites %>% filter(type == 'alternative'))$primary_site_dist
 
     # convert to data frame and add color based on orientation
     polya_dists <- data.frame(dist=polya_dists) %>%
