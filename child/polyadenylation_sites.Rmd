@@ -69,7 +69,10 @@ polya_summary <- polya_sites_combined %>%
     mutate(prop=num / sum(num)) %>%
     arrange(desc(prop))
 
-ggplot(polya_summary, aes(polya_site, y=prop, fill=type)) +
+# manually specify order in which primary/alternatie bars appear
+polya_summary$type <- factor(polya_summary$type, levels=c('primary', 'alternative'))
+
+ggplot(polya_summary, aes(reorder(polya_site, -num), y=prop, fill=type)) +
     geom_bar(position="dodge", stat='identity')
 ```
 
