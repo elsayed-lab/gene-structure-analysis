@@ -24,11 +24,11 @@ xkable(table_01, caption='**Table 1** Gene structure summary table.')
 Below, we report the statistics when considering only those genes shared by 
 *L. major*, *T. brucei*, and *T. cruzi*.
 
-```{r table_s05, results='asis'}
-table_s05 <- gene_structure_summary(gene_structure_lengths %>%
+```{r table_S05, results='asis'}
+table_S05 <- gene_structure_summary(gene_structure_lengths %>%
                                         filter(gene %in% tritryp_orthologs) %>%
                                         select(-gene))
-xkable(table_s05, caption='**Table S5** Gene structure summary table (three-way orthologs).')
+xkable(table_S05, caption='**Table S5** Gene structure summary table (three-way orthologs).')
 ```
 
 ## Average lengths

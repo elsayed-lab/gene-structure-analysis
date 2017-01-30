@@ -74,7 +74,7 @@ lm_median_cds <- 1269
 
 ## Average GC- and CT-richness
 
-```{r table_s06, results='asis'}
+```{r table_S06, results='asis'}
 # function to compute proportion of a nucleotide for a collection of sequences
 nt_proportion <- function (seqs) { 
     # Exclude any N's
@@ -90,7 +90,7 @@ nt_proportion <- function (seqs) {
 }
 
 # intergenic region composition
-intergenic_seqs <- (intercds_regions %>% filter(stage == 'combined'))$intergenic_seq
+intergenic_seqs <- (intercds_regions %>% filter(stage == 'combined'))$seq
 intergenic_comp <- nt_proportion(intergenic_seqs)
 
 # 5' and 3'UTR composition
@@ -108,7 +108,7 @@ cds_comp <- nt_proportion(as.character(cds_fasta))
 genome_comp <- nt_proportion(as.character(fasta))
 
 # data frame of sequence compositions, by feature
-table_s06 <- data.frame(
+table_S06 <- data.frame(
     utr5=apply(utr5_comp, 2, median),
     cds=apply(cds_comp, 2, median),
     utr3=apply(utr3_comp, 2, median),
@@ -117,7 +117,7 @@ table_s06 <- data.frame(
 )
 
 # GC richness
-table_s06 <- rbind(table_s06, GC=table_s06[2,] + table_s06[3,])
+table_S06 <- rbind(table_S06, GC=table_S06[2,] + table_S06[3,])
 
-kable(table_s06, caption="**Table S6** Median GC- and CT-richness for gene features.")
+kable(table_S06, caption="**Table S6** Median GC- and CT-richness for gene features.")
 ```

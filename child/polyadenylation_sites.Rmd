@@ -39,7 +39,7 @@ primary_site_genes <- (polya_sites_combined %>% filter(type == 'primary'))$gene
 polya_sites_combined <- polya_sites_combined[polya_sites_combined$gene %in% primary_site_genes,]
 ```
 
-```{r table_s11, results='asis'}
+```{r table_S11, results='asis'}
 # total number of sites and number of primary sites
 num_total <- nrow(polya_sites_combined)
 num_primary <- nrow(polya_sites_combined %>% filter(type == 'primary'))
@@ -57,8 +57,8 @@ alt_site_props <- polya_sites_combined %>%
 
 table_sXX <- merge(primary_site_props, alt_site_props, by='polya_site') %>%
     arrange(desc(primary))
-colnames(table_sXX) <- c('Polyadenylation sequence', 'Primary site', 'Minor site')
-kable(table_sXX)
+colnames(table_SXX) <- c('Polyadenylation sequence', 'Primary site', 'Minor site')
+kable(table_SXX)
 ```
 
 ```{r, figure_XX_polya_site_sequence_composition}
@@ -95,7 +95,7 @@ seqLogo(pwm, ic.scale=FALSE)
 
 ### Alternative polyadenylation site logo
 
-```{r figure_s06, fig.width=3840/192, fig.height=720/192, dpi=192}
+```{r figure_S06, fig.width=3840/192, fig.height=720/192, dpi=192}
 alt_seqs <- (polya_sites_combined %>% filter(type=='alternative'))$polya_site_win
 
 # for logo purposes, exclude sequences with N's (~1%)
@@ -138,7 +138,7 @@ polya_dists %>%
 
 ### Stage-dependent
 
-```{r figure_S6, results='asis'}
+```{r figure_S06, results='asis'}
 for (stage in stages) {
     # skip combined 
     if (stage == 'combined') {

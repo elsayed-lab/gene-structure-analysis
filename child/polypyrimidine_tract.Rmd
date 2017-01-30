@@ -37,7 +37,7 @@ cat(sprintf('- %% Thymine: %0.1f\n\n', 100 * (num_thymines / (num_cytosines + nu
 
 ### Global Polypyrimidine tract sequence logo
 
-```{r polpyrimidine_tract_logo_global, fig.width=7680/192, fig.height=720/192, dpi=192}
+```{r figure_03f, fig.width=7680/192, fig.height=720/192, dpi=192}
 # perform an MSA
 seqs <- DNAStringSet(polypyrimidine_seqs)
 alignment <- msa(seqs, method='ClustalOmega')

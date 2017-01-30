@@ -40,7 +40,7 @@ sl_sites_combined <- sl_sites_combined[sl_sites_combined$gene %in%
                                        primary_site_genes,]
 ```
 
-```{r table_s11, results='asis'}
+```{r table_S11, results='asis'}
 # total number of sites and number of primary sites
 num_total <- nrow(sl_sites_combined)
 num_primary <- nrow(sl_sites_combined %>% filter(type == 'primary'))
@@ -56,10 +56,10 @@ alt_site_props <- sl_sites_combined %>%
     group_by(acceptor_site) %>% 
     summarize(alternative=round((n() / num_alternative) * 100, 2))
 
-table_s11 <- merge(primary_site_props, alt_site_props, by='acceptor_site') %>%
+table_S11 <- merge(primary_site_props, alt_site_props, by='acceptor_site') %>%
     arrange(desc(primary))
-colnames(table_s11) <- c('Acceptor sequence', 'Primary site', 'Minor site')
-kable(table_s11, caption='**Table S11** Primary and alternative acceptor site sequence composition')
+colnames(table_S11) <- c('Acceptor sequence', 'Primary site', 'Minor site')
+kable(table_S11, caption='**Table S11** Primary and alternative acceptor site sequence composition')
 ```
 
 ```{r figure_03a, fig.cap="**Figure 03a** Sequence composition of primary and alternative SL acceptor sites"}
@@ -175,7 +175,7 @@ for (i in 1:n) {
 
 ### Alternative acceptor site logo
 
-```{r figure_s05, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S5** Sequence logo for region surrounding alternative trans-splicing acceptor sites."}
+```{r figure_S05, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S5** Sequence logo for region surrounding alternative trans-splicing acceptor sites."}
 
 alt_seqs <- (sl_sites_combined %>% filter(type=='alternative'))$acceptor_site_win
 
@@ -244,7 +244,7 @@ ag_dists %>%
 
 ## Preceeding nucleotide
 
-```{r, table_s12}
+```{r, table_S12}
 # primary site proportions (including upstream nucleotide)
 primary_site_props <- sl_sites_combined %>%
     filter(type == 'primary') %>%
@@ -267,12 +267,12 @@ alt_site_props <- sl_sites_combined %>%
     arrange(desc(primary)) %>%
     spread(orientation, primary)
 
-table_s12 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
-colnames(table_s12) <- c('site', 'Primary', 'Alternative downstream', 
+table_S12 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
+colnames(table_S12) <- c('site', 'Primary', 'Alternative downstream', 
                          'Alternative upstream')
-table_s12 <- table_s12 %>% column_to_rownames('site')
-table_s12 <- round(table_s12 * 100)
+table_S12 <- table_S12 %>% column_to_rownames('site')
+table_S12 <- round(table_S12 * 100)
 
-kable(table_s12, caption='**Table S12** Frequency of preceeding nucleotide for primary and alternative trans-splicing acceptor sites.')
+kable(table_S12, caption='**Table S12** Frequency of preceeding nucleotide for primary and alternative trans-splicing acceptor sites.')
 ```
 
