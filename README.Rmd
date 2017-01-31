@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi 2.0)
+title: Trypanosome Gene Structure Analysis (T. cruzi 2.1)
 author: Keith Hughitt
 output:
   html_document:

@@ -1,5 +1,9 @@
 ```{r settings}
 #
+# v2.1
+# ----
+# - Few figure tweaks. 
+#
 # v2.0
 # ----
 # - Fixed couple bugs in upstream analysis steps (utr_analysis.py) which

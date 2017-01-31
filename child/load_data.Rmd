@@ -236,7 +236,7 @@ for (stg in stages) {
     utr5_missing <- all_utr5[!all_utr5 %in% stage_specific_utr5$gene]
 
     if (length(utr5_missing) > 0) {
-        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, NA, NA, stg)
+        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, NA, NA, NA, NA, NA, stg)
         colnames(placeholders) <- colnames(utr5_stats)
         utr5_stats <- rbind(utr5_stats, placeholders)
     }
@@ -244,7 +244,7 @@ for (stg in stages) {
     utr3_missing <- all_utr3[!all_utr3 %in% stage_specific_utr3$gene]
 
     if (length(utr3_missing) > 0) {
-        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, NA, NA, stg)
+        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, NA, NA, NA, NA, NA, stg)
         colnames(placeholders) <- colnames(utr3_stats)
 
         # add to main dataframe

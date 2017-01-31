@@ -29,9 +29,10 @@ p1 <- ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stag
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +
        scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
        xlim(0, 1500) +
-       labs(x="5′ UTR length (nt)", y="Transcript density") +
+       labs(x="5′ UTR length (nt)", y="Transcript frequency") +
        facet_grid(stage ~.) + 
-       theme(strip.background = element_blank(), strip.text.y = element_blank())
+       theme(strip.background=element_blank(), strip.text.y=element_blank(),
+             legend.position="none")
 
 # 3' UTR 
 p2 <- ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
@@ -40,7 +41,7 @@ p2 <- ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stag
        xlim(0, 1500) +
        labs(x="3′ UTR length (nt)") +
        facet_grid(stage ~.) +
-       theme(strip.background = element_blank(), strip.text.y = element_blank())
+       theme(strip.background=element_blank(), strip.text.y=element_blank())
 
 grid.arrange(p1, p2, ncol=2)
 ```

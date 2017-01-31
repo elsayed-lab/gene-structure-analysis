@@ -3,16 +3,27 @@
 ```{r figure_S02, warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
 df <- data.frame(gene=genes$ID, cds_length=as.numeric(genes$size))
 df <- merge(merge(df, utr5_stats_combined %>% select(gene, utr5_length=length), by='gene'),
-                  utr3_stats_combined %>% select(gene, utr3_length=length),
-            by='gene')
+                  utr3_stats_combined %>% select(gene, utr3_length=length), by='gene')
 
-# 5′ UTR vs. CDS
+p1_spearman_rho <- cor(df$utr5_length, df$cds_length, method='spearman', use='pairwise.complete.obs')
+p1_label <- sprintf("\"Spearman's\" ~ rho == %0.2f", p1_spearman_rho)
+
+p2_spearman_rho <- cor(df$utr3_length, df$cds_length, method='spearman', use='pairwise.complete.obs')
+p2_label <- sprintf("\"Spearman's\" ~ rho == %0.2f", p2_spearman_rho)
+
+p3_spearman_rho <- cor(df$utr5_length, df$utr3_length, method='spearman', use='pairwise.complete.obs')
+p3_label <- sprintf("\"Spearman's\" ~ rho == %0.2f", p3_spearman_rho)
+
 p1 <- ggplot(df, aes(x=utr5_length, y=cds_length)) + 
 	geom_point() + 
     geom_smooth(method="rlm") +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("5′ UTR vs. CDS length")
+    xlab("5′ UTR length (nt)") + 
+    ylab("CDS length (nt)") + 
+    annotate("text", x=4000, y=min(df$cds_length), label=p1_label,
+             colour="blue", size=3, parse=TRUE)
+    #ggtitle("5′ UTR vs. CDS length")
 
 # 3′ UTR vs. CDS
 p2 <- ggplot(df, aes(x=utr3_length, y=cds_length)) + 
@@ -20,7 +31,11 @@ p2 <- ggplot(df, aes(x=utr3_length, y=cds_length)) +
     geom_smooth(method="rlm") +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("3′ UTR vs. CDS length")
+    xlab("3′ UTR length (nt)") + 
+    ylab("CDS length (nt)") + 
+    annotate("text", x=4000, y=min(df$cds_length), label=p2_label,
+             colour="blue", size=3, parse=TRUE)
+    #ggtitle("3′ UTR vs. CDS length")
 
 # 5′ UTR vs. 3′ UTR
 p3 <- ggplot(df, aes(x=utr5_length, y=utr3_length)) + 
@@ -28,7 +43,11 @@ p3 <- ggplot(df, aes(x=utr5_length, y=utr3_length)) +
     geom_smooth(method="rlm") +
     scale_x_log10() +
     scale_y_log10() +
-    ggtitle("5′ UTR vs. 5′ UTR length")
+    xlab("5′ UTR length (nt)") + 
+    ylab("3′ UTR length (nt)") + 
+    annotate("text", x=4000, y=1, label=p3_label,
+             colour="blue", size=3, parse=TRUE)
+    #ggtitle("5′ UTR vs. 5′ UTR length")
 
 grid.arrange(p1, p2, p3, ncol=2)
 ```

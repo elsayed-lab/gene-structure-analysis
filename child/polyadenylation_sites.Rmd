@@ -55,7 +55,7 @@ alt_site_props <- polya_sites_combined %>%
     group_by(polya_site) %>% 
     summarize(alternative=round((n() / num_alternative) * 100, 2))
 
-table_sXX <- merge(primary_site_props, alt_site_props, by='polya_site') %>%
+table_SXX <- merge(primary_site_props, alt_site_props, by='polya_site') %>%
     arrange(desc(primary))
 colnames(table_SXX) <- c('Polyadenylation sequence', 'Primary site', 'Minor site')
 kable(table_SXX)
