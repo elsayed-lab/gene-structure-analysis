@@ -16,10 +16,10 @@ for (i in 1:length(stages)) {
     xlabel <- sprintf("Alternative site distance from primary site (%s)", stage)
 
     plts[[stage]] <- plot_alt_site_distance_hist(sites, gene_strands,
-                                               upstream_color=CONFIG$colors[2],
-                                               downstream_color=CONFIG$colors[1],
-                                               stroke_color=CONFIG$stroke,
-                                               main=letters[i], xlabel=xlabel)
+                                                 upstream_color=CONFIG$colors[2],
+                                                 downstream_color=CONFIG$colors[1],
+                                                 stroke_color=CONFIG$stroke,
+                                                 main=letters[i], xlabel=xlabel)
 }
 grid.arrange(grobs=plts, ncol=2)
 ```

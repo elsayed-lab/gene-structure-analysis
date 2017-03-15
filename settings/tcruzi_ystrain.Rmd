@@ -1,5 +1,9 @@
 ```{r settings}
 #
+# v2.2
+# ----
+# - Figure and table tweaks.
+#
 # v2.1
 # ----
 # - Few figure tweaks. 
@@ -42,7 +46,7 @@ library('org.TcCLB.esmer.tritryp.db')
 orgdb <- get('org.TcCLB.esmer.tritryp.db')
 
 # Analysis version
-analysis_version <- '2.0'
+analysis_version <- '2.2'
 
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
@@ -112,9 +116,9 @@ CONFIG <- list(
 
     # TriTrypDB FASTA genome sequence
     'input_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 
-                              '/genome/TriTrypDB-29_TcruziCLBrenerEsmeraldo-like_Genome.fasta'),
+                              'genome/TriTrypDB-29_TcruziCLBrenerEsmeraldo-like_Genome.fasta'),
     'input_cds_fasta' = file.path(Sys.getenv("REF"), 'tcruzi_clbrener_esmeraldo-like', 
-                                  '/genome/TriTrypDB-29_TcruziCLBrenerEsmeraldo-like_AnnotatedCDSs.fasta'),
+                                  'genome/TriTrypDB-29_TcruziCLBrenerEsmeraldo-like_AnnotatedCDSs.fasta'),
 
     # Stage-specific GFFs containing genes and annotated UTRs
     'input_gff' = file.path(utr_analysis_outdir, 'combined',

@@ -107,89 +107,22 @@ if (sum(is.na(genes$size)) > 0) {
 #}
 ```
 
-```{r}
+```{r chr_mapping}
 # create a gene/chromosome mapping
 chr_mapping <- data_frame(gene=genes$ID, chr=as.character(genes@seqnames))
 ```
 
 ## Create a dataframe containing strand information for each gene
 
-```{r}
+```{r get_strand_info}
 gene_strands <- data_frame(gene=genes$ID, strand=as.vector(genes@strand))
-```
-
-## Load spliced leader and poly(A) site coordinates
-
-```{r load_acceptor_sites, warning=FALSE}
-sl_sites <- list()
-polya_sites <- list()
-
-# names of developmental stages being analyzed
-stages <- c(CONFIG$stages, 'combined')
-
-for (stage in stages) {
-    # load site information
-    sl_sites[[stage]]    <- read_csv(CONFIG$sl_sites[[stage]])
-    polya_sites[[stage]] <- read_csv(CONFIG$polya_sites[[stage]])
-
-    # remove sites associated with noncoding RNAs (occurs quite rarely)
-    sl_sites[[stage]] <- sl_sites[[stage]][sl_sites[[stage]]$gene %in% protein_coding,]
-    polya_sites[[stage]] <- polya_sites[[stage]][polya_sites[[stage]]$gene %in% protein_coding,]
-
-    # add chromosome information 
-    sl_sites[[stage]] <- merge(sl_sites[[stage]], chr_mapping, by='gene')
-    polya_sites[[stage]] <- merge(polya_sites[[stage]], chr_mapping, by='gene')
-}
-```
-
-## Load polypyrimidine tract information
-
-```{r load_polypyr_tracts, warning=FALSE}
-polypyrimidine_tracts <- cbind(read_csv(CONFIG$polypyrimidine_tracts[['combined']]),
-                               stage='combined')
-
-polypyrimidine_tracts <- polypyrimidine_tracts[polypyrimidine_tracts$primary_sl %in% sl_sites[['combined']]$site,]
-
-for (stage in CONFIG$stages) {
-    dat <- read_csv(CONFIG$polypyrimidine_tracts[[stage]])
-
-    # remove polypyr tracts associated with SL sites that have been filtered out
-    dat <- dat[dat$primary_sl %in% sl_sites[[stage]]$site,]
-    polypyrimidine_tracts <- rbind(polypyrimidine_tracts, cbind(dat, stage=stage))
-}
-
-# combined statistics for polypyrimidine tracts
-polypyrimidine_tracts <- polypyrimidine_tracts %>% 
-    mutate(length=end - start)
-
-polypyr_combined <- polypyrimidine_tracts %>% 
-    filter(stage == 'combined')
-```
-
-## Load inter-CDS and intergenic region information
-
-```{r load_intercds_regions, warning=FALSE}
-intercds_regions <- cbind(read_csv(CONFIG$intercds_regions[['combined']]),
-                                   stage='combined')
-
-# filter out regions associated with at least one noncoding gene
-intercds_regions <- intercds_regions[intercds_regions$left_gene %in% protein_coding & 
-                                     intercds_regions$right_gene %in% protein_coding,]
-
-for (stage in CONFIG$stages) {
-    dat <- read_csv(CONFIG$intercds_regions[[stage]])
-
-    # filter out regions associated with at least one noncoding gene
-    dat <- dat[dat$left_gene %in% protein_coding & dat$right_gene %in% protein_coding,]
-    intercds_regions <- rbind(intercds_regions, cbind(dat, stage=stage))
-}
 ```
 
 ### Load 5' and 3′ UTR summary statistics
 
 Summary statistics describing the _primary_ 5' and 3′ UTR boundaries.
 
-```{r}
+```{r load_utr_summary_statistics}
 # Create data.frames containing the primary 5' and 3′  length stats
 utr5_stats <- cbind(read_csv(CONFIG$utr5_stats[['combined']]), stage='combined')
 
@@ -263,6 +196,82 @@ for (x in c('length', 'num_reads', 'gc', 'ct')) {
 utr5_stats_combined <- utr5_stats %>% filter(stage == 'combined')
 utr3_stats_combined <- utr3_stats %>% filter(stage == 'combined')
 ```
+
+## Load spliced leader and poly(A) site coordinates
+
+```{r load_acceptor_sites, warning=FALSE}
+sl_sites <- list()
+polya_sites <- list()
+
+# names of developmental stages being analyzed
+stages <- c(CONFIG$stages, 'combined')
+
+for (stage in stages) {
+    # load site information
+    sl_sites[[stage]]    <- read_csv(CONFIG$sl_sites[[stage]])
+    polya_sites[[stage]] <- read_csv(CONFIG$polya_sites[[stage]])
+
+    # remove sites associated with noncoding RNAs (occurs quite rarely)
+    sl_sites[[stage]] <- sl_sites[[stage]][sl_sites[[stage]]$gene %in% protein_coding,]
+    polya_sites[[stage]] <- polya_sites[[stage]][polya_sites[[stage]]$gene %in% protein_coding,]
+
+    # remove sites for which no UTR could be assigned (e.g. do to overlapping
+    # UTR boundaries between neighboring genes)
+    valid_genes_utr5 <- (utr5_stats %>% filter(stage == stage))$gene
+    sl_sites[[stage]] <- sl_sites[[stage]][sl_sites[[stage]]$gene %in% valid_genes_utr5,]
+
+    valid_genes_utr3 <- (utr3_stats %>% filter(stage == stage))$gene
+    polya_sites[[stage]] <- polya_sites[[stage]][polya_sites[[stage]]$gene %in% valid_genes_utr3,]
+
+    # add chromosome information 
+    sl_sites[[stage]] <- merge(sl_sites[[stage]], chr_mapping, by='gene')
+    polya_sites[[stage]] <- merge(polya_sites[[stage]], chr_mapping, by='gene')
+}
+```
+
+## Load polypyrimidine tract information
+
+```{r load_polypyr_tracts, warning=FALSE}
+polypyrimidine_tracts <- cbind(read_csv(CONFIG$polypyrimidine_tracts[['combined']]),
+                               stage='combined')
+
+polypyrimidine_tracts <- polypyrimidine_tracts[polypyrimidine_tracts$primary_sl %in% sl_sites[['combined']]$site,]
+
+for (stage in CONFIG$stages) {
+    dat <- read_csv(CONFIG$polypyrimidine_tracts[[stage]])
+
+    # remove polypyr tracts associated with SL sites that have been filtered out
+    dat <- dat[dat$primary_sl %in% sl_sites[[stage]]$site,]
+    polypyrimidine_tracts <- rbind(polypyrimidine_tracts, cbind(dat, stage=stage))
+}
+
+# combined statistics for polypyrimidine tracts
+polypyrimidine_tracts <- polypyrimidine_tracts %>% 
+    mutate(length=end - start)
+
+polypyr_combined <- polypyrimidine_tracts %>% 
+    filter(stage == 'combined')
+```
+
+## Load inter-CDS and intergenic region information
+
+```{r load_intercds_regions, warning=FALSE}
+intercds_regions <- cbind(read_csv(CONFIG$intercds_regions[['combined']]),
+                                   stage='combined')
+
+# filter out regions associated with at least one noncoding gene
+intercds_regions <- intercds_regions[intercds_regions$left_gene %in% protein_coding & 
+                                     intercds_regions$right_gene %in% protein_coding,]
+
+for (stage in CONFIG$stages) {
+    dat <- read_csv(CONFIG$intercds_regions[[stage]])
+
+    # filter out regions associated with at least one noncoding gene
+    dat <- dat[dat$left_gene %in% protein_coding & dat$right_gene %in% protein_coding,]
+    intercds_regions <- rbind(intercds_regions, cbind(dat, stage=stage))
+}
+```
+
 
 ```{r filter_sites, eval=FALSE}
 # Disabled Nov 28, 2016
@@ -347,13 +356,13 @@ was used during PTU detection.
 
 The mapping was
 
-```{r}
+```{r load_ptu_mapping}
 ptu_mapping <- read_csv(CONFIG$ptu_mapping)
 ```
 
 ### Load TriTryp ortholog gene list
 
-```{r}
+```{r load_tritryp_ortholog_info}
 tritryp_orthologs <- readLines('../input/shared/tritryp_orthologs.txt')
 ```
 

@@ -12,11 +12,11 @@ win_size_downstream = 50
 
 polya_sites_combined <- polya_sites_combined %>% 
     mutate(acc_start=ifelse(strand == '+', 
-                            chr_coordinate - win_size_upstream - 1, 
+                            chr_coordinate - win_size_upstream, 
                             chr_coordinate - win_size_downstream),
            acc_end=ifelse(strand=='+', 
                           chr_coordinate + win_size_downstream, 
-                          chr_coordinate + win_size_upstream + 1)) %>%
+                          chr_coordinate + win_size_upstream)) %>%
     mutate(polya_site_win=substr(chr_seqs[chr], acc_start, acc_end))
 
 # reverse negative strand sequences
@@ -90,7 +90,7 @@ primary_seqs <- primary_seqs[str_count(primary_seqs, 'N') == 0]
 pwm <- consensusMatrix(primary_seqs, as.prob=TRUE)[DNA_BASES,]
 
 # draw sequence logo
-seqLogo(pwm, ic.scale=FALSE)
+seqLogoMod(pwm, xaxis=-50:50, ic.scale=TRUE)
 ```
 
 ### Alternative polyadenylation site logo
@@ -105,7 +105,7 @@ alt_seqs <- alt_seqs[str_count(alt_seqs, 'N') == 0]
 pwm <- consensusMatrix(alt_seqs, as.prob=TRUE)[DNA_BASES,]
 
 # draw sequence logo
-seqLogo(pwm, ic.scale=FALSE)
+seqLogoMod(pwm, xaxis=-50:50, ic.scale=TRUE)
 ```
 
 ## Distance between primary and alternative polyadenylation sites
@@ -134,6 +134,9 @@ polya_dists %>%
     group_by(orientation) %>%
     summarize(number=n(), proportion=n() / nrow(polya_dists)) %>%
     kable
+
+cat(sprintf('\n-%% within 20nt: **%0.2f**\n', sum(abs(polya_dists$dist) <= 20) / nrow(polya_dists) * 100))
+cat(sprintf('\n-%% within 100nt: **%0.2f**\n', sum(abs(polya_dists$dist) <= 100) / nrow(polya_dists) * 100))
 ```
 
 ### Stage-dependent

@@ -133,7 +133,7 @@ detect_polypyrimidine_tracts <- function() {
 #' 
 #' create_utr_comparison_df
 #' 
-create_utr_comparison_df <- function(sites, s1_name, s2_name, min_read_support) {
+create_utr_comparison_df <- function(sites, s1_name, s2_name) {
     # Get sites for specified developmental stages
     s1 <- sites[[s1_name]] %>% 
         filter(type=='primary') %>%
@@ -200,12 +200,7 @@ create_utr_comparison_df <- function(sites, s1_name, s2_name, min_read_support) 
         mutate(len_diff=abs(s1_len - s2_len))
 
     # use min read support as a measure of our confidence
-    dat <- dat %>% 
-        mutate(min_num_reads=pmin(s1_num_reads, s2_num_reads))
-    #    mutate(log_min_num_reads=log(min_num_reads))
-
-    # only show sites with > 3 reads in both stages
-    dat %>% filter(min_num_reads >= min_read_support)
+    dat %>% mutate(min_num_reads=pmin(s1_num_reads, s2_num_reads))
 }
 
 plot_diff_utrs <- function(dat, feature_name) {
@@ -274,5 +269,78 @@ plot_alt_site_distance_hist <- function(sites, gene_strands,
         ggtitle(main) + 
         theme(plot.title=element_text(hjust=0)) + 
         labs(x=xlabel)
+}
+
+#'
+#' Modified version of the seqLogo() function allowing axis to be overridden
+#' Keith Hughitt (khughitt@umd.edu)
+#' 2017/03/02
+#'
+seqLogoMod <- function (pwm, xaxis, ic.scale = TRUE, yaxis = TRUE, xfontsize = 15, yfontsize = 15) 
+{
+    if (class(pwm) == "pwm") {
+        pwm <- pwm@pwm
+    }
+    else if (class(pwm) == "data.frame") {
+        pwm <- as.matrix(pwm)
+    }
+    else if (class(pwm) != "matrix") {
+        stop("pwm must be of class matrix or data.frame")
+    }
+    if (any(abs(1 - apply(pwm, 2, sum)) > 0.01)) 
+        stop("Columns of PWM must add up to 1.0")
+    chars <- c("A", "C", "G", "T")
+    letters <- list(x = NULL, y = NULL, id = NULL, fill = NULL)
+    npos <- ncol(pwm)
+    if (ic.scale) {
+        ylim <- 2
+        ylab <- "Information content"
+        facs <- seqLogo:::pwm2ic(pwm)
+    }
+    else {
+        ylim <- 1
+        ylab <- "Probability"
+        facs <- rep(1, npos)
+    }
+    wt <- 1
+    x.pos <- 0
+    for (j in 1:npos) {
+        column <- pwm[, j]
+        hts <- 0.95 * column * facs[j]
+        letterOrder <- order(hts)
+        y.pos <- 0
+        for (i in 1:4) {
+            letter <- chars[letterOrder[i]]
+            ht <- hts[letterOrder[i]]
+            if (ht > 0) 
+                letters <- seqLogo:::addLetter(letters, letter, x.pos, 
+                  y.pos, ht, wt)
+            y.pos <- y.pos + ht + 0.01
+        }
+        x.pos <- x.pos + wt
+    }
+    grid.newpage()
+    bottomMargin = 2 + xfontsize / 3.5
+    leftMargin = ifelse(yaxis, 2 + yfontsize / 3.5, 2)
+    pushViewport(plotViewport(c(bottomMargin, leftMargin, 2, 
+        2)))
+    pushViewport(dataViewport(0:ncol(pwm), 0:ylim, name = "vp1"))
+    grid.polygon(x = unit(letters$x, "native"), y = unit(letters$y, 
+        "native"), id = letters$id, gp = gpar(fill = letters$fill, 
+        col = "transparent"))
+
+    # x-axis (required)
+    grid.xaxis(at = seq(0.5, ncol(pwm) - 0.5), label = xaxis, 
+        gp = gpar(fontsize = xfontsize))
+    grid.text("Position", y = unit(-3, "lines"), gp = gpar(fontsize = xfontsize))
+
+    # y-axis (optional)
+    if (yaxis) {
+        grid.yaxis(gp = gpar(fontsize = yfontsize))
+        grid.text(ylab, x = unit(-3, "lines"), rot = 90, gp = gpar(fontsize = yfontsize))
+    }
+    popViewport()
+    popViewport()
+    par(ask = FALSE)
 }
 

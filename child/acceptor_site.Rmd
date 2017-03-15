@@ -94,7 +94,7 @@ primary_seqs <- primary_seqs[str_count(primary_seqs, 'N') == 0]
 pwm <- consensusMatrix(primary_seqs, as.prob=TRUE)[DNA_BASES,]
 
 # draw sequence logo
-seqLogo(pwm, ic.scale=FALSE)
+seqLogoMod(pwm, xaxis=-91:10, ic.scale=TRUE)
 ```
 
 #### Sub-groups with similar primary acceptor site sequences
@@ -167,7 +167,7 @@ for (i in 1:n) {
     # draw sequence logo
     cat(sprintf("\n##### Primary acceptor site cluster %d (%d genes)\n\n", i, df$num_seqs[i]))
 
-    seqLogo(pwm, ic.scale=FALSE)
+    seqLogoMod(pwm, xaxis=-91:10, ic.scale=TRUE)
 
     cat('\n')
 }
@@ -186,7 +186,7 @@ alt_seqs <- alt_seqs[str_count(alt_seqs, 'N') == 0]
 pwm <- consensusMatrix(alt_seqs, as.prob=TRUE)[DNA_BASES,]
 
 # draw sequence logo
-seqLogo(pwm, ic.scale=FALSE)
+seqLogoMod(pwm, xaxis=-91:10, ic.scale=TRUE)
 ```
 
 ## Distance between primary and alternative trans-splicing sites
@@ -251,7 +251,7 @@ primary_site_props <- sl_sites_combined %>%
     group_by(acceptor_site_3nt) %>%
     summarise (num=n()) %>%
     mutate(prop=num / sum(num)) %>%
-    filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
+    #filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
     select(-num) %>%
     arrange(desc(prop))
 
@@ -262,7 +262,7 @@ alt_site_props <- sl_sites_combined %>%
     group_by(orientation, acceptor_site_3nt) %>%
     summarise (num=n()) %>%
     mutate(primary=num / sum(num)) %>%
-    filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
+    #filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
     select(-num) %>% 
     arrange(desc(primary)) %>%
     spread(orientation, primary)
@@ -270,8 +270,12 @@ alt_site_props <- sl_sites_combined %>%
 table_S12 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
 colnames(table_S12) <- c('site', 'Primary', 'Alternative downstream', 
                          'Alternative upstream')
-table_S12 <- table_S12 %>% column_to_rownames('site')
-table_S12 <- round(table_S12 * 100)
+table_S12 <- table_S12 %>% 
+    arrange(desc(Primary)) %>%
+    column_to_rownames('site')
+table_S12 <- round(table_S12 * 100, 2)
+
+table_S12[is.na(table_S12)] <- 0
 
 kable(table_S12, caption='**Table S12** Frequency of preceeding nucleotide for primary and alternative trans-splicing acceptor sites.')
 ```

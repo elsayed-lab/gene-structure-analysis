@@ -7,11 +7,18 @@ Further, genes which meet the following requirements and are thus are likely
 candidates for SL switching are listed below:
 
 1. Primary to secondary site coverage ratio > 2 for all stages
-2. Minimum of 20 reads for all stages
+2. Minimum of 10 reads for all stages
 3. Primary site location differs between at least two stages, and is located
    at least 20nt apart.
 
 ```{r figure_x_stage-specific_5utr_lengths, results='asis', fig.cap="**Figure SX** 5' UTR length across developmental stage.", warning=FALSE}
+# create vectors to keep track of genes meeting each of the thresholds for at
+# least one pair of stages compared.
+hits_level1 <- c()
+hits_level2 <- c()
+hits_level3 <- c()
+hits_level4 <- c()
+
 for (s1_name in stages) {
     for (s2_name in stages) {
         # skip combined site dataframes and self comparisons
@@ -21,7 +28,13 @@ for (s1_name in stages) {
         
         # create cross-stage dataframe and plot UTRs with variables lengths
         # across developmental stage
-        dat <- create_utr_comparison_df(sl_sites, s1_name, s2_name, CONFIG$min_read_support_5utr)
+        dat <- create_utr_comparison_df(sl_sites, s1_name, s2_name)
+
+        hits_level1 <- unique(c(hits_level1, dat$gene))
+
+        # filter out genes which don't meet minimum criteria
+        dat <- dat %>% filter(min_num_reads >= CONFIG$min_read_support_5utr)
+        hits_level2 <- unique(c(hits_level2, dat$gene))
 
         cat('\n')
 
@@ -29,13 +42,26 @@ for (s1_name in stages) {
 
         cat('\n')
 
+        ## criteria
+        dat <- dat %>% filter(s1_ptos > 2 & s2_ptos > 2)
+        hits_level3 <- unique(c(hits_level3, dat$gene))
+
         # genes with stage-specific site switching
-        dat %>% filter(s1_ptos > 2 & s2_ptos > 2 & len_diff >= 20 & min_num_reads > 20) %>%
+        dat <- dat %>% filter(len_diff > 20) 
+        hits_level4 <- unique(c(hits_level4, dat$gene))
+       
+        # print list of genes
+        dat %>%
             arrange(desc(min_num_reads)) %>%
             kable %>%
             print
     }
 }
+
+cat(sprintf('\n- Number genes with site switching across stages: %d\n', length(hits_level1)))
+cat(sprintf('- Number with 3+ reads supporting each stage: %d\n', length(hits_level2)))
+cat(sprintf('- Number with primary to secondary ratio > 2 for both stages: %d\n', length(hits_level3)))
+cat(sprintf('- Number where acceptor sites used are >20nt apart: %d\n', length(hits_level4)))
 ```
 
 ## Differences in polyadenylation site usage across developmental stage
@@ -50,8 +76,8 @@ for (s1_name in stages) {
         
         # create cross-stage dataframe and plot UTRs with variables lengths
         # across developmental stage
-        dat <- create_utr_comparison_df(polya_sites, s1_name, s2_name,
-                                        CONFIG$min_read_support_3utr)
+        dat <- create_utr_comparison_df(polya_sites, s1_name, s2_name)
+        dat <- dat %>% filter(min_num_reads >= CONFIG$min_read_support_3utr)
 
         cat('\n')
 
@@ -60,7 +86,7 @@ for (s1_name in stages) {
         cat('\n')
 
         # genes with stage-specific site switching
-        dat %>% filter(s1_ptos > 2 & s2_ptos > 2 & len_diff >= 20 & min_num_reads > 20) %>%
+        dat %>% filter(s1_ptos > 2 & s2_ptos > 2 & len_diff >= 20 & min_num_reads >= 10) %>%
             arrange(desc(min_num_reads)) %>%
             kable %>%
             print

@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi 2.1)
+title: Trypanosome Gene Structure Analysis (T. cruzi 2.2)
 author: Keith Hughitt
 output:
   html_document:
@@ -40,7 +40,7 @@ knit('settings/tcruzi_ystrain.Rmd', quiet=TRUE, output=tempfile())
 ```
 
 ```{r knitr_settings, include=FALSE}
-opts_knit$set(progress=FALSE, verbose=TRUE)
+opts_knit$set(progress=TRUE, verbose=TRUE)
 opts_chunk$set(fig.width=1920/192,
                fig.height=1920/192,
                fig.path=file.path(CONFIG$output_dir, 'figure/'),
@@ -70,6 +70,10 @@ if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {
 }
 ```
 
+```{r testing}
+opts_knit$get("rmarkdown.pandoc.to")
+```
+
 ```{r load_libraries, message=FALSE, warning=FALSE}
 library('GenomicRanges')
 library('Biostrings')
@@ -81,6 +85,7 @@ library('GO.db')
 library('goseq')
 library('gplots')
 library('gridExtra')
+library('Hmisc')
 library('reshape2')
 library('MASS')
 library('dplyr')
@@ -92,6 +97,7 @@ library('stringdist')
 library('tibble')
 library('tidyr')
 library('stringr')
+library('svglite')
 library('xlsx')
 source('../../../2015/00-shared/R/annotations.R')
 source('../../../2015/00-shared/R/enrichment_analysis.R')
@@ -105,7 +111,7 @@ assign('select', dplyr::select, envir=.GlobalEnv)
 set.seed(1)
 ```
 
-```{r include=FALSE}
+```{r load_data, include=FALSE}
 knit('child/load_data.Rmd', quiet=TRUE, output=tempfile())
 ```
 
@@ -175,6 +181,12 @@ Expression across developmental stages
 ```{r child='child/expression_summary.Rmd'}
 ```
 
+Comparative analysis
+====================
+
+```{r child='child/comparative_analysis.Rmd'}
+```
+
 System Info
 ===========
 
@@ -234,6 +246,9 @@ dir.create(data_dir, recursive=TRUE)
 for (gff in CONFIG$site_gffs) {
     file.copy(gff, file.path(data_dir, basename(gff)))
 }
+
+# copy intra-cds sl sites file to output dir
+file.copy('input/tcruzi_ystrain/XX_intracds_orfs.csv.gz', file.path(CONFIG$output_dir, 'table'))
 
 # save rendered output
 if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {

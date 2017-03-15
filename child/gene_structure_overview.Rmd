@@ -50,28 +50,6 @@ cat(sprintf('- 3\'UTR: %0.2f %%\n', utr3_prop))
 cat(sprintf('- CDS: %0.2f %%\n\n', cds_prop))
 ```
 
-```{r cross_species_comparison, message=FALSE}
-# Compute median CDS lengths for T. brucei protein-coding genes
-library('org.Tb927.tritryp.db')
-tb_gene_ids <- keys(org.Tb927.tritryp.db, keytype='GID')
-tb_genes <- AnnotationDbi::select(org.Tb927.tritryp.db, keys=tb_gene_ids,
-                                  keytype='GID', columns=c('TYPE', 'GENESIZE'))
-tb_median_cds <- median(tb_genes$GENESIZE[tb_genes$TYPE == 'proteincoding'])
-
-
-# T. brucei gene structure UTR stats (Kolev et al., 2010)
-
-# L. major Friedlin structure stats
-# Median CDS size computed using all `gene` entries from 
-#
-# filepath  = '/path/to/TriTrypDB-27_LmajorFriedlin.gff'
-# gff <- import.gff3(filepath)
-# genes <- gff[gff$type == 'gene']
-# median(as.numeric(genes$size))
-#
-lm_median_cds <- 1269
-```
-
 ## Average GC- and CT-richness
 
 ```{r table_S06, results='asis'}

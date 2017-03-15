@@ -2,8 +2,7 @@
 
 ### All genes
 
-Median CDS and UTR lengths, considering only UTRs with support from three
-or more reads.
+Median CDS and UTR lengths.
 
 ```{r table_01, results='asis'}
 # Table 1: Gene Structure Summary

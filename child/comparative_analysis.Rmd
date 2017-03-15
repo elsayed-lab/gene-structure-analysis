@@ -1,6 +1,38 @@
 ## TriTryp gene structure comparison
 
-```{r, fig.height=400, fig.width=1600}
+```{r tbrucei_cds_length, message=FALSE}
+# Compute median CDS lengths for T. brucei protein-coding genes
+# Get ID's for protein-coding genes
+library(Trypanosoma.brucei.TREU927)
+tb_gene_types <- AnnotationDbi::select(Trypanosoma.brucei.TREU927,
+                                       keys=keys(Trypanosoma.brucei.TREU927,
+                                                 keytype='GID'), keytype='GID',
+                                       columns=c('TXTYPE'))
+
+tb_protein_coding_genes <- tb_gene_types$GID[tb_gene_types$TXTYPE == 'mRNA']
+
+tb_gff <- import.gff3('/cbcb/lab/nelsayed/ref_data/tbrucei_treu927/annotation/TriTrypDB-30_TbruceiTREU927.gff')
+tb_genes <- tb_gff[tb_gff$type == 'gene']
+tb_genes <- genes[genes$ID %in% tb_protein_coding_genes]
+
+# Feb 18, 2017: GENESIZE no longer available in orgdb packages and TYPE
+# renamed to TXTYPE in Bioconductor 3.4
+                                  #keytype='GID', columns=c('TYPE', 'GENESIZE'))
+#tb_median_cds <- median(tb_genes$GENESIZE[tb_genes$TYPE == 'proteincoding'])
+
+# 1725 nt
+tb_median_cds <- median(width(tb_genes))
+
+
+
+# L. major Friedlin structure stats
+# Median CDS size computed using all `gene` entries from 
+#
+#
+lm_median_cds <- 1269
+```
+
+```{r tritryp_gene_structure, fig.height=400/192, fig.width=1600/192, dev=c(opts_chunk$get('dev'), 'svglite')}
 # create a matrix containing feature lengths for T. cruzi, T. brucei, and 
 # L. major
 #
@@ -35,10 +67,6 @@ gene_margin <- 10
 plot_width <- max(colSums(dat)) + (2 * horizontal_pad)
 plot_height <- (3 * gene_width) + (4 * gene_margin)
 
-# create plot
-plot(c(0, plot_width), c(0, plot_height), type='n', 
-     xlab='', ylab='', xaxt='n', yaxt='n')
-
 #
 # Plot a single entry in a comparative gene structure plot
 #
@@ -62,14 +90,18 @@ plot_multigene_structure <- function(dat, i, plot_width, plot_height,
     x6 <- x5 + dat[6, i]
     x7 <- x6 + dat[7, i]
 
-    rect(x0, y0, x1, cds_y1, col=CONFIG$colors[3], density=90)
+    rect(x0, y0, x1, cds_y1, col=CONFIG$colors[3])
     rect(x1, y0, x2, utr_y1, col=CONFIG$colors[1])
     rect(x2, y0, x3, other_y1, col=CONFIG$colors[2])
     rect(x3, y0, x4, other_y1, col=CONFIG$colors[4])
     rect(x4, y0, x5, other_y1, col=CONFIG$colors[2])
     rect(x5, y0, x6, utr_y1, col=CONFIG$colors[1])
-    rect(x6, y0, x7, cds_y1, col=CONFIG$colors[3], density=90)
+    rect(x6, y0, x7, cds_y1, col=CONFIG$colors[3])
 }
+
+# create plot
+plot(c(0, plot_width), c(0, plot_height), type='n', 
+     xlab='', ylab='', xaxt='n', yaxt='n')
 
 plot_multigene_structure(dat, 1, plot_width, plot_height, gene_width,
                          gene_margin, horizontal_pad)
