@@ -1,13 +1,13 @@
 ## RNA-Seq coverage support for UTR boundaries
 
-```{r table_S01, results='asis'}
+```{r table_S1, results='asis'}
 # coverage statistics collected from original input RNA-Seq fastq files,
 # and UTR pipeline intermediate files.
 # see also: scripts/*/S01_*   
 num_reads$condition_long <- CONFIG$condition_mapping$to[match(num_reads$condition, 
                                                         CONFIG$condition_mapping$from)]
 
-table_S01 <- num_reads %>% 
+table_S1 <- num_reads %>% 
     mutate(pct_reads_sl=(num_reads_sl/num_reads_parasite) * 100,
            pct_reads_polya=(num_reads_polya/num_reads_parasite) * 100) %>%
     group_by(condition_long) %>%
@@ -19,7 +19,7 @@ table_S01 <- num_reads %>%
               "% Poly(A)-containing reads"=mean(pct_reads_polya)) %>%
     rename("Parasite Stage"=condition_long)
 
-xkable(table_S01, caption='**Table S1**: Summary of mapping statistics.')
+xkable(table_S1, caption='**Table S1**: Summary of mapping statistics.')
 ```
 
 ```{r results='asis'}
@@ -42,7 +42,7 @@ cat(sprintf('- Total number of Poly(A)-containing reads: %d (%0.3f%%)\n\n',
 # human-readable condition names
 num_reads$condition_long <- CONFIG$condition_mapping$to[match(num_reads$condition, 
                                                         CONFIG$condition_mapping$from)]
-table_S01 <- num_reads %>%
+table_S1 <- num_reads %>%
     mutate("Infected"=ifelse(condition %in% c('proc', 'meta', 'epi', 'trypo'), 'N', 'Y'),
            num_reads_host=replace(num_reads_host, is.na(num_reads_host), 0),
            num_reads_parasite=replace(num_reads_parasite, is.na(num_reads_parasite), 0)) %>%
@@ -63,7 +63,7 @@ table_S01 <- num_reads %>%
            "Reads mapped to hg19"=num_reads_host,
            "% of mapped reads belonging to parasite"=parasite_mapped_pct,
            "% of mapped reads belonging to hg19"=host_mapped_pct)
-xkable(table_S01, digits=3, 
+xkable(table_S1, digits=3, 
        caption='**Table S1**: Summary of samples collected and mapping statistics')
 ```
 

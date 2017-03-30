@@ -199,20 +199,26 @@ create_utr_comparison_df <- function(sites, s1_name, s2_name) {
         filter(s1_len != s2_len) %>% 
         mutate(len_diff=abs(s1_len - s2_len))
 
-    # use min read support as a measure of our confidence
-    dat %>% mutate(min_num_reads=pmin(s1_num_reads, s2_num_reads))
+    # add min read support and min primary to secondary ratio as a measures 
+    # of our confidence
+    dat %>% mutate(min_num_reads=pmin(s1_num_reads, s2_num_reads),
+                   min_ptos=pmin(s1_ptos, s2_ptos))
 }
 
 plot_diff_utrs <- function(dat, feature_name) {
+    # log-transform min_num_reads and ptos ratio
+    dat$min_ptos <- log1p(dat$min_ptos)
+    dat$min_num_reads <- log1p(dat$min_num_reads)
+
     # plot UTR length differences across developmental stages
-    ggplot(dat, aes(s1_len, s2_len, color=min_num_reads, size=min_num_reads)) + 
+    ggplot(dat, aes(s1_len, s2_len, color=min_ptos, size=min_num_reads)) + 
         geom_abline(slope=1, intercept=0, color='#CCCCCC', lwd=0.5) +
         geom_abline(slope=1, intercept=300, color='#666666', lwd=0.5) +
         geom_abline(slope=1, intercept=-300, color='#666666', lwd=0.5) +
         geom_point() +
         xlab(s1_name) + ylab(s2_name) +
-        scale_color_gradient2(low="black", mid="blue", high="red") + 
-        scale_size_continuous() +
+        scale_color_gradient2(name='Minimum Log-PtoS ratio', low="black", mid="blue", high="red") + 
+        scale_size_continuous(name='Minimum Log-Number of Reads') +
         scale_x_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) +
         scale_y_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) + 
         #geom_text(data=subset(dat, min_num_reads >= 100 & len_diff > 300),

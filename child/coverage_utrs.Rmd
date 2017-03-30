@@ -1,15 +1,15 @@
 ## RNA-Seq coverage support for primary UTR boundaries
 
-```{r table_xx_utr_read_support, results='asis'}
-table_xx_utr_read_support <- cbind(c("5'UTR", "3′ UTR"), 
+```{r table_X1_utr_read_support, results='asis'}
+table_X1_utr_read_support <- cbind(c("5'UTR", "3′ UTR"), 
             c(sum(utr5_stats_combined$num_reads, na.rm=TRUE),
               sum(utr3_stats_combined$num_reads, na.rm=TRUE)) / 1E6)
-colnames(table_xx_utr_read_support) <- c("Feature", "Number of reads (millions)")
+colnames(table_X1_utr_read_support) <- c("Feature", "Number of reads (millions)")
 
-xkable(table_xx_utr_read_support, caption='**Table X**: Number of reads supporting the primary UTR boundaries (millions)')
+xkable(table_X1_utr_read_support, caption='**Table X1**: Number of reads supporting the primary UTR boundaries (millions)')
 ```
 
-```{r figure_xx, fig.show='hold', out.width='450px', fig.cap="**Figure X**: Distribution of number of SL- and Poly(A)-containing reads.", eval=FALSE}
+```{r figure_X0, fig.show='hold', out.width='450px', fig.cap="**Figure X0**: Distribution of number of SL- and Poly(A)-containing reads.", eval=FALSE}
 # NOT USED (Dec 2016)
 # number of reads containing SL- or Poly(A) sequence
 ggplot(data.frame(x=log(utr5_stats_combined$num_reads + 1)), aes(x)) + 
@@ -25,7 +25,7 @@ ggplot(data.frame(x=log(utr3_stats_combined$num_reads + 1)), aes(x)) +
 
 ## Percentage of genes for which UTRs could be assigned
 
-```{r table_x_coverage_summary_table, results='asis'}
+```{r table_X2_coverage_summary_table, results='asis'}
 nvals <- c(1, 2, 3, 4, 5, 10, 100, 1000) 
 
 # % genes with N or more reads mapped to feature
@@ -44,9 +44,9 @@ sl_pcts    <- round(sl_pcts, 4) * 100
 polya_pcts <- round(polya_pcts, 4) * 100
 
 # summary data frame
-table_xx_percent_genes_with_features_assigned <- cbind(N=nvals, SL=sl_pcts, PolyA=polya_pcts)
+table_X2_percent_genes_with_features_assigned <- cbind(N=nvals, SL=sl_pcts, PolyA=polya_pcts)
 
-xkable(table_xx_percent_genes_with_features_assigned, caption='**Table X**: Percent genes containing N or more reads mapping to the specified feature.')
+xkable(table_X2_percent_genes_with_features_assigned, caption='**Table X2**: Percent genes containing N or more reads mapping to the specified feature.')
 ```
 
 ```{r, results='asis'}

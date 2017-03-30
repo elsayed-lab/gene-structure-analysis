@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi 2.2)
+title: Trypanosome Gene Structure Analysis (T. cruzi 2.6)
 author: Keith Hughitt
 output:
   html_document:
@@ -70,7 +70,7 @@ if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {
 }
 ```
 
-```{r testing}
+```{r testing, include=FALSE, eval=FALSE}
 opts_knit$get("rmarkdown.pandoc.to")
 ```
 
@@ -175,8 +175,8 @@ Polypyrimidine tracts
 ```{r child='child/polypyrimidine_tract.Rmd'}
 ```
 
-Expression across developmental stages
-======================================
+Gene expression across chromosome, PTU, and developmental stage
+===============================================================
 
 ```{r child='child/expression_summary.Rmd'}
 ```
@@ -185,6 +185,9 @@ Comparative analysis
 ====================
 
 ```{r child='child/comparative_analysis.Rmd'}
+```
+
+```{r child='child/tcruzi_sylvio_comparison.Rmd'}
 ```
 
 System Info
@@ -199,7 +202,7 @@ sessionInfo()
 table_dir <- file.path(CONFIG$output_dir, 'table')
 dir.create(table_dir, recursive=TRUE)
 
-for (table_name in ls()[grepl('^table', ls())]) {
+for (table_name in ls()[grepl('^table_S?[0-9]', ls())]) {
     if (table_name %in% c('table_dir', 'table_name')) {
         next
     }
@@ -215,7 +218,9 @@ for (stage in CONFIG$stages) {
     sl_sites[[stage]] <- sl_sites[[stage]] %>% select(-site)
     polya_sites[[stage]] <- polya_sites[[stage]] %>% select(-site)
 }
+```
 
+```{r include=FALSE, cache=TRUE, autodep=TRUE}
 # create excel spreadsheets
 sl_xlsx <- file.path(table_dir, 'table_S02.xlsx')
 polya_xlsx <- file.path(table_dir, 'table_S03.xlsx')
@@ -238,7 +243,9 @@ for (stage in CONFIG$stages) {
                file=polya_xlsx, sheetName=stage, append=TRUE,
                row.names=FALSE)
 }
+```
 
+```{r include=FALSE, cache=TRUE, autodep=TRUE}
 # copy SL and Poly(A) gff files
 data_dir <- file.path(CONFIG$output_dir, 'data')
 dir.create(data_dir, recursive=TRUE)
@@ -246,6 +253,9 @@ dir.create(data_dir, recursive=TRUE)
 for (gff in CONFIG$site_gffs) {
     file.copy(gff, file.path(data_dir, basename(gff)))
 }
+
+# copy static alternative sl site figure (S7)
+file.copy('static/Figure_S7.png', file.path(CONFIG$output_dir, 'figure'))
 
 # copy intra-cds sl sites file to output dir
 file.copy('input/tcruzi_ystrain/XX_intracds_orfs.csv.gz', file.path(CONFIG$output_dir, 'table'))

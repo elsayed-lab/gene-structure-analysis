@@ -1,4 +1,4 @@
-## Primary vs. alternative acceptor sites
+## Primary vs. alternative acceptor site
 
 ```{r}
 # create combined site data frame including strand information
@@ -40,7 +40,7 @@ sl_sites_combined <- sl_sites_combined[sl_sites_combined$gene %in%
                                        primary_site_genes,]
 ```
 
-```{r table_S11, results='asis'}
+```{r table_S6, results='asis'}
 # total number of sites and number of primary sites
 num_total <- nrow(sl_sites_combined)
 num_primary <- nrow(sl_sites_combined %>% filter(type == 'primary'))
@@ -56,13 +56,13 @@ alt_site_props <- sl_sites_combined %>%
     group_by(acceptor_site) %>% 
     summarize(alternative=round((n() / num_alternative) * 100, 2))
 
-table_S11 <- merge(primary_site_props, alt_site_props, by='acceptor_site') %>%
+table_S6 <- merge(primary_site_props, alt_site_props, by='acceptor_site') %>%
     arrange(desc(primary))
-colnames(table_S11) <- c('Acceptor sequence', 'Primary site', 'Minor site')
-kable(table_S11, caption='**Table S11** Primary and alternative acceptor site sequence composition')
+colnames(table_S6) <- c('Acceptor sequence', 'Primary site', 'Minor site')
+kable(table_S6, caption='**Table S6** Primary and alternative acceptor site sequence composition')
 ```
 
-```{r figure_03a, fig.cap="**Figure 03a** Sequence composition of primary and alternative SL acceptor sites"}
+```{r figure_2a_sl_sequence_composition, fig.cap="**Figure 2a** Sequence composition of primary and alternative SL acceptor sites"}
 sl_summary <- sl_sites_combined %>% 
     select(acceptor_site, type) %>%
     group_by(type, acceptor_site) %>% 
@@ -83,7 +83,7 @@ ggplot(sl_summary, aes(reorder(acceptor_site, -num), y=prop, fill=type)) +
 
 ### Primary acceptor site logo
 
-```{r figure_03e, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure 03e** Sequence logo for region surrounding primary trans-splicing acceptor site."}
+```{r figure_2e_trans_splicing_site_seqlogo, warning=FALSE, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure 2e** Sequence logo for region surrounding primary trans-splicing acceptor site."}
 primary_seqs <- (sl_sites_combined %>% filter(type=='primary'))$acceptor_site_win
 names(primary_seqs) <- (sl_sites_combined %>% filter(type=='primary'))$gene
 
@@ -99,7 +99,16 @@ seqLogoMod(pwm, xaxis=-91:10, ic.scale=TRUE)
 
 #### Sub-groups with similar primary acceptor site sequences
 
-```{r figure_XX_sl_acceptor_site_sequence_heatmap}
+Next, in order to look for possible groups of genes with similar sequences for
+the trans-splicing acceptor site and surrounding regions, a heatmap of the
+pairwise sequence similarities for the same region depicted in the above
+sequence logo is generated.
+
+Each row and column represents the 100nt acceptor site region sequence for a
+single gene, with blocks along the diagonal indicating clusters of similar
+sequences.
+
+```{r figure_X5_sl_acceptor_site_sequence_heatmap, warning=FALSE, fig.cap='**Figure X5** Heatmap of primary site acceptor sequence similarity'}
 # measure pairwise hamming distances between all acceptor site sequences
 num_seqs <- length(primary_seqs)
 hamming_dist_mat <- as.matrix(stringdistmatrix(primary_seqs, method='hamming', useNames='names'))
@@ -118,7 +127,7 @@ ind <- sample(1:nrow(sim_mat), 1000)
 heatmap.2(sim_mat[ind,ind], trace='none', 
           symkey=FALSE, cex_lab=0.3, col=viridis, labCol=FALSE,
           labRow=FALSE,
-          main='Pairwise Trans-splicing Acceptor Site Region Sequence Alignments')
+          main='Pairwise TS Acceptor Site Region Sequence Alignments')
 ```
 
 ```{r acceptor_site_cluster_sequences, results='asis', cache=TRUE, autodep=TRUE}
@@ -153,7 +162,11 @@ df <- data_frame(cluster=sort(unique(clusters)),
 df <- df %>% arrange(desc(avg_similarity))
 ```
 
-```{r figure_XX_sl_acceptor_site_sequence_cluster, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192}
+To see what the acceptor site region motif looks like for clusters of genes
+with similar sequences in this region, sequence logos are shown for the 10
+clusters of genes with the highest intra-cluster sequence similarity.
+
+```{r figure_X6_sl_acceptor_site_sequence_cluster, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap='**Figure X6** Primary acceptor site sequence motif clusters.'}
 # Iterate over top N clusters and generate a sequence logo for each
 n <- 10
 
@@ -166,16 +179,20 @@ for (i in 1:n) {
 
     # draw sequence logo
     cat(sprintf("\n##### Primary acceptor site cluster %d (%d genes)\n\n", i, df$num_seqs[i]))
-
+    
+    # update caption and plot
+    opts_chunk$set('fig.cap', sprintf('**Figure X6 (%d/10)** Primary acceptor site sequence motif clusters.', i)) 
     seqLogoMod(pwm, xaxis=-91:10, ic.scale=TRUE)
 
-    cat('\n')
+    cat('\n\n\n')
 }
+
+opts_chunk$set('fig.cap', NULL)
 ```
 
 ### Alternative acceptor site logo
 
-```{r figure_S05, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S5** Sequence logo for region surrounding alternative trans-splicing acceptor sites."}
+```{r figure_S3, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S3** Sequence logo for region surrounding alternative trans-splicing acceptor sites."}
 
 alt_seqs <- (sl_sites_combined %>% filter(type=='alternative'))$acceptor_site_win
 
@@ -193,15 +210,18 @@ seqLogoMod(pwm, xaxis=-91:10, ic.scale=TRUE)
 
 ### Canonical AG acceptor site
 
-```{r figure_03b, results='asis', warning=FALSE, fig.cap="**Figure 03b** Distribution of distances between primary and alternative trans-splicing acceptor sites for canonical acceptor sites."}
+```{r figure_2b_canonical_trans_splice_site_primary_minor_dists, results='asis', warning=FALSE, fig.cap="**Figure 2b** Distribution of distances between primary and alternative trans-splicing acceptor sites for canonical acceptor sites."}
 sl_sites_combined <- sl_sites_combined %>% 
     group_by(gene) %>% 
     mutate(primary_site_dist=ifelse(strand=='+', chr_coordinate - chr_coordinate[type == 'primary'],
                                                  chr_coordinate[type == 'primary'] - chr_coordinate)) %>%
     mutate(orientation=ifelse(primary_site_dist < 0, 'upstream', 'downstream'))
 
+canonical_sl_sites <- sl_sites_combined %>% 
+    filter(acceptor_site == 'AG')
+
 # primary - minor acceptor site distances
-ag_dists <- (sl_sites_combined %>% 
+ag_dists <- (canonical_sl_sites %>% 
              filter(type == 'alternative' & acceptor_site == 'AG'))$primary_site_dist
 
 # convert to data frame and add color based on orientation
@@ -213,16 +233,16 @@ ggplot(ag_dists, aes(x=dist, fill=orientation)) +
     xlim(-1000, 1000)
 ```
 
-```{r}
-ag_dists %>% 
+```{r, table_X7}
+table_X7 <- ag_dists %>% 
     group_by(orientation) %>%
-    summarize(number=n(), proportion=n() / nrow(ag_dists)) %>%
-    kable(caption='**Table X** Average distance between primary and alternative acceptor sites for canonical trans-splicing sites')
+    summarize(number=n(), proportion=n() / nrow(ag_dists))
+kable(table_X7, caption='**Table X7** Average distance between primary and alternative acceptor sites for canonical trans-splicing sites')
 ```
 
 ### Non-canonical acceptor sites
 
-```{r, figure_03c, warning=FALSE, fig.cap="**Figure 03c** Distribution of distances between primary and alternative trans-splicing acceptor sites for non-canonical acceptor sites."}
+```{r, figure_2c_noncanonical_trans_splice_site_primary_minor_dists, warning=FALSE, fig.cap="**Figure 2c** Distribution of distances between primary and alternative trans-splicing acceptor sites for non-canonical acceptor sites."}
 ag_dists <- (sl_sites_combined %>% 
              filter(type == 'alternative' & acceptor_site != 'AG'))$primary_site_dist
 
@@ -235,48 +255,45 @@ ggplot(ag_dists, aes(x=dist, fill=orientation)) +
     xlim(-1000, 1000)
 ```
 
-```{r}
-ag_dists %>% 
+```{r, table_X8}
+table_X8 <- ag_dists %>% 
     group_by(orientation) %>%
-    summarize(number=n(), proportion=n() / nrow(ag_dists)) %>%
-    kable(caption='**Table X** Average distance between primary and alternative acceptor sites for non-canonical trans-splicing sites')
+    summarize(number=n(), proportion=n() / nrow(ag_dists))
+kable(table_X8, caption='**Table X8** Average distance between primary and alternative acceptor sites for non-canonical trans-splicing sites')
 ```
 
-## Preceeding nucleotide
+## Preceeding nucleotide for canonical SL sites
 
-```{r, table_S12}
+```{r, table_S7}
 # primary site proportions (including upstream nucleotide)
-primary_site_props <- sl_sites_combined %>%
+primary_site_props <- canonical_sl_sites %>%
     filter(type == 'primary') %>%
     group_by(acceptor_site_3nt) %>%
     summarise (num=n()) %>%
     mutate(prop=num / sum(num)) %>%
-    #filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
     select(-num) %>%
     arrange(desc(prop))
 
 # alt site proportions, divided by up- and down-stream orientation, relative
 # to the primary site
-alt_site_props <- sl_sites_combined %>%
+alt_site_props <- canonical_sl_sites %>%
     filter(type=='alternative') %>%
     group_by(orientation, acceptor_site_3nt) %>%
     summarise (num=n()) %>%
     mutate(primary=num / sum(num)) %>%
-    #filter(acceptor_site_3nt %in% c('AAG', 'CAG', 'GAG', 'TAG')) %>%
     select(-num) %>% 
     arrange(desc(primary)) %>%
     spread(orientation, primary)
 
-table_S12 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
-colnames(table_S12) <- c('site', 'Primary', 'Alternative downstream', 
+table_S7 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
+colnames(table_S7) <- c('site', 'Primary', 'Alternative downstream', 
                          'Alternative upstream')
-table_S12 <- table_S12 %>% 
+table_S7 <- table_S7 %>% 
     arrange(desc(Primary)) %>%
     column_to_rownames('site')
-table_S12 <- round(table_S12 * 100, 2)
+table_S7 <- round(table_S7 * 100, 2)
+table_S7[is.na(table_S7)] <- 0
 
-table_S12[is.na(table_S12)] <- 0
-
-kable(table_S12, caption='**Table S12** Frequency of preceeding nucleotide for primary and alternative trans-splicing acceptor sites.')
+kable(table_S7, caption='**Table S7** Frequency of preceeding nucleotide for primary and alternative canonical trans-splicing acceptor sites.')
 ```
 

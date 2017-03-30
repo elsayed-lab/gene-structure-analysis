@@ -4,8 +4,8 @@
 
 Median CDS and UTR lengths.
 
-```{r table_01, results='asis'}
-# Table 1: Gene Structure Summary
+```{r table_X3, results='asis'}
+# Table X3: Gene Structure Summary
 cds_lengths <- data.frame(
     gene=genes$ID,
     CDS=width(genes)
@@ -14,8 +14,8 @@ cds_lengths <- data.frame(
 gene_structure_lengths <- merge(merge(utr5_stats_combined %>% select(gene, `5' UTR`=length), 
                                       utr3_stats_combined %>% select(gene, `3' UTR`=length), 
                                       by='gene', all=TRUE), cds_lengths, by='gene', all=TRUE)
-table_01 <- gene_structure_summary(gene_structure_lengths %>% select(-gene))
-xkable(table_01, caption='**Table 1** Gene structure summary table.')
+table_X3 <- gene_structure_summary(gene_structure_lengths %>% select(-gene))
+xkable(table_X3, caption='**Table X3** CDS and UTR length summary statistics.')
 ```
 
 ### Three-way tritryp Orthologs
@@ -23,66 +23,77 @@ xkable(table_01, caption='**Table 1** Gene structure summary table.')
 Below, we report the statistics when considering only those genes shared by 
 *L. major*, *T. brucei*, and *T. cruzi*.
 
-```{r table_S05, results='asis'}
-table_S05 <- gene_structure_summary(gene_structure_lengths %>%
+```{r table_S4, results='asis'}
+table_S4 <- gene_structure_summary(gene_structure_lengths %>%
                                         filter(gene %in% tritryp_orthologs) %>%
                                         select(-gene))
-xkable(table_S05, caption='**Table S5** Gene structure summary table (three-way orthologs).')
+xkable(table_S4, caption='**Table S4** CDS and UTR length summary statistics (only including tritryp three-way ortholog genes).')
 ```
 
 ## Average lengths
 
-```{r figure_01_average_lengths, fig.cap=sprintf('**Figure 1** Characterization of %s gene structure', CONFIG$parasite), warning=FALSE}
+```{r figure_1_average_lengths, fig.cap=sprintf('**Figure 1** Characterization of %s gene structure', CONFIG$parasite), warning=FALSE}
+# Plot margins
+plt_margins <- unit(c(6, 12, 6, 12), "pt")
+        
 # Average 5′ UTR length
 p1 <- ggplot(utr5_stats_combined, aes(x=length)) + 
-        geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 1500) +
+        geom_histogram(aes(y=..ncount..), binwidth=15, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        scale_x_continuous(limits=c(0, 1500), expand = c(0, 0)) +
+        theme(axis.title.y=element_blank(), plot.margin=plt_margins) + 
         ggtitle('A') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="5′ UTR length (nt)")
 
 # Average 3′ UTR length
 p2 <- ggplot(utr3_stats_combined, aes(x=length)) + 
-        geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 1500) +
+        geom_histogram(aes(y=..ncount..), binwidth=15, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        scale_x_continuous(limits=c(0, 1500), expand = c(0, 0)) +
+        theme(axis.title.y=element_blank(), plot.margin=plt_margins) + 
         ggtitle('B') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="3′ UTR length (nt)")
-
-# Average Polypyrimidine tract length
-p3 <- ggplot(polypyr_combined, aes(x=length)) + 
-        geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 300) +
-        ggtitle('C') + theme(plot.title=element_text(hjust=0)) + 
-        labs(x="Polypyrimidine tract length (nt)")
 
 # Average CDS length
 cds_lengths <- as.data.frame(as.numeric(genes$size))
 colnames(cds_lengths) <- 'length'
 
-p4 <- ggplot(cds_lengths, aes(x=length)) + 
-        geom_histogram(aes(y=..ncount..), binwidth=20, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 5000) +
-        ggtitle('D') + theme(plot.title=element_text(hjust=0)) + 
+p3 <- ggplot(cds_lengths, aes(x=length)) + 
+        geom_histogram(aes(y=..ncount..), binwidth=50, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        scale_x_continuous(limits=c(0, 5000), expand=c(0, 0)) +
+        theme(axis.title.y=element_blank(), plot.margin=plt_margins) + 
+        ggtitle('C') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="CDS length (nt)")
+
+# Average Polypyrimidine tract length
+p4 <- ggplot(polypyr_combined, aes(x=length)) + 
+        geom_histogram(aes(y=..ncount..), binwidth=3, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        scale_x_continuous(limits=c(0, 300), expand = c(0, 0)) +
+        theme(axis.title.y=element_blank(), plot.margin=plt_margins) + 
+        ggtitle('D') + theme(plot.title=element_text(hjust=0)) + 
+        labs(x="PolyPy tract length (nt)")
+
 
 # Average distance between primary SL site and polypyrimidine tract
 p5 <- ggplot(polypyr_combined, aes(x=sl_dist)) +
-        geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 300) +
+        geom_histogram(aes(y=..ncount..), binwidth=4, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        scale_x_continuous(limits=c(0, 400), expand = c(0, 0)) +
+        theme(axis.title.y=element_blank(), plot.margin=plt_margins) + 
         ggtitle('E') + theme(plot.title=element_text(hjust=0)) + 
-        labs(x="Distance between primary trans-splicing site and polypyrimidine tract (nt)")
+        labs(x="Distance between primary trans-splicing site and PolyPy tract (nt)")
 
 # Average distance between primary poly(A) site and polypyrimidine tract
 p6 <- ggplot(polypyr_combined, aes(x=polya_dist)) +
-        geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 1500) +
+        geom_histogram(aes(y=..ncount..), binwidth=15, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        scale_x_continuous(limits=c(0, 1500), expand = c(0, 0)) +
+        theme(axis.title.y=element_blank(), plot.margin=plt_margins) + 
         ggtitle('F') + theme(plot.title=element_text(hjust=0)) + 
-        labs(x="Distance between primary polyadenylation site and polypyrimidine tract (nt)")
+        labs(x="Distance between primary Poly(A) addition site and PolyPy tract (nt)")
 
 # Average intergenic length (distance between SL and Poly(A) sites)
 p7 <- ggplot(intercds_regions %>% filter(stage == 'combined'), 
              aes(x=intergenic_length)) +
-        geom_histogram(aes(y=..ncount..), binwidth=10, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
-        xlim(0, 1500) +
+        geom_histogram(aes(y=..ncount..), binwidth=15, fill=CONFIG$colors[1], colour=CONFIG$stroke, alpha=0.75) +
+        scale_x_continuous(limits=c(0, 1500), expand = c(0, 0)) +
+        theme(axis.title.y=element_blank(), plot.margin=plt_margins) + 
         ggtitle('G') + theme(plot.title=element_text(hjust=0)) + 
         labs(x="Intergenic length (nt)")
 

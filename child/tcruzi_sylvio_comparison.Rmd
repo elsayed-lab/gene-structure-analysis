@@ -1,0 +1,202 @@
+## T. cruzi Y strain vs. Sylvio
+
+Here, gene structure is compared between two strains of Trypanosoma cruzi: Y 
+strain and Sylvio.
+
+```{r load_utr_summary_statistics, message=FALSE}
+# Sylvio input UTR stats
+utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
+                                  '06-gene-structure/01-gene-structure-determination')
+utr_analysis_suffix <- 'tcruzi_sylvio/sl-min3_polya-min3_mindiff-2'
+utr_analysis_outdir <- file.path(utr_analysis_basedir, 'output', utr_analysis_suffix)
+
+# Create data.frames containing the primary 5' and 3′  length stats
+stages_sylvio <- c('trypomastigote', 'amastigote')
+
+# Sylvio 5' UTR stats
+utr5_stats_sylvio_filepaths <- as.list(file.path(utr_analysis_outdir, c(stages_sylvio, 'combined'), '5utr_stats.csv'))
+names(utr5_stats_sylvio_filepaths) <- c(stages_sylvio, 'combined')
+
+utr5_stats_sylvio <- cbind(read_csv(utr5_stats_sylvio_filepaths[['combined']]), stage='combined')
+
+for (stage in stages_sylvio) {
+    utr5_stats_sylvio <- rbind(utr5_stats_sylvio, 
+                               cbind(read_csv(utr5_stats_sylvio_filepaths[[stage]]), stage=stage))
+}
+
+# Sylvio 3' UTR stats
+utr3_stats_sylvio_filepaths <- as.list(file.path(utr_analysis_outdir, c(stages_sylvio, 'combined'), '3utr_stats.csv'))
+names(utr3_stats_sylvio_filepaths) <- c(stages_sylvio, 'combined')
+
+utr3_stats_sylvio <- cbind(read_csv(utr3_stats_sylvio_filepaths[['combined']]), stage='combined')
+for (stage in stages_sylvio) {
+    utr3_stats_sylvio <- rbind(utr3_stats_sylvio,
+                        cbind(read_csv(utr3_stats_sylvio_filepaths[[stage]]), stage=stage))
+}
+
+# Filter out UTR stats for noncoding genes (around 50 genes for T. cruzi)
+utr5_stats_sylvio <- utr5_stats_sylvio[utr5_stats_sylvio$gene %in% protein_coding,]
+utr3_stats_sylvio <- utr3_stats_sylvio[utr3_stats_sylvio$gene %in% protein_coding,]
+
+# Remove any genes for which UTR boundaries were assigned within one or more
+# of the developmental stages, but could not be assigned when data from all
+# stages were considered together (e.g. primary sites with most support in 
+# wrong orientation). This occurs infrequently (~1.5% of assignments for T. cruzi).
+utr5_combined_genes_sylvio <- (utr5_stats_sylvio %>% filter(stage == 'combined'))$gene
+utr5_stats_sylvio <- utr5_stats_sylvio %>%
+    filter(gene %in% utr5_combined_genes_sylvio)
+
+utr3_combined_genes_sylvio <- (utr3_stats_sylvio %>% filter(stage == 'combined'))$gene
+utr3_stats_sylvio <- utr3_stats_sylvio %>%
+    filter(gene %in% utr3_combined_genes_sylvio)
+
+# Add NA placeholders for genes where the feature length was determined in 
+# one stage, but not one or more of the others
+all_utr5 <- unique(utr5_stats_sylvio$gene)
+all_utr3 <- unique(utr3_stats_sylvio$gene)
+
+for (stg in c(stages_sylvio, 'combined')) {
+    # grab stage-specific 5'UTR stats
+    stage_specific_utr5 <- utr5_stats_sylvio %>% 
+        filter(stage == stg)
+    stage_specific_utr3 <- utr3_stats_sylvio %>% 
+        filter(stage == stg)
+
+    # create rows for each gene missing in the stage
+    utr5_missing <- all_utr5[!all_utr5 %in% stage_specific_utr5$gene]
+
+    if (length(utr5_missing) > 0) {
+        placeholders <- cbind(utr5_missing, NA, NA, NA, NA, NA, NA, NA, NA, NA, stg)
+        colnames(placeholders) <- colnames(utr5_stats_sylvio)
+        utr5_stats_sylvio <- rbind(utr5_stats_sylvio, placeholders)
+    }
+
+    utr3_missing <- all_utr3[!all_utr3 %in% stage_specific_utr3$gene]
+
+    if (length(utr3_missing) > 0) {
+        placeholders <- cbind(utr3_missing, NA, NA, NA, NA, NA, NA, NA, NA, NA, stg)
+        colnames(placeholders) <- colnames(utr3_stats_sylvio)
+
+        # add to main dataframe
+        utr3_stats_sylvio <- rbind(utr3_stats_sylvio, placeholders)
+    }
+}
+
+# Fix types
+for (x in c('length', 'num_reads', 'gc', 'ct')) {
+    utr5_stats_sylvio[[x]] <- as.numeric(utr5_stats_sylvio[[x]])
+    utr3_stats_sylvio[[x]] <- as.numeric(utr3_stats_sylvio[[x]])
+}
+
+# For convenience, we will also create version of the above containing just the
+# combined stats
+utr5_stats_combined_sylvio <- utr5_stats_sylvio %>% filter(stage == 'combined')
+utr3_stats_combined_sylvio <- utr3_stats_sylvio %>% filter(stage == 'combined')
+```
+
+### 5' UTR length conservation
+
+```{r figure_X20_tcruzi_ystrain_vs_sylvio_5utr_length, results='asis', fig.cap="**Figure X20** T. cruzi 5' UTR length conservation"}
+common_genes <- intersect(utr5_stats_combined$gene, utr5_stats_combined_sylvio$gene) 
+
+ystrain_5utr_stats <- utr5_stats_combined %>% 
+                        select(gene, ystrain_length=length, 
+                               ystrain_num_reads=num_reads) %>% 
+                        filter(gene %in% common_genes)
+
+sylvio_5utr_stats <- utr5_stats_combined_sylvio %>% 
+                        select(gene, sylvio_length=length,
+                               sylvio_num_reads=num_reads) %>% 
+                        filter(gene %in% common_genes)
+
+dat <- merge(ystrain_5utr_stats, sylvio_5utr_stats, by='gene')
+
+# number of genes compared
+cat(sprintf("\n- Number of genes with 5' UTRs detected in both Y strain and sylvio: %d", length(common_genes)))
+
+# median 5' UTR length for each strain
+cat(sprintf("\n- Median 5' UTR length (Y strain): %g",
+            median(dat$ystrain_length)))
+cat(sprintf("\n- Median 5' UTR length (Sylvio): %g\n",
+            median(dat$sylvio_length)))
+
+# compute correlation across strains
+cat(sprintf('\n- Pearson correlation: %0.3f', cor(dat$ystrain_length, dat$sylvio_length)))
+cat(sprintf('\n- Spearman correlation: %0.3f\n', cor(dat$ystrain_length, dat$sylvio_length, method='spearman')))
+
+# hide genes with same length across T. cruzi strains 
+dat <- dat %>% 
+    mutate(min_num_reads=pmin(ystrain_num_reads, sylvio_num_reads)) %>%
+    filter(ystrain_length != sylvio_length & min_num_reads > 5)
+
+# plot 5' UTR lengths
+ggplot(dat, aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +
+    geom_point() +
+    scale_colour_gradient2(limits=c(2, 50), low="black", mid="blue", high="red",
+                           na.value='red') +
+    scale_x_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
+    scale_y_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
+    geom_smooth() +
+    geom_abline(intercept=0, slope=1, color='red') +
+    xlab("T. cruzi Y strain 5' UTR length") +
+    ylab("T. cruzi Sylvio 5' UTR length")
+```
+
+```{r}
+# Print table of interesting hits
+table_X12 <- dat %>% filter(abs(ystrain_length - sylvio_length) > 100)
+kable(table_X12, caption="**Table X12** Genes with significantly differing 5' UTR lengths between T. cruzi strains")
+```
+
+### 3' UTR length conservation
+
+```{r figure_X21_tcruzi_ystrain_vs_sylvio_3utr_length, results='asis', fig.cap="**Figure X21** T. cruzi 3' UTR length conservation"}
+common_genes <- intersect(utr3_stats_combined$gene, utr3_stats_combined_sylvio$gene) 
+
+ystrain_3utr_stats <- utr3_stats_combined %>% 
+                        select(gene, ystrain_length=length, 
+                               ystrain_num_reads=num_reads) %>% 
+                        filter(gene %in% common_genes)
+
+sylvio_3utr_stats <- utr3_stats_combined_sylvio %>% 
+                        select(gene, sylvio_length=length,
+                               sylvio_num_reads=num_reads) %>% 
+                        filter(gene %in% common_genes)
+
+dat <- merge(ystrain_3utr_stats, sylvio_3utr_stats, by='gene')
+
+# number of genes compared
+cat(sprintf("\n- Number of genes with 3' UTRs detected in both Y strain and sylvio: %d", length(common_genes)))
+
+# median 3' UTR length for each strain
+cat(sprintf("\n- Median 3' UTR length (Y strain): %g",
+            median(dat$ystrain_length)))
+cat(sprintf("\n- Median 3' UTR length (Sylvio): %g\n",
+            median(dat$sylvio_length)))
+
+# compute correlation across strains
+cat(sprintf('\n- Pearson correlation: %0.3f', cor(dat$ystrain_length, dat$sylvio_length)))
+cat(sprintf('\n- Spearman correlation: %0.3f\n', cor(dat$ystrain_length, dat$sylvio_length, method='spearman')))
+
+# hide genes with same length across T. cruzi strains 
+dat <- dat %>% 
+    mutate(min_num_reads=pmin(ystrain_num_reads, sylvio_num_reads)) %>%
+    filter(ystrain_length != sylvio_length & min_num_reads > 5)
+
+# plot 3' UTR lengths
+ggplot(dat, aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +
+    geom_point() +
+    scale_colour_gradient2(limits=c(2, 50), low="black", mid="blue", high="red",
+                           na.value='red') +
+    scale_x_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
+    scale_y_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
+    geom_smooth() +
+    geom_abline(intercept=0, slope=1, color='red') +
+    xlab("T. cruzi Y strain 3' UTR length") +
+    ylab("T. cruzi Sylvio 3' UTR length")
+
+
+# Print table of interesting hits
+table_X13 <- dat %>% filter(abs(ystrain_length - sylvio_length) > 100)
+kable(table_X13, caption="**Table X13** Genes with significantly differing 3' UTR lengths between T. cruzi strains")
+```

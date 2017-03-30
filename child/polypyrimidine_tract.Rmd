@@ -1,15 +1,15 @@
 ## Polypyrimidine length statistics
 
 ```{r results='asis'}
-# Table X: Polypyrimidine tract lengths
+# Table X11: Polypyrimidine tract lengths
 polypyrimidine_lengths <- polypyr_combined$length
 
-table_xx <- data.frame(length=c(min(polypyrimidine_lengths),
+table_X11 <- data.frame(length=c(min(polypyrimidine_lengths),
                                 mean(polypyrimidine_lengths),
                                 median(polypyrimidine_lengths),
                                 max(polypyrimidine_lengths)))
-rownames(table_xx) <- c('min', 'mean', 'median', 'max')
-xkable(t(table_xx), caption='**Table X** Polypyrimidine tract length statistics.')
+rownames(table_X11) <- c('min', 'mean', 'median', 'max')
+xkable(t(table_X11), caption='**Table X11** Polypyrimidine tract length statistics.')
 ```
 
 ## Median distance from SL/Poly(A) sites
@@ -37,7 +37,7 @@ cat(sprintf('- %% Thymine: %0.1f\n\n', 100 * (num_thymines / (num_cytosines + nu
 
 ### Global Polypyrimidine tract sequence logo
 
-```{r figure_03f, fig.width=7680/192, fig.height=720/192, dpi=192}
+```{r figure_X8_polypyr_tract_logo_primary, fig.width=7680/192, fig.height=720/192, dpi=192, fig.cap='**Figure X8** Sequence logo for polypyrimidine tract of primary trans-splicing sites.'}
 # perform an MSA
 seqs <- DNAStringSet(polypyrimidine_seqs)
 alignment <- msa(seqs, method='ClustalOmega')
@@ -61,7 +61,11 @@ seqLogo(pwm[,from:to])
 
 ### Pairwise similarity between polypyrimidine sequences
 
-```{r figure_XX_polypyr_sequence_cluster_heatmap, cache=TRUE, autodep=TRUE}
+Similar to the heatmap constructed for trans-splicing acceptor site region
+sequences, a heatmap showing the pairwise similarity between gene
+polypyrimidine tracts is plotted below.
+
+```{r figure_X9_polypyr_sequence_cluster_heatmap, cache=TRUE, autodep=TRUE, warning=FALSE, fig.cap='**Figure X9** Heatmap of polypyrimidine tract sequence similarity.'}
 # Sequence similarity matrix
 num_seqs <- length(seqs)
 sim_mat <- matrix(0, nrow=num_seqs, ncol=num_seqs)
@@ -92,7 +96,7 @@ heatmap.2(sim_mat[ind,ind], trace='none',
 
 ### Visualization of polypyrimidine sequence clusters
 
-```{r, cluster_sequences, results='asis', cache=TRUE, autodep=TRUE}
+```{r, cluster_sequences, message=FALSE, results='asis', cache=TRUE, autodep=TRUE}
 # convert to distance matrix and find clusters of similar polypyrimidine tract
 # sequences 
 dist_mat <- 1 - ((sim_mat - min(sim_mat)) / max(sim_mat))
@@ -124,7 +128,7 @@ df <- data_frame(cluster=sort(unique(clusters)),
 df <- df %>% arrange(desc(avg_similarity))
 ```
 
-```{r figure_XX_polypyr_tract_cluster, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192}
+```{r figure_X10_polypyr_tract_cluster, results='asis', cache=TRUE, autodep=TRUE, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap='**Figure X10** Sequence motifs for most common PolyPyr sequence clusters'}
 # Iterate over top N clusters and generate a sequence logo for each
 n <- 10
 
@@ -150,7 +154,11 @@ for (i in 1:n) {
 
     cat(sprintf("\n### Polypyrimidine tract cluster %d (%d genes)\n\n", i, df$num_seqs[i]))
 
+    # update figure caption and plot
+    opts_chunk$set('fig.cap', sprintf('**Figure X10 (%d/10)** Sequence motifs for most common PolyPyr sequence clusters', i)) 
     seqLogo(pwm[,from:to])
+
+    cat('\n\n\n')
 
     # visualize result (PDF output only)
     #msaPrettyPrint(alignment, output="asis", 
@@ -158,4 +166,6 @@ for (i in 1:n) {
     #               showLogo="top", logoColors="rasmol", shadingMode="similar",
     #               showLegend=FALSE, askForOverwrite=FALSE)
 }
+
+opts_chunk$set('fig.cap', NULL) 
 ```

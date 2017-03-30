@@ -1,13 +1,17 @@
 ## Primary vs. secondary trans-splicing site usage
 
-```{r figure_x_alt_ts}
+Below, histograms of the distance between primary and alternative sites for the 
+same gene are shown, separated by developmental stage. The final panel (D) shows
+the histogram for the combined (stage-independent) set of sites. In these figures,
+both canonical (AG) and non-canonical trans-splicing sites are included.
+
+```{r figure_X2_primary_vs_alt_ts_site_usage, fig.cap='**Figure X2** Primary vs. alternative trans-splicing site usage'}
 # iterate over genes for which primary trans-splicing site was detected
 plts <- list()
 
 for (i in 1:length(stages)) {
     stage <- stages[i]
     sites <- sl_sites[[stage]]
-    message(stage)
 
     # filter sites with low read coverage
     sites <- sites %>% filter(num_reads >= CONFIG$min_read_support_5utr)
@@ -42,7 +46,13 @@ cat(sprintf('- Number of genes with 5+ SL sites detected: %d (%0.1f)\n\n',
 
 ## Primary vs. secondary polyadenylation site usage
 
-```{r figure_x_alt_polya}
+Below, histograms of the distance between primary and alternative
+polyadenylation sites for the same gene are shown, separated by developmental
+stage. Note that panel D (combined) shows the same information as figure 2d,
+but uses different bin sizes and coloration, thus resulting in a different
+appearance.
+
+```{r figure_X3_primary_vs_alt_polya_site_usage, fig.cap='**Figure X3** Primary vs. alternative Poly(A) site usage'}
 # iterate over genes for which primary trans-splicing site was detected
 plts <- list()
 

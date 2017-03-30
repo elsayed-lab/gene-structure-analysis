@@ -1,5 +1,16 @@
 ## Average gene RPKM expression by chromosome
 
+The next section represents a brief deviation from the focus on gene structure.
+Here instead, the focus is on the global level of expression across parasite
+chromosomes and polycistronic developmental units (PTUs), both globally and as
+a function of developmental stage.
+
+To begin, we explore the average expression level (in RPKM) as a function of 
+chromosome. This is useful for indicating possible chromosomal duplications.
+
+In the first plot, the average expression at the gene level is shown by
+chromosome.
+
 ```{r data_prep}
 # Create RPKM-normalized version of counts
 gene_lengths <- data.frame(gene=genes$ID, length=as.numeric(genes$size))
@@ -17,7 +28,7 @@ length_vector <- gene_lengths[match(row.names(count_table), gene_lengths$gene), 
 rpkm_counts <- rpkm(count_table, gene.length=length_vector)
 ```
 
-```{r figure_x_average_chr_gene_rpkm_expr}
+```{r figure_X11_average_chr_gene_rpkm_expr, fig.cap='**Figure X11** Average RPKM expression by chromosome at the gene level'}
 # Get total expression for each gene, across all samples
 rpkm_totals <- rownames_to_column(as.data.frame(rowSums(rpkm_counts)))
 colnames(rpkm_totals) <- c('gene', 'expr')
@@ -42,7 +53,11 @@ ggplot(chr_expr_averages, aes(x=chr, y=average_expr)) +
 
 ## Average RPKM expression by chromosome at the nucleotide level
 
-```{r figure_x_average_chr_rpkm_expr_by_nt}
+Next, the average expression per nucleotide is shown for each chromosome. This
+is an alternate way to get at the "average" expression of genes on a given
+chromosome.
+
+```{r figure_X12_average_chr_rpkm_expr_by_nt, fig.cap='**Figure X12** Average RPKM expression by chromosome at the nucleotide level'}
 chr_cds_total_lengths <- merge(gene_lengths, chr_mapping, by='gene') %>%
     group_by(chr) %>%
     summarise(total_length=sum(length))
@@ -61,7 +76,12 @@ ggplot(chr_stats, aes(x=chr, y=expr_per_nt)) +
 
 ## Average RPKM expression by chromosome (extracellular vs. intracellular)
 
-```{r figure_x_average_chr_gene_rpkm_expr_stage_specific}
+Below, the same plots are shown, but with expression divided among the
+intracellular and extracellular parasite developmental stages. Any large
+discrepancies here would indicate chromosome-level expression changes across
+developmental stage.
+
+```{r figure_X13_average_chr_gene_rpkm_expr_stage_specific, fig.cap='**Figure X13** Average RPKM expression by chromosome at the gene level (intra vs extracellular)'}
 # Create a long version of RPKM counts
 rpkm_counts_long <- melt(rpkm_counts)
 colnames(rpkm_counts_long) <- c('gene', 'sample_id', 'expr')
@@ -90,7 +110,10 @@ ggplot(chr_expr_averages, aes(x=stage, y=average_expr, fill=stage)) +
 
 ## Total RPKM expression by chromosome (extracellular vs. intracellular)
 
-```{r figure_x_total_chr_rpkm_expr_stage_specific}
+For comparison, a similar plot is shown but using the _total_ expression across
+stage and chromosome, instead of the _average_ expression.
+
+```{r figure_X14_total_chr_rpkm_expr_stage_specific, fig.cap='**Figure X14** Total RPKM expression by chromosome at the gene level (intra vs extracellular)'}
 ggplot(chr_expr_averages, aes(x=stage, y=total_expr, fill=stage)) + 
     geom_bar(stat='identity', color=CONFIG$stroke) +
     scale_fill_manual(values=CONFIG$colors) +
@@ -100,7 +123,10 @@ ggplot(chr_expr_averages, aes(x=stage, y=total_expr, fill=stage)) +
 
 ## Average RPKM expression by chromosome (developmental stage)
 
-```{r figure_x_average_chr_gene_rpkm_expr_condition_specific}
+Below, a more granular look at chromosome-level average expression is shown for
+each developmental stage studied.
+
+```{r figure_X15_average_chr_gene_rpkm_expr_condition_specific, fig.cap='**Figure X15** Average RPKM expression by chromosome at the gene level (by developmental stage)'}
 # Compute average total RPKM for each chromosome (developmental stage)
 chr_expr_averages <- rpkm_counts_long %>% 
     group_by(chr, condition) %>%
@@ -115,7 +141,10 @@ ggplot(chr_expr_averages, aes(x=condition, y=total_expr, fill=condition)) +
 
 ## Total RPKM expression by chromosome (developmental stage)
 
-```{r figure_x_total_chr_rpkm_expr_condition_specific}
+Similar to the above plot, but using _total_ expression instead of _average_
+expression.
+
+```{r figure_X16_total_chr_gene_rpkm_expr_condition_specific, fig.cap='**Figure X16** Total RPKM expression by chromosome at the gene level (by developmental stage)'}
 ggplot(chr_expr_averages, aes(x=condition, y=total_expr, fill=condition)) + 
     geom_bar(stat='identity', color=CONFIG$stroke) +
     theme(axis.text.x=element_text(angle=90)) +
@@ -124,7 +153,14 @@ ggplot(chr_expr_averages, aes(x=condition, y=total_expr, fill=condition)) +
 
 ## Average RPKM expression per nucleotide by PTU
 
-```{r figure_x_average_rpkm_expr_per_nt_by_ptu}
+Next, a table of putative polycistronic transcriptional units was creating by
+grouping contiguous sets of genes all on the same strand (script and tables
+available at https://github.com/elsayed-lab/ptu-detection), and average 
+expression was plotted as a function of PTU.
+
+This can be useful to detect trends in expression at the level of PTUs.
+
+```{r figure_X17_average_rpkm_expr_per_nt_by_ptu, fig.cap='**Figure X17** Average RPKM expression by PTU at the nucleotide level'}
 # Add PTU mapping to RPKM gene counts
 rpkm_totals <- merge(rpkm_totals, ptu_mapping, by.x='gene', by.y='gene_id')
 
@@ -161,7 +197,9 @@ ggplot(ptu_expr_averages, aes(x=ptu, y=average_expr)) +
 
 ## Total RPKM expression per nucleotide by PTU
 
-```{r figure_x_total_rpkm_expr_per_nt_by_ptu}
+Same as above, but showing _total_ expression instead of _average_ expression.
+
+```{r figure_X18_total_rpkm_expr_per_nt_by_ptu, fig.cap='**Figure X18** Total RPKM expression by PTU at the nucleotide level'}
 #ptu_stats <- merge(ptu_stats, rpkm_totals %>% select(chr, ptu) %>% unique, by='ptu')
 
 # in order to avoid noise due to small, possibly incorrect PTU's, we will 

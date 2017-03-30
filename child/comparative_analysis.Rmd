@@ -1,6 +1,6 @@
 ## TriTryp gene structure comparison
 
-```{r tbrucei_cds_length, message=FALSE}
+```{r tbrucei_cds_length, message=FALSE, }
 # Compute median CDS lengths for T. brucei protein-coding genes
 # Get ID's for protein-coding genes
 library(Trypanosoma.brucei.TREU927)
@@ -23,16 +23,12 @@ tb_genes <- genes[genes$ID %in% tb_protein_coding_genes]
 # 1725 nt
 tb_median_cds <- median(width(tb_genes))
 
-
-
 # L. major Friedlin structure stats
-# Median CDS size computed using all `gene` entries from 
-#
-#
+# Median CDS size computed using all `gene` entries from TriTrypDB GFF
 lm_median_cds <- 1269
 ```
 
-```{r tritryp_gene_structure, fig.height=400/192, fig.width=1600/192, dev=c(opts_chunk$get('dev'), 'svglite')}
+```{r figure_X19_tritryp_gene_structure, fig.height=600/192, fig.width=1600/192, dev=c(opts_chunk$get('dev'), 'svglite'), fig.cap='**Figure X19** TriTryp gene structure comparison'}
 # create a matrix containing feature lengths for T. cruzi, T. brucei, and 
 # L. major
 #
@@ -64,8 +60,10 @@ dat <- cbind(`T. brucei`=tbrucei_lengths, `T. cruzi`=tcruzi_lengths,
 horizontal_pad <- 100
 gene_width <- 40
 gene_margin <- 10
-plot_width <- max(colSums(dat)) + (2 * horizontal_pad)
-plot_height <- (3 * gene_width) + (4 * gene_margin)
+#plot_width <- max(colSums(dat)) + (2 * horizontal_pad)
+#plot_height <- (3 * gene_width) + (4 * gene_margin)
+plot_width <- 1600
+plot_height <- 160
 
 #
 # Plot a single entry in a comparative gene structure plot
@@ -100,7 +98,7 @@ plot_multigene_structure <- function(dat, i, plot_width, plot_height,
 }
 
 # create plot
-plot(c(0, plot_width), c(0, plot_height), type='n', 
+plot(c(0, plot_width), c(0, plot_height * 3), type='n', 
      xlab='', ylab='', xaxt='n', yaxt='n')
 
 plot_multigene_structure(dat, 1, plot_width, plot_height, gene_width,
@@ -115,4 +113,14 @@ ytick2 <- ytick1 + gene_margin + gene_width
 ytick3 <- ytick2 + gene_margin + gene_width
 
 axis(2, labels=colnames(dat), at=c(ytick1, ytick2, ytick3), tick=FALSE)
+```
+
+```{r table_1}
+table_1 <- dat[1:6,]
+rownames(table_1) <- c('CDS', "3' UTR", 'Poly(A) - PolyPy distance', 'PolyPy tract', 
+                       'SL - PolyPy distance', "5' UTR")
+
+# reorder columns and display
+table_1 <- table_1[c(6,1,2,3,4,5),]
+kable(table_1, caption='**Table 1** TriTryp comparative gene structure.')
 ```

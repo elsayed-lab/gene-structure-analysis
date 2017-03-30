@@ -1,6 +1,6 @@
 ## UTR / CDS length correlations
 
-```{r figure_S02, warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
+```{r figure_S2_gene_structure_length_correlations, warning=FALSE, fig.cap="**Figure S2**: UTR and CDS length correlations"}
 df <- data.frame(gene=genes$ID, cds_length=as.numeric(genes$size))
 df <- merge(merge(df, utr5_stats_combined %>% select(gene, utr5_length=length), by='gene'),
                   utr3_stats_combined %>% select(gene, utr3_length=length), by='gene')
@@ -21,6 +21,7 @@ p1 <- ggplot(df, aes(x=utr5_length, y=cds_length)) +
     scale_y_log10() +
     xlab("5′ UTR length (nt)") + 
     ylab("CDS length (nt)") + 
+    ggtitle('A') + theme(plot.title=element_text(hjust=0)) + 
     annotate("text", x=4000, y=min(df$cds_length), label=p1_label,
              colour="blue", size=3, parse=TRUE)
     #ggtitle("5′ UTR vs. CDS length")
@@ -33,6 +34,7 @@ p2 <- ggplot(df, aes(x=utr3_length, y=cds_length)) +
     scale_y_log10() +
     xlab("3′ UTR length (nt)") + 
     ylab("CDS length (nt)") + 
+    ggtitle('B') + theme(plot.title=element_text(hjust=0)) + 
     annotate("text", x=4000, y=min(df$cds_length), label=p2_label,
              colour="blue", size=3, parse=TRUE)
     #ggtitle("3′ UTR vs. CDS length")
@@ -45,6 +47,7 @@ p3 <- ggplot(df, aes(x=utr5_length, y=utr3_length)) +
     scale_y_log10() +
     xlab("5′ UTR length (nt)") + 
     ylab("3′ UTR length (nt)") + 
+    ggtitle('C') + theme(plot.title=element_text(hjust=0)) + 
     annotate("text", x=4000, y=1, label=p3_label,
              colour="blue", size=3, parse=TRUE)
     #ggtitle("5′ UTR vs. 5′ UTR length")
@@ -53,13 +56,13 @@ grid.arrange(p1, p2, p3, ncol=2)
 ```
 
 ```{r length_correlations_table, results='asis'}
-table_04b <- as.data.frame(c(
+table_X5 <- as.data.frame(c(
     cor(df$utr5_length, df$cds_length, method='spearman', use='pairwise.complete.obs'),
     cor(df$utr3_length, df$cds_length, method='spearman', use='pairwise.complete.obs'),
     cor(df$utr5_length, df$utr3_length, method='spearman', use='pairwise.complete.obs')
 ))
-rownames(table_04b) <- c("5′ UTR vs. CDS", "3′ UTR vs. CDS", "5′ UTR vs. 3′ UTR")
-colnames(table_04b) <- c("Spearman's rho")
+rownames(table_X5) <- c("5′ UTR vs. CDS", "3′ UTR vs. CDS", "5′ UTR vs. 3′ UTR")
+colnames(table_X5) <- c("Spearman's rho")
 
-xkable(table_04b, caption='**Table 4b**: Percent genes containing N or more reads mapping to the specified feature.')
+xkable(table_X5, caption='**Table X5**: Spearman correlation of feature lengths.')
 ```

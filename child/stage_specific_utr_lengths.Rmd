@@ -12,18 +12,18 @@ utr3_summary <- utr3_stats %>%
 	group_by(stage) %>% 
 	summarise(median=median(length, na.rm=TRUE))
 
-table_02 <- cbind(
+table_X4 <- cbind(
 	stage=stages,
 	utr5=(utr5_summary %>% filter(stage != 'combined'))$median,
 	utr3=(utr3_summary %>% filter(stage != 'combined'))$median
 )
-colnames(table_02) <- c('stage', "5′ UTR", "3′ UTR")
+colnames(table_X4) <- c('stage', "5′ UTR", "3′ UTR")
 
-xkable(table_02, caption='**Table 2**: Stage-specific UTR lengths.')
+xkable(table_X4, caption='**Table X4**: Stage-specific UTR lengths.')
 ```
 
 
-```{r figure_S01, warning=FALSE, fig.cap="**Figure S1** Distribution of 5' and 3' UTR lengths across developmental stages"}
+```{r figure_S1_stage_specific_utr_lengths, warning=FALSE, fig.cap="**Figure S1** Distribution of 5' and 3' UTR lengths across developmental stages"}
 # 5' UTR
 p1 <- ggplot(utr5_stats %>% filter(stage !='combined'), aes(x=length, group=stage, fill=stage)) + 
        geom_histogram(binwidth=20, colour=CONFIG$stroke) +
@@ -40,6 +40,7 @@ p2 <- ggplot(utr3_stats %>% filter(stage !='combined'), aes(x=length, group=stag
        scale_fill_manual(values=CONFIG$colors[1:length(CONFIG$stages)]) +
        xlim(0, 1500) +
        labs(x="3′ UTR length (nt)") +
+       theme(axis.title.y=element_blank()) +
        facet_grid(stage ~.) +
        theme(strip.background=element_blank(), strip.text.y=element_blank())
 

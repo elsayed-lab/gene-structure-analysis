@@ -1,5 +1,28 @@
 ```{r settings}
 #
+# v2.6
+# ----
+# - Table/figure numbering updates.
+# 
+# v2.5
+# ----
+# - Figure tweaks and table/figure numbering and caption updates.
+#
+# v2.4
+# ----
+# - Added T. cruzi sylvio comparison section
+# - Switched to log scale for size/color for figure 3, hiding genes with site
+#   switches that are 5nt or less apart.
+# - Renamed table 2 -> table 1
+#
+# v2.3
+# ----
+# - Relabeling figures and tables; removing unused ones.
+# - Figure 3 histograms modified so that only canonical vs. canonical and
+#   non-canonical vs. non-canonical distances are displayed.
+# - Primary to secondary (PtoS) ratio included in alt. splicing /
+#   polyadenylation site plots.
+#
 # v2.2
 # ----
 # - Figure and table tweaks.
@@ -46,7 +69,7 @@ library('org.TcCLB.esmer.tritryp.db')
 orgdb <- get('org.TcCLB.esmer.tritryp.db')
 
 # Analysis version
-analysis_version <- '2.2'
+analysis_version <- '2.6'
 
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
@@ -159,8 +182,8 @@ CONFIG <- list(
     'type_filter_string' = 'rRNAencoding|snRNAencoding|snoRNAencoding|tRNAencoding',
 
     # Minimum number of reads for UTR to be used for analysis
-    'min_read_support_5utr'   = 3,
-    'min_read_support_3utr'   = 3,
+    'min_read_support_5utr'   = 5,
+    'min_read_support_3utr'   = 5,
 
     # Number of reads mapped
     'reads_mapped_total'    = file.path(input_dir, 'S01_num_reads_total.csv'),

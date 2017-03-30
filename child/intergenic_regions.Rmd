@@ -5,10 +5,10 @@
 intergenic_lengths <- (intercds_regions %>% 
     filter(stage == 'combined'))$intergenic_length
 
-table_05 <- data.frame(length=c(min(intergenic_lengths), mean(intergenic_lengths),
+table_X6 <- data.frame(length=c(min(intergenic_lengths), mean(intergenic_lengths),
                           median(intergenic_lengths), max(intergenic_lengths)))
-rownames(table_05) <- c('min', 'mean', 'median', 'max')
-xkable(t(table_05), caption='**Table 5** Intergenic length statistics.')
+rownames(table_X6) <- c('min', 'mean', 'median', 'max')
+xkable(t(table_X6), caption='**Table X6** Intergenic length statistics.')
 ```
 
 ```{r, results='asis'}
