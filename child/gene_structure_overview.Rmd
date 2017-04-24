@@ -102,5 +102,5 @@ table_S5 <- data.frame(
 # GC richness
 table_S5 <- rbind(table_S5, GC=table_S5[2,] + table_S5[3,])
 
-kable(table_S5, caption="**Table S5** Median GC- and CT-richness for gene features.")
+xkable(table_S5, caption="**Table S5** Median GC- and CT-richness for gene features.")
 ```

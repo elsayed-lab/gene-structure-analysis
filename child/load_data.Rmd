@@ -76,6 +76,9 @@ protein_coding <- gene_types$GID[gene_types$TYPE == 'proteincoding']
 
 genes <- genes[genes$ID %in% protein_coding]
 
+# for convenience, create a data frame with gene ids and descriptions
+gene_info <- data.frame(gene=genes$ID, description=genes$description)
+
 # remaining gene ids
 gene_ids <- genes$ID
 

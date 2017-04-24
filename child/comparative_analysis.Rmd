@@ -28,20 +28,19 @@ tb_median_cds <- median(width(tb_genes))
 lm_median_cds <- 1269
 ```
 
-```{r figure_X19_tritryp_gene_structure, fig.height=600/192, fig.width=1600/192, dev=c(opts_chunk$get('dev'), 'svglite'), fig.cap='**Figure X19** TriTryp gene structure comparison'}
-# create a matrix containing feature lengths for T. cruzi, T. brucei, and 
-# L. major
-#
-# Feature order:
-#
-# - CDS
-# - 3'UTR
-# - Poly(A)-Polypyrimidine tract gap
-# - Polypyrimidine tract
-# - SL-Polypyrimidine tract gap
-# - 5'UTR
-# - CDS
-#
+Feature lengths for T. cruzi, T. brucei, and L. major.
+
+From left to right:
+
+- CDS
+- 3'UTR
+- Poly(A)-Polypyrimidine tract gap
+- Polypyrimidine tract
+- SL-Polypyrimidine tract gap
+- 5'UTR
+- CDS
+
+```{r figure_X19_tritryp_gene_structure, fig.height=620/192, fig.width=1600/192, dev=c(opts_chunk$get('dev'), 'svglite'), fig.cap='**Figure X19** TriTryp gene structure comparison'}
 tcruzi_lengths <- c(median_cds, median_3utr,
                     median(polypyr_combined$polya_dist), median_ppt,
                     median(polypyr_combined$sl_dist), median_5utr, median_cds)
@@ -58,17 +57,15 @@ dat <- cbind(`T. brucei`=tbrucei_lengths, `T. cruzi`=tcruzi_lengths,
 
 # plot properties
 horizontal_pad <- 100
-gene_width <- 40
-gene_margin <- 10
-#plot_width <- max(colSums(dat)) + (2 * horizontal_pad)
-#plot_height <- (3 * gene_width) + (4 * gene_margin)
-plot_width <- 1600
-plot_height <- 160
+gene_width <- 180
+gene_margin <- 20
+plot_width <- max(colSums(dat)) + (2 * horizontal_pad)
+plot_height <- (3 * gene_width) + (4 * gene_margin)
 
 #
 # Plot a single entry in a comparative gene structure plot
 #
-plot_multigene_structure <- function(dat, i, plot_width, plot_height,
+plot_gene_structure <- function(dat, i, plot_width, plot_height,
                                      gene_width, gene_margin, horizontal_pad) {
     # cds
     x0 <- (plot_width - colSums(dat)[i]) / 2
@@ -98,21 +95,23 @@ plot_multigene_structure <- function(dat, i, plot_width, plot_height,
 }
 
 # create plot
-plot(c(0, plot_width), c(0, plot_height * 3), type='n', 
-     xlab='', ylab='', xaxt='n', yaxt='n')
+#plot(c(0, plot_width), c(0, plot_height * 3), type='n', 
+plot(c(0, plot_width), c(0, plot_height), type='n', 
+     xlab='', ylab='', xaxt='n', yaxt='n', mar=c(4, 12, 1, 1))
 
-plot_multigene_structure(dat, 1, plot_width, plot_height, gene_width,
+plot_gene_structure(dat, 1, plot_width, plot_height, gene_width,
                          gene_margin, horizontal_pad)
-plot_multigene_structure(dat, 2, plot_width, plot_height, gene_width,
+plot_gene_structure(dat, 2, plot_width, plot_height, gene_width,
                          gene_margin, horizontal_pad)
-plot_multigene_structure(dat, 3, plot_width, plot_height, gene_width,
+plot_gene_structure(dat, 3, plot_width, plot_height, gene_width,
                          gene_margin, horizontal_pad)
 
 ytick1 <- gene_margin + (gene_width / 2)
 ytick2 <- ytick1 + gene_margin + gene_width
 ytick3 <- ytick2 + gene_margin + gene_width
 
-axis(2, labels=colnames(dat), at=c(ytick1, ytick2, ytick3), tick=FALSE)
+axis(2, labels=colnames(dat), at=c(ytick1, ytick2, ytick3), tick=FALSE,
+     cex.axis=0.75, las=1)
 ```
 
 ```{r table_1}
@@ -122,5 +121,5 @@ rownames(table_1) <- c('CDS', "3' UTR", 'Poly(A) - PolyPy distance', 'PolyPy tra
 
 # reorder columns and display
 table_1 <- table_1[c(6,1,2,3,4,5),]
-kable(table_1, caption='**Table 1** TriTryp comparative gene structure.')
+xkable(table_1, caption='**Table 1** TriTryp comparative gene structure.')
 ```

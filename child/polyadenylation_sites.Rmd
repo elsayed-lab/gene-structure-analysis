@@ -39,7 +39,7 @@ primary_site_genes <- (polya_sites_combined %>% filter(type == 'primary'))$gene
 polya_sites_combined <- polya_sites_combined[polya_sites_combined$gene %in% primary_site_genes,]
 ```
 
-```{r table_X9, results='asis'}
+```{r table_X10, results='asis'}
 # total number of sites and number of primary sites
 num_total <- nrow(polya_sites_combined)
 num_primary <- nrow(polya_sites_combined %>% filter(type == 'primary'))
@@ -55,10 +55,10 @@ alt_site_props <- polya_sites_combined %>%
     group_by(polya_site) %>% 
     summarize(alternative=round((n() / num_alternative) * 100, 2))
 
-table_X9 <- merge(primary_site_props, alt_site_props, by='polya_site') %>%
+table_X10 <- merge(primary_site_props, alt_site_props, by='polya_site') %>%
     arrange(desc(primary))
-colnames(table_X9) <- c('Polyadenylation sequence', 'Primary site', 'Minor site')
-kable(table_X9, caption='**Table X9** Polyadenylation site dinucleotide sequence frequencies for primary and alternative sites.')
+colnames(table_X10) <- c('Polyadenylation sequence', 'Primary site', 'Minor site')
+kable(table_X10, caption='**Table X10** Polyadenylation site dinucleotide sequence frequencies for primary and alternative sites.')
 ```
 
 ```{r, figure_X7_polya_site_sequence_composition, fig.cap='**Figure X7** Sequence composition of primary and alternative Poly(A) acceptor sites'}
@@ -130,10 +130,10 @@ ggplot(polya_dists, aes(x=dist, fill=orientation)) +
     geom_histogram(binwidth=20, center=10, color='white') +
     xlim(-1000, 1000)
 
-table_X10 <- polya_dists %>% 
+table_X11 <- polya_dists %>% 
     group_by(orientation) %>%
     summarize(number=n(), proportion=n() / nrow(polya_dists))
-kable(table_X10, caption='**Table X10** Distribution of upstream and downstream alternative polyadenylation sites')
+kable(table_X11, caption='**Table X11** Distribution of upstream and downstream alternative polyadenylation sites')
 
 cat(sprintf('\n-%% within 20nt: **%0.2f**\n', sum(abs(polya_dists$dist) <= 20) / nrow(polya_dists) * 100))
 cat(sprintf('\n-%% within 100nt: **%0.2f**\n', sum(abs(polya_dists$dist) <= 100) / nrow(polya_dists) * 100))
@@ -169,7 +169,7 @@ for (stage in stages) {
     plts[[stage]] <- ggplot(polya_dists, aes(x=dist, fill=orientation)) + 
         geom_histogram(binwidth=20, center=10, color='white') +
         theme(axis.title.y=element_blank(), plot.title=element_text(hjust=0)) + 
-        ggtitle(toupper(letters[i])) + 
+        ggtitle(sprintf("%s. %s", toupper(letters[i]), stage)) + 
         xlim(-1000, 1000)
 
     i <- i + 1

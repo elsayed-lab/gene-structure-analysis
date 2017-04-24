@@ -18,6 +18,44 @@ table_X3 <- gene_structure_summary(gene_structure_lengths %>% select(-gene))
 xkable(table_X3, caption='**Table X3** CDS and UTR length summary statistics.')
 ```
 
+#### SL sites
+
+```{r table_S2}
+# create table S2 and reorder so that combined sheet comes first
+table_S2 <- sl_sites[c('combined', CONFIG$stages)]
+
+i <- 1
+
+for (stage in names(table_S2)) {
+    # sort each sheet by gene id
+    table_S2[[stage]] <- table_S2[[stage]] %>% arrange(gene)
+
+    # show a preview of the table (full table is very long)
+    caption <- sprintf('**Table S2%s**: Coordinates for all detected trans-splicing acceptor sites (%s: First 10 entries shown).', letters[i], stage)
+    xkable(table_S2[[stage]], caption=caption)
+    i <- i + 1
+}
+```
+
+#### Poly(A) sites
+
+```{r table_S3}
+# create table S3 and reorder so that combined sheet comes first
+table_S3 <- polya_sites[c('combined', CONFIG$stages)]
+
+i <- 1
+
+for (stage in names(table_S3)) {
+    # sort each sheet by gene id
+    table_S3[[stage]] <- table_S3[[stage]] %>% arrange(gene)
+
+    # show a preview of the table (full table is very long)
+    caption <- sprintf('**Table S3%s**: Coordinates for all detected polyadenylation sites (%s: First 10 entries shown).', letters[i], stage)
+    xkable(table_S3[[stage]], caption=caption)
+    i <- i + 1
+}
+```
+
 ### Three-way tritryp Orthologs
 
 Below, we report the statistics when considering only those genes shared by 

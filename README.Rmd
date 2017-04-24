@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi 2.6)
+title: Trypanosome Gene Structure Analysis (T. cruzi 3.0)
 author: Keith Hughitt
 output:
   html_document:
@@ -78,6 +78,7 @@ opts_knit$get("rmarkdown.pandoc.to")
 library('GenomicRanges')
 library('Biostrings')
 library('dynamicTreeCut')
+library('DT')
 library('rtracklayer')
 library('edgeR')
 library('ggplot2')
@@ -92,6 +93,7 @@ library('dplyr')
 library('readr')
 library('viridis')
 library('msa')
+library('printr')
 library('seqLogo')
 library('stringdist')
 library('tibble')
@@ -206,42 +208,44 @@ for (table_name in ls()[grepl('^table_S?[0-9]', ls())]) {
     if (table_name %in% c('table_dir', 'table_name')) {
         next
     }
-    filename <- sprintf("%s.csv", table_name)
+    message(sprintf("Saving %s", table_name))
 
-    # write table to file
-    write.csv(format(get(table_name), digits=3), 
-              file=file.path(table_dir, filename))
+    # Retrieve variable associated with table
+    tbl_ <- get(table_name)
+
+    # For single tables, save as CSV
+    if (is.matrix(tbl_) || is.data.frame(tbl_)) {
+        filename <- sprintf("%s.csv", table_name)
+
+        # write table to file
+        write.csv(format(tbl_, digits=3), 
+                file=file.path(table_dir, filename))
+    } else {
+        # Otherwise, if multiple tables stored in a list, save as XLS with
+        # separate sheets for each table
+        filename <- sprintf("%s.xlsx", table_name)
+        xls_filepath <- file.path(table_dir, filename)
+
+        sheet_names <- names(tbl_)
+
+        write.xlsx(as.data.frame(tbl_[[sheet_names[1]]]), file=xls_filepath,
+                   sheetName=sheet_names[1], row.names=FALSE)
+
+        for (sheet in sheet_names[2:length(tbl_)]) {
+            # free up Java memory on each loop iteration
+            # http://stackoverflow.com/questions/21937640/handling-java-lang-outofmemoryerror-when-writing-to-excel-from-r
+            .jcall("java/lang/System", method = "gc")
+
+            write.xlsx(as.data.frame(tbl_[[sheet]]), file=xls_filepath,
+                       sheetName=sheet, row.names=FALSE)
+        }
+    }
 }
 
 # drop site identifiers for all tables, except for the 'combined' one
 for (stage in CONFIG$stages) {
     sl_sites[[stage]] <- sl_sites[[stage]] %>% select(-site)
     polya_sites[[stage]] <- polya_sites[[stage]] %>% select(-site)
-}
-```
-
-```{r include=FALSE, cache=TRUE, autodep=TRUE}
-# create excel spreadsheets
-sl_xlsx <- file.path(table_dir, 'table_S02.xlsx')
-polya_xlsx <- file.path(table_dir, 'table_S03.xlsx')
-
-write.xlsx(sl_sites$combined %>% arrange(gene), 
-           file=sl_xlsx, sheetName="combined",
-           row.names=FALSE)
-write.xlsx(polya_sites$combined %>% arrange(gene), 
-           file=polya_xlsx, sheetName="combined",
-           row.names=FALSE)
-
-for (stage in CONFIG$stages) {
-    # free up Java memory on each loop iteration
-    # http://stackoverflow.com/questions/21937640/handling-java-lang-outofmemoryerror-when-writing-to-excel-from-r
-    .jcall("java/lang/System", method = "gc")
-    write.xlsx(sl_sites[[stage]] %>% arrange(gene), 
-               file=sl_xlsx, sheetName=stage, append=TRUE,
-               row.names=FALSE)
-    write.xlsx(polya_sites[[stage]] %>% arrange(gene), 
-               file=polya_xlsx, sheetName=stage, append=TRUE,
-               row.names=FALSE)
 }
 ```
 
@@ -254,8 +258,9 @@ for (gff in CONFIG$site_gffs) {
     file.copy(gff, file.path(data_dir, basename(gff)))
 }
 
-# copy static alternative sl site figure (S7)
-file.copy('static/Figure_S7.png', file.path(CONFIG$output_dir, 'figure'))
+# copy static alternative sl site figures (4 & S6)
+file.copy('static/Figure_S6.png', file.path(CONFIG$output_dir, 'figure'))
+file.copy('static/Figure_4.png', file.path(CONFIG$output_dir, 'figure'))
 
 # copy intra-cds sl sites file to output dir
 file.copy('input/tcruzi_ystrain/XX_intracds_orfs.csv.gz', file.path(CONFIG$output_dir, 'table'))

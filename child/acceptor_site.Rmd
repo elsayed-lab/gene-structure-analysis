@@ -264,7 +264,11 @@ kable(table_X8, caption='**Table X8** Average distance between primary and alter
 
 ## Preceeding nucleotide for canonical SL sites
 
-```{r, table_S7}
+This table includes the percentage usage for each trinucleotide XAG acceptor
+site motif: CAG, AAG, TAG, and GAG, separated by primary and up- or down-stream
+alternative sites.
+
+```{r, table_X9}
 # primary site proportions (including upstream nucleotide)
 primary_site_props <- canonical_sl_sites %>%
     filter(type == 'primary') %>%
@@ -285,15 +289,15 @@ alt_site_props <- canonical_sl_sites %>%
     arrange(desc(primary)) %>%
     spread(orientation, primary)
 
-table_S7 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
-colnames(table_S7) <- c('site', 'Primary', 'Alternative downstream', 
+table_X9 <- merge(primary_site_props, alt_site_props, by='acceptor_site_3nt')
+colnames(table_X9) <- c('site', 'Primary', 'Alternative downstream', 
                          'Alternative upstream')
-table_S7 <- table_S7 %>% 
+table_X9 <- table_X9 %>% 
     arrange(desc(Primary)) %>%
     column_to_rownames('site')
-table_S7 <- round(table_S7 * 100, 2)
-table_S7[is.na(table_S7)] <- 0
+table_X9 <- round(table_X9 * 100, 2)
+table_X9[is.na(table_X9)] <- 0
 
-kable(table_S7, caption='**Table S7** Frequency of preceeding nucleotide for primary and alternative canonical trans-splicing acceptor sites.')
+kable(table_X9, caption='**Table X9** Frequency of preceeding nucleotide for primary and alternative canonical trans-splicing acceptor sites.')
 ```
 

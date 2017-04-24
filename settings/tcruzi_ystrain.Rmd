@@ -1,8 +1,33 @@
 ```{r settings}
 #
+# v3.0
+# ----
+# - Table and figure reorganization:
+#   - Table S7 -> X9
+#   - New Table S7 intra-CDS SL sites
+#   - Added tables S8 and S9 (interesting SL/Poly(A) site-switch events)
+#   - Numbering for other tables modified accordingly.
+#
+# v2.8
+# ----
+# - Fixed a bug resulting in only a subset of all possible pairwise UTR length
+# - plots to be shown.
+# - Minimum number of reads required to be shown in alt site usage plots for 
+#   3' UTR changed from 5 to 3.
+#
+# v2.7
+# ----
+# - Removed redundant alt splicing / polyadenylation plots
+# - Add gene desriptions to alt site table output
+#
 # v2.6
 # ----
 # - Table/figure numbering updates.
+# - Figure S7 renamed S6
+# - Genes with ptos ratios < 1 excluded from stage-specific site-switching
+#   plots
+# - Reverted to linear color and size scaling for site-switching plots, but
+#   clipping upper 5% of values to improve dynamic range.
 # 
 # v2.5
 # ----
@@ -69,7 +94,7 @@ library('org.TcCLB.esmer.tritryp.db')
 orgdb <- get('org.TcCLB.esmer.tritryp.db')
 
 # Analysis version
-analysis_version <- '2.6'
+analysis_version <- '3.0'
 
 # Input and output data used from previous analyses
 utr_analysis_basedir <- file.path(Sys.getenv('RESEARCH'), '2016',
@@ -182,8 +207,8 @@ CONFIG <- list(
     'type_filter_string' = 'rRNAencoding|snRNAencoding|snoRNAencoding|tRNAencoding',
 
     # Minimum number of reads for UTR to be used for analysis
-    'min_read_support_5utr'   = 5,
-    'min_read_support_3utr'   = 5,
+    'min_read_support_5utr'   = 3,
+    'min_read_support_3utr'   = 3,
 
     # Number of reads mapped
     'reads_mapped_total'    = file.path(input_dir, 'S01_num_reads_total.csv'),

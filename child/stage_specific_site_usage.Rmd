@@ -19,16 +19,31 @@ hits_level2 <- c()
 hits_level3 <- c()
 hits_level4 <- c()
 
+sl_plots <- list()
+
+# list to store pairwise comparison tables
+table_S8 <- list()
+
+i <- 1
+
 for (s1_name in stages) {
     for (s2_name in stages) {
         # skip combined site dataframes and self comparisons
-        if (s1_name == 'combined' || s2_name == 'combined' || s1_name == s2_name) {
+        comparison <- paste(sort(c(s1_name, s2_name)), collapse='_vs_')
+
+        # skip combined site dataframes, self comparisons, and previously
+        # plotted pairs of stages
+        if (s1_name == 'combined' || s2_name == 'combined' || 
+            s1_name == s2_name || comparison %in% names(sl_plots)) {
             next
         }
-        
+
         # create cross-stage dataframe and plot UTRs with variables lengths
         # across developmental stage
         dat <- create_utr_comparison_df(sl_sites, s1_name, s2_name)
+
+        # Store unfiltered table results for output
+        table_S8[[comparison]] <- dat
 
         # don't show genes with site-switches < 5nt
         dat <- dat %>% filter(len_diff > 5)
@@ -39,12 +54,8 @@ for (s1_name in stages) {
         dat <- dat %>% filter(min_num_reads >= CONFIG$min_read_support_5utr)
         hits_level2 <- unique(c(hits_level2, dat$gene))
 
-        cat('\n')
-
         # plot utr lengths across stages
-        print(plot_diff_utrs(dat, 'SL'))
-
-        cat('\n')
+        sl_plots[[comparison]] <- plot_diff_utrs(dat, 'SL')
 
         ## criteria
         dat <- dat %>% filter(s1_ptos >= 3 & s2_ptos >= 3)
@@ -54,11 +65,20 @@ for (s1_name in stages) {
         dat <- dat %>% filter(len_diff > 20) 
         hits_level4 <- unique(c(hits_level4, dat$gene))
 
+        # add gene description and print list of interesting hits
+        dat <- merge(dat, gene_info, by='gene')
+
+        # display table of interesting hits
+        caption <- sprintf("**Table S8%s** List of potentially interesting trans-splicing acceptor site switches comparing %s and %s.", 
+                           letters[i], s1_name, s2_name)
+
         dat %>%
             filter(min_num_reads >= 10) %>%
             arrange(desc(min_num_reads)) %>%
-            kable %>%
+            xkable(caption=caption) %>%
             print
+
+        i <- i + 1
     }
 }
 
@@ -71,29 +91,64 @@ cat(sprintf('- Number where acceptor sites used are >20nt apart: %d\n', length(h
 ## Differences in polyadenylation site usage across developmental stage
 
 ```{r figure_X4_stage-specific_3utr_lengths, results='asis', fig.cap="**Figure X4** 3′ UTR length across developmental stage.", warning=FALSE}
+polya_plots <- list()
+
+# list to store pairwise comparison tables
+table_S9 <- list()
+
 for (s1_name in stages) {
     for (s2_name in stages) {
         # skip combined site dataframes and self comparisons
-        if (s1_name == 'combined' || s2_name == 'combined' || s1_name == s2_name) {
+        comparison <- paste(sort(c(s1_name, s2_name)), collapse='_vs_')
+
+        # skip combined site dataframes, self comparisons, and previously
+        # plotted pairs of stages
+        if (s1_name == 'combined' || s2_name == 'combined' || 
+            s1_name == s2_name || comparison %in% names(polya_plots)) {
             next
         }
-        
+
         # create cross-stage dataframe and plot UTRs with variables lengths
         # across developmental stage
         dat <- create_utr_comparison_df(polya_sites, s1_name, s2_name)
+
+        # Store unfiltered table results for output
+        table_S9[[comparison]] <- dat
+
+        # Filter out sites with low read support
         dat <- dat %>% filter(min_num_reads >= CONFIG$min_read_support_3utr)
 
-        cat('\n')
+        polya_plots[[comparison]] <- plot_diff_utrs(dat, 'Poly(A)')
 
-        print(plot_diff_utrs(dat, 'Poly(A)'))
+        ## criteria
+        dat <- dat %>% filter(s1_ptos >= 3 & s2_ptos >= 3)
+        hits_level3 <- unique(c(hits_level3, dat$gene))
 
-        cat('\n')
+        # add gene description and print list of interesting hits
+        dat <- merge(dat, gene_info, by='gene')
 
-        # genes with stage-specific site switching
-        dat %>% filter(s1_ptos >= 3 & s2_ptos >= 3 & len_diff >= 20 & min_num_reads >= 10) %>%
+        # display table of interesting hits
+        caption <- sprintf("**Table S9%s** List of potentially interesting polyadenylation site switches comparing %s and %s.", 
+                           letters[i], s1_name, s2_name)
+
+        dat %>%
+            filter(len_diff >= 20 & min_num_reads >= 10) %>%
             arrange(desc(min_num_reads)) %>%
-            kable %>%
+            xkable(caption=caption) %>%
             print
+
+        cat('\n')
     }
+}
+```
+
+## Stage-specific SL and Poly(A) site switch plots
+
+Below, scatterplots of alternative trans-splicing and polyadenylation events
+are shown for each pair of developmental stages.
+
+```{r figure_3, warning=FALSE}
+for (comparison in names(sl_plots)) {
+    grid.arrange(sl_plots[[comparison]], polya_plots[[comparison]], ncol=2)
 }
 ```

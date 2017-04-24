@@ -1,15 +1,15 @@
 ## Polypyrimidine length statistics
 
 ```{r results='asis'}
-# Table X11: Polypyrimidine tract lengths
+# Table X12: Polypyrimidine tract lengths
 polypyrimidine_lengths <- polypyr_combined$length
 
-table_X11 <- data.frame(length=c(min(polypyrimidine_lengths),
+table_X12 <- data.frame(length=c(min(polypyrimidine_lengths),
                                 mean(polypyrimidine_lengths),
                                 median(polypyrimidine_lengths),
                                 max(polypyrimidine_lengths)))
-rownames(table_X11) <- c('min', 'mean', 'median', 'max')
-xkable(t(table_X11), caption='**Table X11** Polypyrimidine tract length statistics.')
+rownames(table_X12) <- c('min', 'mean', 'median', 'max')
+xkable(t(table_X12), caption='**Table X12** Polypyrimidine tract length statistics.')
 ```
 
 ## Median distance from SL/Poly(A) sites
