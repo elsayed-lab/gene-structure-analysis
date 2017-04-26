@@ -266,6 +266,8 @@ file.copy('static/Figure_4.png', file.path(CONFIG$output_dir, 'figure'))
 file.copy('input/tcruzi_ystrain/XX_intracds_orfs.csv.gz', file.path(CONFIG$output_dir, 'table'))
 
 # save rendered output
+message(opts_knit$get("rmarkdown.pandoc.to"))
+
 if (opts_knit$get("rmarkdown.pandoc.to") == 'latex') {
     system(sprintf('(sleep 30 && cp -r README.pdf %s) &', CONFIG$output_dir))
 } else {

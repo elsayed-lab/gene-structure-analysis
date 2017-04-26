@@ -147,7 +147,7 @@ for (s1_name in stages) {
 Below, scatterplots of alternative trans-splicing and polyadenylation events
 are shown for each pair of developmental stages.
 
-```{r figure_3, warning=FALSE}
+```{r figure_3, warning=FALSE, fig.width=2160/192, fig.height=1080/192, dpi=192}
 for (comparison in names(sl_plots)) {
     grid.arrange(sl_plots[[comparison]], polya_plots[[comparison]], ncol=2)
 }

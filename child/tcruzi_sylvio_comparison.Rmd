@@ -109,49 +109,45 @@ sylvio_5utr_stats <- utr5_stats_combined_sylvio %>%
                                sylvio_num_reads=num_reads) %>% 
                         filter(gene %in% common_genes)
 
-dat <- merge(ystrain_5utr_stats, sylvio_5utr_stats, by='gene')
+table_S10 <- merge(ystrain_5utr_stats, sylvio_5utr_stats, by='gene') %>%
+    mutate(min_num_reads=pmin(ystrain_num_reads, sylvio_num_reads),
+           length_diff=abs(ystrain_length - sylvio_length))
 
 # number of genes compared
 cat(sprintf("\n- Number of genes with 5' UTRs detected in both Y strain and sylvio: %d", length(common_genes)))
 
 # median 5' UTR length for each strain
 cat(sprintf("\n- Median 5' UTR length (Y strain): %g",
-            median(dat$ystrain_length)))
+            median(table_S10$ystrain_length)))
 cat(sprintf("\n- Median 5' UTR length (Sylvio): %g\n",
-            median(dat$sylvio_length)))
+            median(table_S10$sylvio_length)))
+
+# ratio of genes with same site across strains
+num_same <- sum(table_S10$length_diff == 0)
+num_diff <- nrow(table_S10) - num_same
+pct_diff <- num_diff / nrow(table_S10)
+
+cat(sprintf("\n    - %d/%d (%0.2f%%) genes with different trans-splicing acceptor site usage", 
+            num_diff, nrow(table_S10), pct_diff))
+num_diff_five_plus <- sum(table_S10$length_diff >= 5)
+
+pct_diff_five_plus <- num_diff_five_plus / nrow(table_S10)
+cat(sprintf("\n    - %d/%d (%0.2f%%) genes with different trans-splicing acceptor site usage (5+ reads)", 
+            num_diff_five_plus, nrow(table_S10), pct_diff_five_plus))
 
 # compute correlation across strains
-cat(sprintf('\n- Pearson correlation: %0.3f', cor(dat$ystrain_length, dat$sylvio_length)))
-cat(sprintf('\n- Spearman correlation: %0.3f\n', cor(dat$ystrain_length, dat$sylvio_length, method='spearman')))
+cat(sprintf('\n- Pearson correlation: %0.3f', cor(table_S10$ystrain_length, table_S10$sylvio_length)))
+cat(sprintf('\n- Spearman correlation: %0.3f\n', cor(table_S10$ystrain_length, table_S10$sylvio_length, method='spearman')))
 
-# hide genes with same length across T. cruzi strains 
-dat <- dat %>% 
-    mutate(min_num_reads=pmin(ystrain_num_reads, sylvio_num_reads),
-           length_diff = abs(ystrain_length - sylvio_length)) %>%
-    filter(length_diff > 20 & min_num_reads > 5)
+# add gene description and print list of interesting hits
+table_S10 <- merge(table_S10, gene_info, by='gene')
 
-# plot 5' UTR lengths
-ggplot(dat, aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +
-    geom_point() +
-    scale_colour_gradient2(limits=c(NA, quantile(dat$min_num_reads, 0.95)),
-                           low="black", mid="blue", high="red", na.value='red') +
-    scale_x_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
-    scale_y_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
-    #geom_smooth(method='rlm') +
-    geom_abline(intercept=0, slope=1, color='red') +
-    xlab("T. cruzi Y strain 5' UTR length") +
-    ylab("T. cruzi Sylvio 5' UTR length")
 ```
 
 ```{r}
 # Print table of interesting hits
-table_X13 <- dat %>% filter(abs(ystrain_length - sylvio_length) > 100 &
-                            min_num_reads > 10)
-
-# add gene description and print list of interesting hits
-table_X13 <- merge(table_X13, gene_info, by='gene')
-
-kable(table_X13, caption="**Table X13** Genes with significantly differing 5' UTR lengths between T. cruzi strains")
+xkable(table_S10 %>% filter(length_diff > 100 &  min_num_reads > 10), 
+       caption="**Table S10** Genes with significantly differing 5' UTR lengths between T. cruzi strains (preview)")
 ```
 
 ### 3' UTR length conservation
@@ -169,29 +165,65 @@ sylvio_3utr_stats <- utr3_stats_combined_sylvio %>%
                                sylvio_num_reads=num_reads) %>% 
                         filter(gene %in% common_genes)
 
-dat <- merge(ystrain_3utr_stats, sylvio_3utr_stats, by='gene')
+table_S11 <-  merge(ystrain_3utr_stats, sylvio_3utr_stats, by='gene') %>%
+    mutate(min_num_reads=pmin(ystrain_num_reads, sylvio_num_reads),
+           length_diff = abs(ystrain_length - sylvio_length))
 
 # number of genes compared
 cat(sprintf("\n- Number of genes with 3' UTRs detected in both Y strain and sylvio: %d", length(common_genes)))
 
 # median 3' UTR length for each strain
-cat(sprintf("\n- Median 3' UTR length (Y strain): %g",
-            median(dat$ystrain_length)))
-cat(sprintf("\n- Median 3' UTR length (Sylvio): %g\n",
-            median(dat$sylvio_length)))
+cat(sprintf("\n    - Median 3' UTR length (Y strain): %g",
+            median(table_S11$ystrain_length)))
+cat(sprintf("\n    - Median 3' UTR length (Sylvio): %g",
+            median(table_S11$sylvio_length)))
+
+# ratio of genes with same site across strains
+num_same <- sum(table_S11$length_diff == 0)
+num_diff <- nrow(table_S11) - num_same
+pct_diff <- num_diff / nrow(table_S11)
+
+cat(sprintf("\n    - %d/%d (%0.2f%%) genes with different site usage", 
+            num_diff, nrow(table_S11), pct_diff))
+num_diff_five_plus <- sum(table_S11$length_diff >= 5)
+
+pct_diff_five_plus <- num_diff_five_plus / nrow(table_S11)
+cat(sprintf("\n    - %d/%d (%0.2f%%) genes with different site usage (5+ reads)", 
+            num_diff_five_plus, nrow(table_S11), pct_diff_five_plus))
 
 # compute correlation across strains
-cat(sprintf('\n- Pearson correlation: %0.3f', cor(dat$ystrain_length, dat$sylvio_length)))
-cat(sprintf('\n- Spearman correlation: %0.3f\n', cor(dat$ystrain_length, dat$sylvio_length, method='spearman')))
+cat(sprintf('\n- Pearson correlation: %0.3f', cor(table_S11$ystrain_length, table_S11$sylvio_length)))
+cat(sprintf('\n- Spearman correlation: %0.3f\n', cor(table_S11$ystrain_length, table_S11$sylvio_length, method='spearman')))
 
-# hide genes with same length across T. cruzi strains 
-dat <- dat %>% 
-    mutate(min_num_reads=pmin(ystrain_num_reads, sylvio_num_reads),
-           length_diff = abs(ystrain_length - sylvio_length)) %>%
-    filter(length_diff > 20 & min_num_reads > 5)
+# add gene description and print list of interesting hits
+table_S11 <- merge(table_S11, gene_info, by='gene')
+
+# Print table of interesting hits
+xkable(table_S11 %>% filter(length_diff > 100 & min_num_reads > 10), 
+       caption="**Table S11** Genes with significantly differing 3' UTR lengths between T. cruzi strains (preview)")
+```
+
+### Plot of 5' and 3' UTR lengths across strains
+
+```{r figure_S7, fig.width=2160/192, fig.height=1080/192, dpi=192, fig.cap="**Figure_S7** T. cruzi UTR length conservation across strains"}
+# plot 5' UTR lengths
+p1 <- ggplot(table_S10 %>% filter(length_diff > 20 & min_num_reads > 5), 
+       aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +
+    geom_point() +
+    scale_colour_gradient2(limits=c(NA, quantile(table_S10$min_num_reads, 0.95)),
+                           low="black", mid="blue", high="red", na.value='red') +
+    scale_x_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
+    scale_y_continuous(limits=c(0, 2000), expand=c(0.01, 0.01)) +
+    #geom_smooth(method='rlm') +
+    geom_abline(intercept=0, slope=1, color='red') +
+    xlab("T. cruzi Y strain 5' UTR length") +
+    ylab("T. cruzi Sylvio 5' UTR length") +
+    theme(text=element_text(size=11, family='DejaVu Sans'),
+          legend.justification=c(1,0), legend.position=c(1,0))
 
 # plot 3' UTR lengths
-ggplot(dat, aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +
+p2 <- ggplot(table_S11 %>% filter(length_diff > 20 & min_num_reads > 5), 
+       aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +
     geom_point() +
     scale_colour_gradient2(limits=c(2, 50), low="black", mid="blue", high="red",
                            na.value='red') +
@@ -200,14 +232,9 @@ ggplot(dat, aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +
     #geom_smooth(method='rlm') +
     geom_abline(intercept=0, slope=1, color='red') +
     xlab("T. cruzi Y strain 3' UTR length") +
-    ylab("T. cruzi Sylvio 3' UTR length")
+    ylab("T. cruzi Sylvio 3' UTR length") +
+    theme(text=element_text(size=11, family='DejaVu Sans'),
+          legend.justification=c(1,0), legend.position=c(1,0))
 
-# Print table of interesting hits
-table_X14 <- dat %>% filter(abs(ystrain_length - sylvio_length) > 100 &
-                            min_num_reads > 10)
-
-# add gene description and print list of interesting hits
-table_X14 <- merge(table_X14, gene_info, by='gene')
-
-kable(table_X14, caption="**Table X14** Genes with significantly differing 3' UTR lengths between T. cruzi strains")
+grid.arrange(p1, p2, ncol=2)
 ```

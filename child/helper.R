@@ -229,8 +229,9 @@ plot_diff_utrs <- function(dat, feature_name, clip_upper=0.95) {
         #          aes(s1_len, s2_len, label=gene),
         #          color='#000000', size=4, angle=45, hjust=0, vjust=0) +
         ggtitle(sprintf("%s site usage: %s vs. %s (All genes)", feature_name, s1_name, s2_name)) +
-        theme(text=element_text(size=12, family='DejaVu Sans'),
-            plot.title=element_text(size=rel(1)))
+        theme(text=element_text(size=11, family='DejaVu Sans'),
+              plot.title=element_text(size=rel(1)),
+              legend.justification=c(1,0), legend.position=c(1,0))
 }
 
 #'

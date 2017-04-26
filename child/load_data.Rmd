@@ -45,7 +45,7 @@ RNA-Seq samples, the following two analysis pipelines may be applied sequently:
 
 ```{r load_annotations, warning=FALSE}
 # Load genome sequence and annotations
-gff <- import.gff3(CONFIG$input_gff)
+gff <- import.gff3(con=CONFIG$input_gff)
 fasta <- readDNAStringSet(CONFIG$input_fasta)
 
 # Fix TriTrypDB FASTA names
