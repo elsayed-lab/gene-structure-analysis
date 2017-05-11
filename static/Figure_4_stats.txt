@@ -1,0 +1,60 @@
+1. TcCLB.503899.90
+
+keith@Kore  ~/Dropbox/research/2016/06-gene-structure/01-gene-structure-determination/input/tcruzi_ystrain/sl-min3_polya-min3_mindiff-2
+
+          trypo    epi    ama
+685630    0.44     0      0.49
+685970    0.39     0.5    0.36
+686061    0.11     0.32   0.12
+686068    0.06     0.18   0.03
+
+
+$ zgrep TcCLB.503899.90 tcruzi_infecting_hsapiens_trypomastigote_sl_sorted.gff.gz 
+TcChr29-S	utr_analysis.py	trans_splice_site	685630	685630	16	+	.	ID=TcCLB.503899.90.sl.3;Name=TcCLB.503899.90;seq_dist=48;match_len=48;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	685970	685970	14	+	.	ID=TcCLB.503899.90.sl.2;Name=TcCLB.503899.90;seq_dist=99;match_len=215;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686061	686061	4	+	.	ID=TcCLB.503899.90.sl.4;Name=TcCLB.503899.90;seq_dist=29;match_len=43;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686068	686068	2	+	.	ID=TcCLB.503899.90.sl.1;Name=TcCLB.503899.90;seq_dist=22;match_len=32;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686392	686392	1	+	.	ID=TcCLB.503899.90.sl.5;Name=TcCLB.503899.90;seq_dist=2;match_len=3;description=asparagine synthetase a, putative
+
+$ zgrep TcCLB.503899.90 tcruzi_infecting_hsapiens_epimastigote_sl_sorted.gff.gz  
+TcChr29-S	utr_analysis.py	trans_splice_site	685550	685550	1	+	.	ID=TcCLB.503899.90.sl.6;Name=TcCLB.503899.90;seq_dist=2;match_len=3;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	685629	685629	2	+	.	ID=TcCLB.503899.90.sl.3;Name=TcCLB.503899.90;seq_dist=4;match_len=6;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	685658	685658	1	+	.	ID=TcCLB.503899.90.sl.7;Name=TcCLB.503899.90;seq_dist=3;match_len=3;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	685970	685970	11	+	.	ID=TcCLB.503899.90.sl.5;Name=TcCLB.503899.90;seq_dist=89;match_len=184;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686061	686061	7	+	.	ID=TcCLB.503899.90.sl.4;Name=TcCLB.503899.90;seq_dist=59;match_len=89;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686068	686068	4	+	.	ID=TcCLB.503899.90.sl.2;Name=TcCLB.503899.90;seq_dist=25;match_len=34;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686256	686256	2	+	.	ID=TcCLB.503899.90.sl.1;Name=TcCLB.503899.90;seq_dist=22;match_len=32;description=asparagine synthetase a, putative
+
+$ zgrep TcCLB.503899.90 tcruzi_infecting_hsapiens_amastigote_sl_sorted.gff.gz  
+TcChr29-S	utr_analysis.py	trans_splice_site	685629	685629	1	+	.	ID=TcCLB.503899.90.sl.3;Name=TcCLB.503899.90;seq_dist=2;match_len=3;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	685630	685630	16	+	.	ID=TcCLB.503899.90.sl.5;Name=TcCLB.503899.90;seq_dist=48;match_len=48;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	685970	685970	12	+	.	ID=TcCLB.503899.90.sl.6;Name=TcCLB.503899.90;seq_dist=96;match_len=202;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686061	686061	4	+	.	ID=TcCLB.503899.90.sl.4;Name=TcCLB.503899.90;seq_dist=41;match_len=64;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686068	686068	1	+	.	ID=TcCLB.503899.90.sl.2;Name=TcCLB.503899.90;seq_dist=10;match_len=13;description=asparagine synthetase a, putative
+TcChr29-S	utr_analysis.py	trans_splice_site	686377	686377	1	+	.	ID=TcCLB.503899.90.sl.1;Name=TcCLB.503899.90;seq_dist=3;match_len=3;description=asparagine synthetase a, putative
+
+2. TcCLB.511001.180
+
+          trypo    epi    ama
+187791    0.7      0      0.52
+188122    0.3      0.75   0.48
+188283    0        0.25   0
+
+$ zgrep TcCLB.511001.180 tcruzi_infecting_hsapiens_trypomastigote_sl_sorted.gff.gz
+TcChr38-S	utr_analysis.py	trans_splice_site	187361	187361	1	+	.	ID=TcCLB.511001.180.sl.2;Name=TcCLB.511001.180;seq_dist=6;match_len=8;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	187701	187701	116	+	.	ID=TcCLB.511001.180.sl.3;Name=TcCLB.511001.180;seq_dist=232;match_len=348;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188108	188108	2	+	.	ID=TcCLB.511001.180.sl.4;Name=TcCLB.511001.180;seq_dist=15;match_len=33;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188122	188122	49	+	.	ID=TcCLB.511001.180.sl.1;Name=TcCLB.511001.180;seq_dist=438;match_len=621;description=hypothetical protein, conserved
+
+$ zgrep TcCLB.511001.180 tcruzi_infecting_hsapiens_epimastigote_sl_sorted.gff.gz                                                                                                                                                         2 ↵
+TcChr38-S	utr_analysis.py	trans_splice_site	187701	187701	1	+	.	ID=TcCLB.511001.180.sl.3;Name=TcCLB.511001.180;seq_dist=2;match_len=3;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188107	188107	1	+	.	ID=TcCLB.511001.180.sl.4;Name=TcCLB.511001.180;seq_dist=12;match_len=17;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188108	188108	2	+	.	ID=TcCLB.511001.180.sl.2;Name=TcCLB.511001.180;seq_dist=6;match_len=12;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188122	188122	21	+	.	ID=TcCLB.511001.180.sl.1;Name=TcCLB.511001.180;seq_dist=166;match_len=242;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188283	188283	7	+	.	ID=TcCLB.511001.180.sl.5;Name=TcCLB.511001.180;seq_dist=53;match_len=90;description=hypothetical protein, conserved
+
+$ zgrep TcCLB.511001.180 tcruzi_infecting_hsapiens_amastigote_sl_sorted.gff.gz  
+TcChr38-S	utr_analysis.py	trans_splice_site	187701	187701	59	+	.	ID=TcCLB.511001.180.sl.2;Name=TcCLB.511001.180;seq_dist=118;match_len=177;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188116	188116	2	+	.	ID=TcCLB.511001.180.sl.4;Name=TcCLB.511001.180;seq_dist=18;match_len=22;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188122	188122	56	+	.	ID=TcCLB.511001.180.sl.1;Name=TcCLB.511001.180;seq_dist=466;match_len=667;description=hypothetical protein, conserved
+TcChr38-S	utr_analysis.py	trans_splice_site	188144	188144	2	+	.	ID=TcCLB.511001.180.sl.3;Name=TcCLB.511001.180;seq_dist=27;match_len=31;description=hypothetical protein, conserved

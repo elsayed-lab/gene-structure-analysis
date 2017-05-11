@@ -219,9 +219,9 @@ plot_diff_utrs <- function(dat, feature_name, clip_upper=0.95) {
         geom_abline(slope=1, intercept=-300, color='#666666', lwd=0.5) +
         geom_point() +
         xlab(s1_name) + ylab(s2_name) +
-        scale_color_gradient2(name='Minimum PtoS ratio', low="black", mid="blue", high="red", 
+        scale_color_gradient2(name='Minimum\nPtoS\nratio', low="black", mid="blue", high="red", 
                               limits=c(1, round(quantile(dat$min_ptos, clip_upper))), na.value='red') + 
-        scale_size_continuous(name='Minimum Number of Reads', 
+        scale_size_continuous(name='Minimum\nNumber\nof Reads', 
                               limits=c(NA, round(quantile(dat$min_num_reads, clip_upper)))) +
         scale_x_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) +
         scale_y_continuous(limits=c(0,2000), expand=c(0.01, 0.01)) + 
@@ -231,7 +231,8 @@ plot_diff_utrs <- function(dat, feature_name, clip_upper=0.95) {
         ggtitle(sprintf("%s site usage: %s vs. %s (All genes)", feature_name, s1_name, s2_name)) +
         theme(text=element_text(size=11, family='DejaVu Sans'),
               plot.title=element_text(size=rel(1)),
-              legend.justification=c(1,0), legend.position=c(1,0))
+              legend.justification=c(1,0), legend.position=c(1,0),
+              legend.title=element_text(size=9))
 }
 
 #'

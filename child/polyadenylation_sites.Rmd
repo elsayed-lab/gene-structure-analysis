@@ -95,7 +95,7 @@ seqLogoMod(pwm, xaxis=-50:50, ic.scale=TRUE)
 
 ### Alternative polyadenylation site logo
 
-```{r figure_S4, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S4** Sequence logo for region surrounding alternative poly(A) sites."}
+```{r figure_S5, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S5** Sequence logo for region surrounding alternative poly(A) sites."}
 alt_seqs <- (polya_sites_combined %>% filter(type=='alternative'))$polya_site_win
 
 # for logo purposes, exclude sequences with N's (~1%)
@@ -128,7 +128,8 @@ polya_dists <- data.frame(dist=polya_dists) %>%
 
 ggplot(polya_dists, aes(x=dist, fill=orientation)) + 
     geom_histogram(binwidth=20, center=10, color='white') +
-    xlim(-1000, 1000)
+    xlim(-1000, 1000) +
+    theme(legend.position="none")
 
 table_X11 <- polya_dists %>% 
     group_by(orientation) %>%
@@ -141,7 +142,7 @@ cat(sprintf('\n-%% within 100nt: **%0.2f**\n', sum(abs(polya_dists$dist) <= 100)
 
 ### Stage-dependent
 
-```{r figure_S5_primary_alt_polya_site_dist_stage_specific, results='asis', fig.cap='**Figure S5** Distribution of distances between primary and alternative polyadenylation sites in transcripts from different developmental stages of T. cruzi'}
+```{r figure_S6_primary_alt_polya_site_dist_stage_specific, results='asis', fig.cap='**Figure S6** Distribution of distances between primary and alternative polyadenylation sites in transcripts from different developmental stages of T. cruzi'}
 plts <- list()
 i = 1
 

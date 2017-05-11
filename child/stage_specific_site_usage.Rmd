@@ -148,7 +148,13 @@ Below, scatterplots of alternative trans-splicing and polyadenylation events
 are shown for each pair of developmental stages.
 
 ```{r figure_3, warning=FALSE, fig.width=2160/192, fig.height=1080/192, dpi=192}
-for (comparison in names(sl_plots)) {
-    grid.arrange(sl_plots[[comparison]], polya_plots[[comparison]], ncol=2)
-}
+grid.arrange(sl_plots[["epimastigote_vs_trypomastigote"]], 
+             polya_plots[["epimastigote_vs_trypomastigote"]], ncol=2)
+```
+
+```{r figure_S3, warning=FALSE, figure.width=2160/192, fig.height=2160/192, dpi=192}
+grid.arrange(sl_plots[["amastigote_vs_trypomastigote"]], 
+             polya_plots[["amastigote_vs_trypomastigote"]],
+             sl_plots[["amastigote_vs_epimastigote"]], 
+             polya_plots[["amastigote_vs_epimastigote"]], ncol=2)
 ```

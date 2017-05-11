@@ -76,7 +76,8 @@ sl_summary$type <- factor(sl_summary$type, levels=c('primary', 'alternative'))
 ggplot(sl_summary, aes(reorder(acceptor_site, -num), y=prop, fill=type)) +
     geom_bar(position="dodge", stat='identity') +
     xlab("Acceptor site sequence") + 
-    ylab("Acceptor site motif proportion")
+    ylab("Acceptor site motif proportion") +
+    theme(legend.title=element_blank())
 ```
 
 ## Acceptor site sequence logos
@@ -192,7 +193,7 @@ opts_chunk$set('fig.cap', NULL)
 
 ### Alternative acceptor site logo
 
-```{r figure_S3, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S3** Sequence logo for region surrounding alternative trans-splicing acceptor sites."}
+```{r figure_S4, fig.width=3840/192, fig.height=720/192, dpi=192, fig.cap="**Figure S4** Sequence logo for region surrounding alternative trans-splicing acceptor sites."}
 
 alt_seqs <- (sl_sites_combined %>% filter(type=='alternative'))$acceptor_site_win
 
@@ -230,7 +231,8 @@ ag_dists <- data.frame(dist=ag_dists) %>%
 
 ggplot(ag_dists, aes(x=dist, fill=orientation)) + 
     geom_histogram(binwidth=20, center=10, color='white') +
-    xlim(-1000, 1000)
+    xlim(-1000, 1000) +
+    theme(legend.title=element_blank())
 ```
 
 ```{r, table_X7}
@@ -252,7 +254,8 @@ ag_dists <- data.frame(dist=ag_dists) %>%
 
 ggplot(ag_dists, aes(x=dist, fill=orientation)) + 
     geom_histogram(binwidth=10, center=5, color='white') +
-    xlim(-1000, 1000)
+    xlim(-1000, 1000) +
+    theme(legend.position="none")
 ```
 
 ```{r, table_X8}

@@ -205,7 +205,7 @@ xkable(table_S11 %>% filter(length_diff > 100 & min_num_reads > 10),
 
 ### Plot of 5' and 3' UTR lengths across strains
 
-```{r figure_S7, fig.width=2160/192, fig.height=1080/192, dpi=192, fig.cap="**Figure_S7** T. cruzi UTR length conservation across strains"}
+```{r figure_S8, fig.width=2160/192, fig.height=1080/192, dpi=192, fig.cap="**Figure_S7** T. cruzi UTR length conservation across strains"}
 # plot 5' UTR lengths
 p1 <- ggplot(table_S10 %>% filter(length_diff > 20 & min_num_reads > 5), 
        aes(x=ystrain_length, y=sylvio_length, color=min_num_reads)) +

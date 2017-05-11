@@ -1,5 +1,5 @@
 ---
-title: Trypanosome Gene Structure Analysis (T. cruzi 3.0)
+title: Trypanosome Gene Structure Analysis (T. cruzi 3.1)
 author: Keith Hughitt
 output:
   html_document:
@@ -259,7 +259,7 @@ for (gff in CONFIG$site_gffs) {
 }
 
 # copy static alternative sl site figures (4 & S6)
-file.copy('static/Figure_S6.png', file.path(CONFIG$output_dir, 'figure'))
+file.copy('static/Figure_S7.png', file.path(CONFIG$output_dir, 'figure'))
 file.copy('static/Figure_4.png', file.path(CONFIG$output_dir, 'figure'))
 
 # copy intra-cds sl sites file to output dir

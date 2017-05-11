@@ -1,5 +1,10 @@
 ```{r settings}
 #
+# v3.1
+# ----
+# - Updates to supplemental figure numbering; added figure S3 (alternative SL
+#   and Poly(A) site usage). Improvements to legend appearance.
+#
 # v3.0
 # ----
 # - Table and figure reorganization:
